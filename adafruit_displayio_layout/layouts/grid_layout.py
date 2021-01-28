@@ -38,6 +38,7 @@ class GridLayout(displayio.Group):
     :param int y: y location the layout should be placed
     """
 
+    # pylint: disable=too-many-arguments
     def __init__(self, x, y, width, height, grid_size, child_padding, max_children=4):
         super().__init__(x=x, y=y, max_size=max_children)
         self.x = x
@@ -88,6 +89,16 @@ class GridLayout(displayio.Group):
                 self.append(sub_view["view"])
 
     def add_sub_view(self, new_view, grid_position, view_grid_size):
+        """
+        Add a child to the grid.
+
+        :param new_view: the child object to add e.g. label, button, etc...
+        :param grid_position: where in the grid it should go. Tuple with
+        x,y coordinates in grid cells. e.g. (1,0)
+        :param view_grid_size: the size and shape of cells that the new
+        child should occupy.
+        :return: None
+        """
         sub_view_obj = {
             "view": new_view,
             "grid_position": grid_position,
