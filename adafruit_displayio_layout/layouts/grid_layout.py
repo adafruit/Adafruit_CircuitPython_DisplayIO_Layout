@@ -28,6 +28,7 @@ import displayio
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
+
 class GridLayout(displayio.Group):
 
     """
@@ -36,16 +37,8 @@ class GridLayout(displayio.Group):
     :param int x: x location the layout should be placed
     :param int y: y location the layout should be placed
     """
-    def __init__(
-            self,
-            x,
-            y,
-            width,
-            height,
-            grid_size,
-            child_padding,
-            max_children=4
-    ):
+
+    def __init__(self, x, y, width, height, grid_size, child_padding, max_children=4):
         super().__init__(x=x, y=y, max_size=max_children)
         self.x = x
         self.y = y
@@ -68,13 +61,29 @@ class GridLayout(displayio.Group):
                 button_size_x = sub_view["view_grid_size"][0]
                 button_size_y = sub_view["view_grid_size"][1]
 
-                print("setting width to: {}".format(
-                    int(button_size_x * self._width / grid_size_x) - 2 * self.child_padding))
-                sub_view["view"].width = int(button_size_x * self._width / grid_size_x) - 2 * self.child_padding
-                sub_view["view"].height = int(button_size_y * self._height / grid_size_y) - 2 * self.child_padding
+                print(
+                    "setting width to: {}".format(
+                        int(button_size_x * self._width / grid_size_x)
+                        - 2 * self.child_padding
+                    )
+                )
+                sub_view["view"].width = (
+                    int(button_size_x * self._width / grid_size_x)
+                    - 2 * self.child_padding
+                )
+                sub_view["view"].height = (
+                    int(button_size_y * self._height / grid_size_y)
+                    - 2 * self.child_padding
+                )
 
-                sub_view["view"].x = int(grid_position_x * self._width / grid_size_x) + self.child_padding
-                sub_view["view"].y = int(grid_position_y * self._height / grid_size_y) + self.child_padding
+                sub_view["view"].x = (
+                    int(grid_position_x * self._width / grid_size_x)
+                    + self.child_padding
+                )
+                sub_view["view"].y = (
+                    int(grid_position_y * self._height / grid_size_y)
+                    + self.child_padding
+                )
 
                 self.append(sub_view["view"])
 
@@ -82,7 +91,7 @@ class GridLayout(displayio.Group):
         sub_view_obj = {
             "view": new_view,
             "grid_position": grid_position,
-            "view_grid_size": view_grid_size
+            "view_grid_size": view_grid_size,
         }
         self._sub_views.append(sub_view_obj)
         self._layout_sub_views()
