@@ -45,9 +45,6 @@ class WidgetLabel(bitmap_label.Label):
     	**kwargs,
     	):
 
-    	for arg in kwargs:
-    		print(arg)
-
 		super().__init__(font, text=Widget.name, **kwargs)
 
 		self.anchor_point_on_widget = anchor_point_on_widget

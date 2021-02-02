@@ -37,9 +37,9 @@ class Control:
 
     def __init__(
         self,
-        ):
+    ):
 
-        self.touch_boundary=None # should be overridden by subclass
+        self.touch_boundary = None  # should be overridden by subclass
 
     def contains(self, touch_point):
         """Checks if the Control was touched.  Returns True if the touch_point
@@ -47,10 +47,18 @@ class Control:
 
         # The touch_point should be in local coordinates for this item.
 
-        if ((self.touch_boundary is not None) and
-            ((self.touch_boundary[0] <= touch_point[0] <= (self.touch_boundary[0]+self.touch_boundary[2])) and
-             (self.touch_boundary[1] <= touch_point[1] <= (self.touch_boundary[1]+self.touch_boundary[3])) )
-           ):
+        if (self.touch_boundary is not None) and (
+            (
+                self.touch_boundary[0]
+                <= touch_point[0]
+                <= (self.touch_boundary[0] + self.touch_boundary[2])
+            )
+            and (
+                self.touch_boundary[1]
+                <= touch_point[1]
+                <= (self.touch_boundary[1] + self.touch_boundary[3])
+            )
+        ):
             return True
         return False
 
@@ -59,7 +67,7 @@ class Control:
         """Response function when Control is selected."""
         pass
 
-    def still_touched(self, touch_point): # *** this needs a clearer name
+    def still_touched(self, touch_point):  # *** this needs a clearer name
         """Response function when Control remains touched."""
         pass
 
