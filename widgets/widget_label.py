@@ -45,6 +45,12 @@ class WidgetLabel(bitmap_label.Label):
     	**kwargs,
     	):
 
+<<<<<<< HEAD
+=======
+    	for arg in kwargs:
+    		print(arg)
+
+>>>>>>> 4dfdce6 (Initial commit with Widget, Control and WidgetLabel class definitions, includes horizontal switch widget definition and PyPortal example)
 		super().__init__(font, text=Widget.name, **kwargs)
 
 		self.anchor_point_on_widget = anchor_point_on_widget
