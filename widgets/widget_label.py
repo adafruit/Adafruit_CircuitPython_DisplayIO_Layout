@@ -24,12 +24,11 @@
 # CircuitPython GUI Widget Class for visual elements
 #
 # Properties:
-#   - name
+# 	- name
 # 	- font
-#	- anchor_point
-#	- anchor_point_on_widget
+# 	- anchor_point
+# 	- anchor_point_on_widget
 
-import displayio
 from adafruit_display_text import bitmap_label
 
 class WidgetLabel(bitmap_label.Label):
@@ -38,40 +37,38 @@ class WidgetLabel(bitmap_label.Label):
     the widget's ``bounding_box`` are used to position the label."""
 
     def __init__(
-    	self,
-    	font,
-    	Widget,
-    	anchor_point_on_widget=None,
-    	**kwargs,
-    	):
+        self,
+        font,
+        Widget,
+        anchor_point_on_widget=None,
+        **kwargs,
+    ):
 
-		super().__init__(font, text=Widget.name, **kwargs)
+        super().__init__(font, text=Widget.name, **kwargs)
 
-		self.anchor_point_on_widget = anchor_point_on_widget
-		self.update_label_position(Widget.bounding_box)
-		Widget.append(self)
-
+        self.anchor_point_on_widget = anchor_point_on_widget
+        self.update_label_position(Widget.bounding_box)
+        Widget.append(self)
 
     # Widget label position is adjusted so that the ``anchor_point`` on the label
     # is set to the ``anchor_point_on_widget`` location.  This function requires
     # the widget's ``bounding_box`` as a parameter.
     def update_label_position(self, bounding_box):
 
-		if ( (bounding_box is None) or
-			(self.anchor_point is None) or
-			(self.anchor_point_on_widget) is None ):
-			pass
+        if (
+            (bounding_box is None)
+            or (self.anchor_point is None)
+            or (self.anchor_point_on_widget) is None
+        ):
+            pass
 
-		else:
-			x0 = bounding_box[0]
-			y0 = bounding_box[1]
-			width = bounding_box[2]
-			height = bounding_box[3]
+        else:
+            x0 = bounding_box[0]
+            y0 = bounding_box[1]
+            width = bounding_box[2]
+            height = bounding_box[3]
 
-			anchored_position_x = x0 + int(width  * self.anchor_point_on_widget[0])
-			anchored_position_y = y0 + int(height * self.anchor_point_on_widget[1])
+            anchored_position_x = x0 + int(width * self.anchor_point_on_widget[0])
+            anchored_position_y = y0 + int(height * self.anchor_point_on_widget[1])
 
-			self.anchored_position=(anchored_position_x, anchored_position_y)
-
-
-
+            self.anchored_position = (anchored_position_x, anchored_position_y)

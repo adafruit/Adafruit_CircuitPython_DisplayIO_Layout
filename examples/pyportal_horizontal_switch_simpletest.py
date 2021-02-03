@@ -7,10 +7,9 @@ import time
 import board
 import displayio
 from adafruit_display_shapes.rect import Rect
-from switch_round_horizontal import SwitchRoundHorizontal as Switch
-
 import adafruit_touchscreen
 from adafruit_pyportal import PyPortal
+from switch_round_horizontal import SwitchRoundHorizontal as Switch
 
 display = board.DISPLAY
 
@@ -47,7 +46,8 @@ switch_stroke = 2  # Width of the outlines (in pixels)
 text_stroke = switch_stroke  # width of text lines
 touch_padding = 0  # Additional boundary around widget that will accept touch input
 
-animation_time = 0.2  # time for switch to display change (in seconds).  0.15 is a good starting point
+animation_time = 0.2  # time for switch to display change (in seconds).
+                      # animation_time=0.15 is a good starting point
 display_text = True  # show the text (0/1)
 
 # initialize state variables
@@ -109,7 +109,7 @@ my_switch3 = Switch(
     touch_padding=10,
     animation_time=animation_time,
     value=False,
-    flip=True, # Switch in the opposite direction
+    flip=True,  # Switch in the opposite direction
 )
 
 my_switch4 = Switch(
@@ -132,11 +132,11 @@ my_switch4 = Switch(
 )
 
 my_switch5 = Switch(
-    x=switch_x+240,
+    x=switch_x + 240,
     y=switch_y,
-    name="Vertical", # include a label
-    label_anchor_point=(0, 0.5), # set the label's anchor
-    label_anchor_on_widget=(1.1, 0.5), # set the label anchor point on the widget
+    name="Vertical",  # include a label
+    label_anchor_point=(0, 0.5),  # set the label's anchor
+    label_anchor_on_widget=(1.1, 0.5),  # set the label anchor point on the widget
     height=switch_radius * 2,
     fill_color_off=switch_fill_color_off,
     fill_color_on=switch_fill_color_on,
@@ -151,18 +151,18 @@ my_switch5 = Switch(
     touch_padding=10,
     animation_time=animation_time,
     value=False,
-    horizontal=False, # Use vertical orientation
-    flip=True, # flip orientation
+    horizontal=False,  # Use vertical orientation
+    flip=True,  # flip orientation
 )
 
 # Show repositioning switch with anchor_point and anchored_position
 my_switch5.anchor_point = (1, 0)
-my_switch5.anchored_position = (320-60, 40)
+my_switch5.anchored_position = (320 - 60, 40)
 
 my_switch6 = Switch(
     x=0,
     y=0,
-    name="BIG Switch", # include a label
+    name="BIG Switch",  # include a label
     height=switch_radius * 4,
     fill_color_off=switch_fill_color_off,
     fill_color_on=switch_fill_color_on,

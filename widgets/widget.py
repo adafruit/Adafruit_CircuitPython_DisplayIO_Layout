@@ -73,7 +73,7 @@ class Widget(displayio.Group):
             else:
                 self._bounding_box = [0, 0, 0, 0]
 
-        self._update_position
+        self._update_position()
 
     def _update_position(self):
         # Reposition self.x, self.y based on anchor_point and anchored_position
@@ -91,7 +91,8 @@ class Widget(displayio.Group):
 
     @property
     def anchor_point(self):
-        """The anchor point for positioning the switch, works in concert with `anchored_position`."""
+        """The anchor point for positioning the switch, works in concert
+        with `anchored_position`."""
         return self._anchor_point
 
     @anchor_point.setter
@@ -101,7 +102,8 @@ class Widget(displayio.Group):
 
     @property
     def anchored_position(self):
-        """The anchored position for positioning the switch, works in concert with `anchor_point`."""
+        """The anchored position for positioning the switch, works in concert
+        with `anchor_point`."""
         return self._anchored_position
 
     @anchored_position.setter

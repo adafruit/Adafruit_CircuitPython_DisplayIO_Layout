@@ -35,12 +35,12 @@
 
 import time
 import terminalio
-from widget import Widget
-from control import Control
-from widget_label import WidgetLabel
 from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.rect import Rect
+from widget import Widget
+from control import Control
+from widget_label import WidgetLabel
 
 
 class SwitchRoundHorizontal(Widget, Control):
@@ -100,10 +100,10 @@ class SwitchRoundHorizontal(Widget, Control):
         text_stroke=None,  # default to switch_stroke
         display_button_text=True,
         animation_time=0.2,  # animation duration (in seconds)
-        horizontal=True, # horizontal orientation
-        flip=False, # flip the direction of the switch movement
-        label_anchor_point=(1, 0.5), # default label position
-        label_anchor_on_widget=(-0.05, 0.5), # default label position on widget
+        horizontal=True,  # horizontal orientation
+        flip=False,  # flip the direction of the switch movement
+        label_anchor_point=(1, 0.5),  # default label position
+        label_anchor_on_widget=(-0.05, 0.5),  # default label position on widget
         **kwargs,
     ):
 
@@ -169,23 +169,23 @@ class SwitchRoundHorizontal(Widget, Control):
         self._label_anchor_on_widget = label_anchor_on_widget
 
         # Define the motion "keyframes" that define the switch movement
-        if horizontal: # horizontal switch orientation
+        if horizontal:  # horizontal switch orientation
             self._x_motion = self._width - 2 * self._radius - 1
-            self._y_motion=0
+            self._y_motion = 0
 
-        else: # vertical orientation
-            self._x_motion=0
+        else:  # vertical orientation
+            self._x_motion = 0
             self._y_motion = self._width - 2 * self._radius - 1
 
         self._angle_motion = 0
 
         if flip:
-            self._x_motion     = -1 * self._x_motion
-            self._y_motion     = -1 * self._y_motion
+            self._x_motion = -1 * self._x_motion
+            self._y_motion = -1 * self._y_motion
             self._angle_motion = -1 * self._angle_motion
 
-
-        # Initialize the display elements - These should depend upon the orientation (`horizontal` and `flip`)
+        # Initialize the display elements - These should depend upon the
+        # orientation (`horizontal` and `flip`)
         #
         # Initialize the Circle
 
@@ -205,7 +205,7 @@ class SwitchRoundHorizontal(Widget, Control):
         )
 
         # Initialize the RoundRect for the background
-        if horizontal: # Horizontal orientation
+        if horizontal:  # Horizontal orientation
             self._switch_roundrect = RoundRect(
                 x=switch_x - self._radius,
                 y=switch_y - self._radius,
@@ -216,7 +216,7 @@ class SwitchRoundHorizontal(Widget, Control):
                 outline=self._background_outline_color_off,
                 stroke=self._switch_stroke,
             )
-        else: # Vertical orientation
+        else:  # Vertical orientation
             self._switch_roundrect = RoundRect(
                 x=switch_x - self._radius,
                 y=switch_y - self._radius,
@@ -241,7 +241,7 @@ class SwitchRoundHorizontal(Widget, Control):
         # The "1" text rectangle
         # Needs to adapt to flip and horizontal
         text1_x_offset = (-1 * self._switch_stroke) + 1
-        text1_y_offset = - self._radius // 2
+        text1_y_offset = -self._radius // 2
 
         # if flip:
         #     text1_x_offset = -1 * text1_x_offset
@@ -261,14 +261,14 @@ class SwitchRoundHorizontal(Widget, Control):
         # Must be offset by self.x and self.y to get the raw display coordinates
         #
 
-        if horizontal: # Horizontal orientation
+        if horizontal:  # Horizontal orientation
             self._bounding_box = [
                 0,
                 0,
                 self._width,
                 2 * self._radius + 1,
             ]
-        else: # Vertical orientation
+        else:  # Vertical orientation
             self._bounding_box = [
                 0,
                 0,
@@ -321,11 +321,13 @@ class SwitchRoundHorizontal(Widget, Control):
                 self.append(self._text_1)
 
         # update the position, if required
-        self._update_position
+        self._update_position()
 
     def _get_offset_position(self, position):
-        # Function to calculate the offset position (x, y, angle) of the moving elements of an animated widget
-        # input parameter `position` is a value from 0.0 to 1.0 indicating start and end position
+        # Function to calculate the offset position (x, y, angle) of the moving
+        # elements of an animated widget
+        # input parameter `position` is a value from 0.0 to 1.0 indicating start
+        # and end position
         #
         # Designed to be flexible depending upon the widget's response
         #
@@ -460,7 +462,7 @@ def _color_to_tuple(value):
     """
     if isinstance(value, tuple):
         return value
-    elif isinstance(value, int):
+    if isinstance(value, int):
         if value >> 24:
             raise ValueError("Only bits 0->23 valid for integer input")
         r = value >> 16
@@ -485,10 +487,10 @@ def _color_fade(start_color, end_color, fraction):
         return end_color
     if fraction <= 0:
         return start_color
-    else:
-        faded_color = [0, 0, 0]
-        for i in range(3):
-            faded_color[i] = start_color[i] - int(
-                (start_color[i] - end_color[i]) * fraction
-            )
-        return faded_color
+
+    faded_color = [0, 0, 0]
+    for i in range(3):
+        faded_color[i] = start_color[i] - int(
+            (start_color[i] - end_color[i]) * fraction
+        )
+    return faded_color
