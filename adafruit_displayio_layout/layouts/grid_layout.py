@@ -6,7 +6,7 @@
 `grid_layout`
 ================================================================================
 
-A layout that organizes children into a grid table structure.
+A layout that organizes cells into a grid table structure.
 
 
 * Author(s): Kevin Matocha, Tim Cocks
@@ -34,73 +34,76 @@ class GridLayout(displayio.Group):
     """
     A layout that organizes children into a grid table structure.
 
-    :param int x: x location the layout should be placed
-    :param int y: y location the layout should be placed
+    :param int x: x location the layout should be placed. Pixel coordinates.
+    :param int y: y location the layout should be placed. Pixel coordinates.
+
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, x, y, width, height, grid_size, child_padding, max_children=4):
-        super().__init__(x=x, y=y, max_size=max_children)
+    def __init__(self, x, y, width, height, grid_size, cell_padding, max_size=None):
+        if not max_size:
+            max_size = grid_size[0] * grid_size[1]
+        super().__init__(x=x, y=y, max_size=max_size)
         self.x = x
         self.y = y
         self._width = width
         self._height = height
         self.grid_size = grid_size
-        self.child_padding = child_padding
-        self._sub_views = []
+        self.cell_padding = cell_padding
+        self._cell_content_list = []
 
-    def _layout_sub_views(self):
+    def _layout_cells(self):
 
-        for sub_view in self._sub_views:
-            if sub_view["view"] not in self:
+        for cell in self._cell_content_list:
+            if cell["content"] not in self:
                 grid_size_x = self.grid_size[0]
                 grid_size_y = self.grid_size[1]
 
-                grid_position_x = sub_view["grid_position"][0]
-                grid_position_y = sub_view["grid_position"][1]
+                grid_position_x = cell["grid_position"][0]
+                grid_position_y = cell["grid_position"][1]
 
-                button_size_x = sub_view["view_grid_size"][0]
-                button_size_y = sub_view["view_grid_size"][1]
+                button_size_x = cell["cell_size"][0]
+                button_size_y = cell["cell_size"][1]
 
                 print(
                     "setting width to: {}".format(
                         int(button_size_x * self._width / grid_size_x)
-                        - 2 * self.child_padding
+                        - 2 * self.cell_padding
                     )
                 )
-                sub_view["view"].width = (
+                cell["content"].width = (
                     int(button_size_x * self._width / grid_size_x)
-                    - 2 * self.child_padding
+                    - 2 * self.cell_padding
                 )
-                sub_view["view"].height = (
+                cell["content"].height = (
                     int(button_size_y * self._height / grid_size_y)
-                    - 2 * self.child_padding
+                    - 2 * self.cell_padding
                 )
 
-                sub_view["view"].x = (
-                    int(grid_position_x * self._width / grid_size_x)
-                    + self.child_padding
+                cell["content"].x = (
+                    int(grid_position_x * self._width / grid_size_x) + self.cell_padding
                 )
-                sub_view["view"].y = (
+                cell["content"].y = (
                     int(grid_position_y * self._height / grid_size_y)
-                    + self.child_padding
+                    + self.cell_padding
                 )
 
-                self.append(sub_view["view"])
+                self.append(cell["content"])
 
-    def add_sub_view(self, new_view, grid_position, view_grid_size):
+    def add_content(self, cell_content, grid_position, cell_size):
         """Add a child to the grid.
 
-        :param new_view: the child object to add e.g. label, button, etc...
+        :param cell_content: the content to add to this cell e.g. label, button, etc...
+         Group subclass that have width and height properties can be used.
         :param grid_position: where in the grid it should go. Tuple with
          x,y coordinates in grid cells. e.g. (1,0)
-        :param view_grid_size: the size and shape of cells that the new
-         child should occupy.
+        :param cell_size: the size and shape that the new cell should
+         occupy
         :return: None"""
         sub_view_obj = {
-            "view": new_view,
+            "content": cell_content,
             "grid_position": grid_position,
-            "view_grid_size": view_grid_size,
+            "cell_size": cell_size,
         }
-        self._sub_views.append(sub_view_obj)
-        self._layout_sub_views()
+        self._cell_content_list.append(sub_view_obj)
+        self._layout_cells()

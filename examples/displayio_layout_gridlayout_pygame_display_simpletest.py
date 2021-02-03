@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2020 Tim C, written for Adafruit Industries
+# SPDX-FileCopyrightText: 2021 Tim C, written for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 """
@@ -15,8 +15,6 @@ from blinka_displayio_pygamedisplay import PyGameDisplay
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 
 display = PyGameDisplay(width=320, height=240)
-
-# Make the display context
 main_group = displayio.Group(max_size=10)
 display.show(main_group)
 
@@ -26,8 +24,7 @@ layout = GridLayout(
     width=320,
     height=100,
     grid_size=(2, 2),
-    child_padding=8,
-    max_children=10,
+    cell_padding=8,
 )
 _labels = []
 
@@ -36,17 +33,17 @@ _labels.append(
         terminalio.FONT, scale=2, x=0, y=0, text="Hello", background_color=0x770077
     )
 )
-layout.add_sub_view(_labels[0], grid_position=(0, 0), view_grid_size=(1, 1))
+layout.add_content(_labels[0], grid_position=(0, 0), cell_size=(1, 1))
 _labels.append(
     label.Label(
         terminalio.FONT, scale=2, x=0, y=0, text="World", background_color=0x007700
     )
 )
-layout.add_sub_view(_labels[1], grid_position=(1, 0), view_grid_size=(1, 1))
+layout.add_content(_labels[1], grid_position=(1, 0), cell_size=(1, 1))
 _labels.append(label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Hello"))
-layout.add_sub_view(_labels[2], grid_position=(0, 1), view_grid_size=(1, 1))
+layout.add_content(_labels[2], grid_position=(0, 1), cell_size=(1, 1))
 _labels.append(label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Grid"))
-layout.add_sub_view(_labels[3], grid_position=(1, 1), view_grid_size=(1, 1))
+layout.add_content(_labels[3], grid_position=(1, 1), cell_size=(1, 1))
 
 main_group.append(layout)
 while display.running:
