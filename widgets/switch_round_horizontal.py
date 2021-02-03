@@ -100,6 +100,10 @@ class SwitchRoundHorizontal(Widget, Control):
         text_stroke=None,  # default to switch_stroke
         display_button_text=True,
         animation_time=0.2,  # animation duration (in seconds)
+        horizontal=True, # horizontal orientation
+        flip=False, # flip the direction of the switch movement
+        label_anchor_point=(1, 0.5), # default label position
+        label_anchor_on_widget=(-0.05, 0.5), # default label position on widget
         **kwargs,
     ):
 
@@ -161,36 +165,116 @@ class SwitchRoundHorizontal(Widget, Control):
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
 
-        # initialize the display elements
+        self._label_anchor_point = label_anchor_point
+        self._label_anchor_on_widget = label_anchor_on_widget
+
+        # Define the motion "keyframes" that define the switch movement
+        if horizontal: # horizontal switch orientation
+            self._x_motion = self._width - 2 * self._radius - 1
+            self._y_motion=0
+
+        else: # vertical orientation
+            self._x_motion=0
+            self._y_motion = self._width - 2 * self._radius - 1
+
+        self._angle_motion = 0
+
+        if flip:
+            self._x_motion     = -1 * self._x_motion
+            self._y_motion     = -1 * self._y_motion
+            self._angle_motion = -1 * self._angle_motion
+
+
+        # Initialize the display elements - These should depend upon the orientation (`horizontal` and `flip`)
+        #
+        # Initialize the Circle
+
+        circle_x0 = switch_x
+        circle_y0 = switch_y
+        if flip:
+            circle_x0 = circle_x0 - self._x_motion
+            circle_y0 = circle_y0 - self._y_motion
 
         self._switch_circle = Circle(
-            x0=switch_x,
-            y0=switch_y,
+            x0=circle_x0,
+            y0=circle_y0,
             r=self._radius,
             fill=self._fill_color_off,
             outline=self._outline_color_off,
             stroke=self._switch_stroke,
         )
 
-        self._switch_roundrect = RoundRect(
-            x=switch_x - self._radius,
-            y=switch_y - self._radius,
-            r=self._radius,
-            width=self._width,
-            height=2 * self._radius + 1,
-            fill=self._background_color_off,
-            outline=self._background_outline_color_off,
-            stroke=self._switch_stroke,
+        # Initialize the RoundRect for the background
+        if horizontal: # Horizontal orientation
+            self._switch_roundrect = RoundRect(
+                x=switch_x - self._radius,
+                y=switch_y - self._radius,
+                r=self._radius,
+                width=self._width,
+                height=2 * self._radius + 1,
+                fill=self._background_color_off,
+                outline=self._background_outline_color_off,
+                stroke=self._switch_stroke,
+            )
+        else: # Vertical orientation
+            self._switch_roundrect = RoundRect(
+                x=switch_x - self._radius,
+                y=switch_y - self._radius,
+                r=self._radius,
+                width=2 * self._radius + 1,
+                height=self._width,
+                fill=self._background_color_off,
+                outline=self._background_outline_color_off,
+                stroke=self._switch_stroke,
+            )
+
+        # The "0" text circle
+        self._text_0 = Circle(
+            x0=circle_x0,
+            y0=circle_y0,
+            r=self._radius // 2,
+            fill=self._fill_color_off,
+            outline=self._outline_color_off,
+            stroke=self._text_stroke,
+        )
+
+        # The "1" text rectangle
+        # Needs to adapt to flip and horizontal
+        text1_x_offset = (-1 * self._switch_stroke) + 1
+        text1_y_offset = - self._radius // 2
+
+        # if flip:
+        #     text1_x_offset = -1 * text1_x_offset
+        #     text1_y_offset = -1 * text1_y_offset
+
+        self._text_1 = Rect(
+            x=circle_x0 + text1_x_offset,
+            y=circle_y0 + text1_y_offset,
+            height=self._radius,
+            width=self._text_stroke,
+            fill=self._fill_color_off,
+            outline=self._outline_color_off,
+            stroke=self._text_stroke,
         )
 
         # bounding_box defines the "local" x and y.
         # Must be offset by self.x and self.y to get the raw display coordinates
-        self._bounding_box = [
-            self._switch_circle.x,
-            self._switch_circle.y,
-            self._width,
-            2 * self._radius + 1,
-        ]
+        #
+
+        if horizontal: # Horizontal orientation
+            self._bounding_box = [
+                0,
+                0,
+                self._width,
+                2 * self._radius + 1,
+            ]
+        else: # Vertical orientation
+            self._bounding_box = [
+                0,
+                0,
+                2 * self._radius + 1,
+                self._width,
+            ]
 
         self.touch_boundary = [
             self._bounding_box[0] - self._touch_padding,
@@ -199,31 +283,14 @@ class SwitchRoundHorizontal(Widget, Control):
             self._bounding_box[3] + 2 * self._touch_padding,
         ]
 
-        # The "0" text circle
-        self._text_0 = Circle(
-            x0=switch_x,
-            y0=switch_y,
-            r=self._radius // 2,
-            fill=self._fill_color_off,
-            outline=self._outline_color_off,
-            stroke=self._text_stroke,
-        )
-
-        # The "1" text rectangle
-        self._text_1 = Rect(
-            x=switch_x - self._switch_stroke + 1,
-            y=switch_y - self._radius // 2,
-            height=self._radius,
-            width=self._text_stroke,
-            fill=self._fill_color_off,
-            outline=self._outline_color_off,
-            stroke=self._text_stroke,
-        )
-
-        # Store initial positions of the moving parts
+        # Store initial positions of all moving elements
         self._switch_initial_x = self._switch_circle.x
+        self._switch_initial_y = self._switch_circle.y
+
         self._text_0_initial_x = self._text_0.x
+        self._text_0_initial_y = self._text_0.y
         self._text_1_initial_x = self._text_1.x
+        self._text_1_initial_y = self._text_1.y
 
         # Set the initial switch position based on the starting value
         if value:
@@ -240,7 +307,10 @@ class SwitchRoundHorizontal(Widget, Control):
         if self.name != "":
             font = terminalio.FONT
             self.widget_label = WidgetLabel(
-                font, self, anchor_point=(1, 0.5), anchor_point_on_widget=(-0.05, 0.5)
+                font,
+                self,
+                anchor_point=self._label_anchor_point,
+                anchor_point_on_widget=self._label_anchor_on_widget,
             )
 
         # If display_button_text is True, append the correct text element (0 or 1)
@@ -253,32 +323,44 @@ class SwitchRoundHorizontal(Widget, Control):
         # update the position, if required
         self._update_position
 
+    def _get_offset_position(self, position):
+        # Function to calculate the offset position (x, y, angle) of the moving elements of an animated widget
+        # input parameter `position` is a value from 0.0 to 1.0 indicating start and end position
+        #
+        # Designed to be flexible depending upon the widget's response
+        #
+        # values should be set in the __init__ function:
+        #     self._x_motion: x-direction movement in pixels
+        #     self._y_motion: y-direction movement in pixels
+        #     self._angle_motion: angle movement
+        #
+        # A linear movement function (but can be modified for other motion acceleration)
+        if position < 0:
+            position = 0
+        if position > 1:
+            position = 1
+
+        # if multiple elements are present, they could each have their own movement functions.
+        x_offset = int(self._x_motion * position)
+        y_offset = int(self._y_motion * position)
+        angle_offset = self._angle_motion * position
+
+        return x_offset, y_offset, angle_offset
+
     def _draw_position(self, position):
-
         # Draw the position of the slider.
-        # The position is a float between 0 and 1 (0= off, 1= on).
+        # The position parameter is a float between 0 and 1 (0= off, 1= on).
 
-        # To deal with any rounding errors
-        if position <= 0:  # left-end position
-            self._switch_circle.x = self._switch_initial_x
-            self._text_0.x = self._text_0_initial_x
-            self._text_1.x = self._text_1_initial_x
-        elif position >= 1:  # right-end position
-            self._switch_circle.x = (
-                self._switch_initial_x + self._width - 2 * self._radius - 1
-            )
-            self._text_0.x = self._text_0_initial_x + self._width - 2 * self._radius - 1
-            self._text_1.x = self._text_1_initial_x + self._width - 2 * self._radius - 1
-        else:  # somewhere in the middle
-            self._switch_circle.x = self._switch_initial_x + int(
-                (self._width - (2 * self._radius) - 1) * position
-            )
-            self._text_0.x = self._text_0_initial_x + int(
-                (self._width - (2 * self._radius) - 1) * position
-            )
-            self._text_1.x = self._text_1_initial_x + int(
-                (self._width - (2 * self._radius) - 1) * position
-            )
+        # Get the position offset from the motion function
+        x_offset, y_offset, angle_offset = self._get_offset_position(position)
+
+        # Update the switch and text x- and y-positions
+        self._switch_circle.x = self._switch_initial_x + x_offset
+        self._switch_circle.y = self._switch_initial_y + y_offset
+        self._text_0.x = self._text_0_initial_x + x_offset
+        self._text_0.y = self._text_0_initial_y + y_offset
+        self._text_1.x = self._text_1_initial_x + x_offset
+        self._text_1.y = self._text_1_initial_y + y_offset
 
         # Set the color to the correct fade
         self._switch_circle.fill = _color_fade(
