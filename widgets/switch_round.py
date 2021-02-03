@@ -43,7 +43,7 @@ from control import Control
 from widget_label import WidgetLabel
 
 
-class SwitchRoundHorizontal(Widget, Control):
+class SwitchRound(Widget, Control):
     """A horizontal sliding switch widget.  The origin is set using ``x`` and ``y``.
 
     :param int x: pixel position

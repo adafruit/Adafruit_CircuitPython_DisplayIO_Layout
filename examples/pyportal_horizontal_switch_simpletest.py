@@ -9,7 +9,7 @@ import displayio
 from adafruit_display_shapes.rect import Rect
 import adafruit_touchscreen
 from adafruit_pyportal import PyPortal
-from switch_round_horizontal import SwitchRoundHorizontal as Switch
+from switch_round import SwitchRound as Switch
 
 display = board.DISPLAY
 
