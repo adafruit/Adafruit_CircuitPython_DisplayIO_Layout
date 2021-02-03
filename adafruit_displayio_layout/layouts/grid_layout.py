@@ -36,6 +36,13 @@ class GridLayout(displayio.Group):
 
     :param int x: x location the layout should be placed. Pixel coordinates.
     :param int y: y location the layout should be placed. Pixel coordinates.
+    :param int width: Width of the layout in pixels.
+    :param int height: Height of the layout in pixels.
+    :param tuple grid_size: Size in cells as two ints in a tuple e.g. (2, 2)
+    :param int cell_padding: Extra padding space inside each cell. In pixels.
+    :param int max_size: (Optional) this will get passed through to the
+     displayio.Group constructor. If omitted we default to
+     grid_size width * grid_size height to make room for all (1, 1) sized cells.
 
     """
 
@@ -95,10 +102,10 @@ class GridLayout(displayio.Group):
 
         :param cell_content: the content to add to this cell e.g. label, button, etc...
          Group subclass that have width and height properties can be used.
-        :param grid_position: where in the grid it should go. Tuple with
+        :param tuple grid_position: where in the grid it should go. Tuple with
          x,y coordinates in grid cells. e.g. (1,0)
-        :param cell_size: the size and shape that the new cell should
-         occupy
+        :param tuple cell_size: the size and shape that the new cell should
+         occupy. Width and height in cells inside a tuple e.g. (1, 1)
         :return: None"""
         sub_view_obj = {
             "content": cell_content,
