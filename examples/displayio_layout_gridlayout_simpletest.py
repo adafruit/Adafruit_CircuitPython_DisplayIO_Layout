@@ -27,7 +27,7 @@ layout = GridLayout(
     height=100,
     grid_size=(2, 2),
     cell_padding=8,
-    max_cells=10,
+    max_size=10,
 )
 _labels = []
 
