@@ -38,9 +38,9 @@ import terminalio
 from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.rect import Rect
-from widget import Widget
-from control import Control
-from widget_label import WidgetLabel
+from adafruit_displayio_layout.widgets.widget import Widget
+from adafruit_displayio_layout.widgets.control import Control
+from adafruit_displayio_layout.widgets.widget_label import WidgetLabel
 
 
 class SwitchRound(Widget, Control):
@@ -117,7 +117,7 @@ class SwitchRound(Widget, Control):
         #  2. switch_circle: The switch button
         #  3. Optional - widget label
         #  4. Optional: text_0: The "0" circle on the switch button
-        #  5. Optional: text_1: The "1" rectangle on the switch button
+        #  5. Optional: text_1: The "1" rectangle  on the switch button
 
         # initialize the Control superclass
         super(Control, self).__init__()
