@@ -108,7 +108,7 @@ class SwitchRound(Widget, Control):
     ):
 
         # initialize the Widget superclass (x, y, scale)
-        super().__init__(**kwargs, max_size=4)
+        super().__init__(**kwargs, max_size=5)
         # Define how many graphical elements will be in this group
         # using "max_size=XX"
         #
@@ -116,7 +116,8 @@ class SwitchRound(Widget, Control):
         #  1. switch_roundrect: The switch background
         #  2. switch_circle: The switch button
         #  3. Optional - widget label
-        #  4. Optional - text_0 or text_1: The 0/1 text on the switch button
+        #  4. Optional: text_0: The "0" circle on the switch button
+        #  5. Optional: text_1: The "1" rectangle on the switch button
 
         # initialize the Control superclass
         super(Control, self).__init__()
@@ -159,8 +160,6 @@ class SwitchRound(Widget, Control):
         self._animation_time = animation_time
 
         self._value = value
-
-        self._text_0_on = not value  # controls which text value is displayed (0 or 1)
 
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
@@ -315,10 +314,14 @@ class SwitchRound(Widget, Control):
 
         # If display_button_text is True, append the correct text element (0 or 1)
         if display_button_text:
-            if self._text_0_on:
-                self.append(self._text_0)
+            self.append(self._text_0)
+            self.append(self._text_1)
+            if self._value:
+                self._text_0.hidden=True
+                self._text_1.hidden=False
             else:
-                self.append(self._text_1)
+                self._text_0.hidden=False
+                self._text_1.hidden=True
 
         # update the position, if required
         self._update_position()
@@ -386,15 +389,13 @@ class SwitchRound(Widget, Control):
         self._text_0.outline = self._switch_circle.outline
         self._text_1.outline = self._switch_circle.outline
 
-        if self._display_button_text and position > 0.5 and self._text_0_on:
-            self.pop()
-            self.append(self._text_1)
-            self._text_0_on = False
+        if self._display_button_text and position >= 0.5 :
+            self._text_0.hidden=True
+            self._text_1.hidden=False
 
-        elif self._display_button_text and position < 0.5 and not self._text_0_on:
-            self.pop()
-            self.append(self._text_0)
-            self._text_0_on = True
+        elif self._display_button_text and position < 0.5 :
+            self._text_0.hidden=False
+            self._text_1.hidden=True
 
     def selected(self, touch_point):
         # requires passing display to allow auto_refresh off when redrawing
