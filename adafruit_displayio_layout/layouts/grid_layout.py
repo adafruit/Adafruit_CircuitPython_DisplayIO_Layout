@@ -78,14 +78,28 @@ class GridLayout(displayio.Group):
                         - 2 * self.cell_padding
                     )
                 )
-                cell["content"].width = (
-                    int(button_size_x * self._width / grid_size_x)
-                    - 2 * self.cell_padding
-                )
-                cell["content"].height = (
-                    int(button_size_y * self._height / grid_size_y)
-                    - 2 * self.cell_padding
-                )
+                if hasattr(cell["content"], "resize"):
+                    # if it has resize function
+                    cell["content"].resize(
+                        (
+                            int(button_size_x * self._width / grid_size_x)
+                            - 2 * self.cell_padding
+                        ),
+                        (
+                            int(button_size_y * self._height / grid_size_y)
+                            - 2 * self.cell_padding
+                        ),
+                    )
+                else:
+                    # try width and height properties.
+                    cell["content"].width = (
+                        int(button_size_x * self._width / grid_size_x)
+                        - 2 * self.cell_padding
+                    )
+                    cell["content"].height = (
+                        int(button_size_y * self._height / grid_size_y)
+                        - 2 * self.cell_padding
+                    )
 
                 cell["content"].x = (
                     int(grid_position_x * self._width / grid_size_x) + self.cell_padding
