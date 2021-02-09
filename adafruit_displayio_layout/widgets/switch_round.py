@@ -34,13 +34,11 @@
 #
 
 import time
-import terminalio
 from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.rect import Rect
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets.control import Control
-from adafruit_displayio_layout.widgets.widget_label import WidgetLabel
 
 
 class SwitchRound(Widget, Control):
@@ -122,14 +120,18 @@ class SwitchRound(Widget, Control):
         # initialize the Control superclass
         super(Control, self).__init__()
 
+
+        self._horizontal = horizontal
+        self._flip = flip
+
+        # height and width internal variables are treated before considering rotation
+        self._height = self.height
         self._radius = self.height // 2
-        switch_x = self._radius
-        switch_y = self._radius
 
         if self._width is None:
             self._width = 4 * self._radius
         else:
-            self._width = self._width
+            self._width = self.width
 
         if background_outline_color_off is None:
             background_outline_color_off = background_color_off
@@ -167,8 +169,15 @@ class SwitchRound(Widget, Control):
         self._label_anchor_point = label_anchor_point
         self._label_anchor_on_widget = label_anchor_on_widget
 
+        self._create_switch()
+
+    def _create_switch(self):
+
+        switch_x = self._radius
+        switch_y = self._radius
+
         # Define the motion "keyframes" that define the switch movement
-        if horizontal:  # horizontal switch orientation
+        if self._horizontal:  # horizontal switch orientation
             self._x_motion = self._width - 2 * self._radius - 1
             self._y_motion = 0
 
@@ -178,7 +187,7 @@ class SwitchRound(Widget, Control):
 
         self._angle_motion = 0
 
-        if flip:
+        if self._flip:
             self._x_motion = -1 * self._x_motion
             self._y_motion = -1 * self._y_motion
             self._angle_motion = -1 * self._angle_motion
@@ -190,7 +199,8 @@ class SwitchRound(Widget, Control):
 
         circle_x0 = switch_x
         circle_y0 = switch_y
-        if flip:
+
+        if self._flip:
             circle_x0 = circle_x0 - self._x_motion
             circle_y0 = circle_y0 - self._y_motion
 
@@ -204,7 +214,7 @@ class SwitchRound(Widget, Control):
         )
 
         # Initialize the RoundRect for the background
-        if horizontal:  # Horizontal orientation
+        if self._horizontal:  # Horizontal orientation
             self._switch_roundrect = RoundRect(
                 x=switch_x - self._radius,
                 y=switch_y - self._radius,
@@ -260,7 +270,7 @@ class SwitchRound(Widget, Control):
         # Must be offset by self.x and self.y to get the raw display coordinates
         #
 
-        if horizontal:  # Horizontal orientation
+        if self._horizontal:  # Horizontal orientation
             self._bounding_box = [
                 0,
                 0,
@@ -292,18 +302,25 @@ class SwitchRound(Widget, Control):
         self._text_1_initial_y = self._text_1.y
 
         # Set the initial switch position based on the starting value
-        if value:
+        if self._value:
             self._draw_position(1)
         else:
             self._draw_position(0)
+
+        # pop any items off the current self group
+        for i in range( len(self) ):
+            self.pop()
 
         # Add the display elements to the self group
         self.append(self._switch_roundrect)
         self.append(self._switch_circle)
 
-        # Create the widget label
+        # Create the widget label  *** Should this be pushed up to the Widget class?
         self.widget_label = None
         if self.name != "":
+            from adafruit_displayio_layout.widgets.widget_label import WidgetLabel
+            import terminalio
+
             font = terminalio.FONT
             self.widget_label = WidgetLabel(
                 font,
@@ -313,7 +330,7 @@ class SwitchRound(Widget, Control):
             )
 
         # If display_button_text is True, append the correct text element (0 or 1)
-        if display_button_text:
+        if self._display_button_text:
             self.append(self._text_0)
             self.append(self._text_1)
             if self._value:
@@ -453,6 +470,70 @@ class SwitchRound(Widget, Control):
             fake_touch_point = [0, 0, 0]  # send an arbitrary touch_point
             self.selected(fake_touch_point)
 
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, new_width):
+        if self._width is None:
+            self._width = 4 * self._radius
+        else:
+            self._width = new_width
+        self._create_switch()
+
+    @property
+    def height(self):
+        return self._height
+
+    @height.setter
+    def height(self, new_height):
+        self._height = new_height
+        self._radius = new_height // 2
+        self._create_switch()
+
+    def resize(self, new_width, new_height): #
+
+        # Fit the new button size within the requested maximum width/height
+        # dimensions, but keeping an aspect ratio of 2:1 (width:height)
+
+        print("starting: new_width, new_height: {},{}".format(new_width, new_height))
+        # Swap dimensions when orientation is vertical: "horizontal=False"
+        if not self._horizontal:
+            new_width, new_height = new_height, new_width
+
+        # calculate the preferred target width based on new_height and 2:1 aspect ratio
+        preferred_width = new_height * 2
+
+        if preferred_width <= new_width: # the new_height is the constraint
+            self._height = new_height
+            self._width = preferred_width
+        else:                           # the new_width is the constraint
+            self._height = new_width // 2 # keep 2:1 aspect ratio
+            self._width = new_width
+
+        self._radius = self._height // 2
+
+        self._create_switch()
+
+        # preferred_width = new_height * 2
+
+        # if preferred_width <= new_width: # the new_height is the constraint
+        #     self._height = new_height
+        #     self._width = preferred_width
+        # else:                           # the new_width is the constraint
+        #     self._height = new_width // 2 # keep 2:1 aspect ratio
+        #     self._width = new_width
+
+        # self._radius = self._height // 2
+
+        # self._create_switch()
+
+
+
+
+
+
 
 ######  color support functions  ######
 
@@ -495,3 +576,8 @@ def _color_fade(start_color, end_color, fraction):
             (start_color[i] - end_color[i]) * fraction
         )
     return faded_color
+
+
+
+
+
