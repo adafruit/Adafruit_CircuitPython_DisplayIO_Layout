@@ -120,7 +120,6 @@ class SwitchRound(Widget, Control):
         # initialize the Control superclass
         super(Control, self).__init__()
 
-
         self._horizontal = horizontal
         self._flip = flip
 
@@ -308,7 +307,7 @@ class SwitchRound(Widget, Control):
             self._draw_position(0)
 
         # pop any items off the current self group
-        for i in range( len(self) ):
+        for _ in range(len(self)):
             self.pop()
 
         # Add the display elements to the self group
@@ -334,11 +333,11 @@ class SwitchRound(Widget, Control):
             self.append(self._text_0)
             self.append(self._text_1)
             if self._value:
-                self._text_0.hidden=True
-                self._text_1.hidden=False
+                self._text_0.hidden = True
+                self._text_1.hidden = False
             else:
-                self._text_0.hidden=False
-                self._text_1.hidden=True
+                self._text_0.hidden = False
+                self._text_1.hidden = True
 
         # update the position, if required
         self._update_position()
@@ -406,13 +405,13 @@ class SwitchRound(Widget, Control):
         self._text_0.outline = self._switch_circle.outline
         self._text_1.outline = self._switch_circle.outline
 
-        if self._display_button_text and position >= 0.5 :
-            self._text_0.hidden=True
-            self._text_1.hidden=False
+        if self._display_button_text and position >= 0.5:
+            self._text_0.hidden = True
+            self._text_1.hidden = False
 
-        elif self._display_button_text and position < 0.5 :
-            self._text_0.hidden=False
-            self._text_1.hidden=True
+        elif self._display_button_text and position < 0.5:
+            self._text_0.hidden = False
+            self._text_1.hidden = True
 
     def selected(self, touch_point):
         # requires passing display to allow auto_refresh off when redrawing
@@ -492,12 +491,11 @@ class SwitchRound(Widget, Control):
         self._radius = new_height // 2
         self._create_switch()
 
-    def resize(self, new_width, new_height): #
+    def resize(self, new_width, new_height):  #
 
         # Fit the new button size within the requested maximum width/height
         # dimensions, but keeping an aspect ratio of 2:1 (width:height)
 
-        print("starting: new_width, new_height: {},{}".format(new_width, new_height))
         # Swap dimensions when orientation is vertical: "horizontal=False"
         if not self._horizontal:
             new_width, new_height = new_height, new_width
@@ -505,34 +503,16 @@ class SwitchRound(Widget, Control):
         # calculate the preferred target width based on new_height and 2:1 aspect ratio
         preferred_width = new_height * 2
 
-        if preferred_width <= new_width: # the new_height is the constraint
+        if preferred_width <= new_width:  # the new_height is the constraint
             self._height = new_height
             self._width = preferred_width
-        else:                           # the new_width is the constraint
-            self._height = new_width // 2 # keep 2:1 aspect ratio
+        else:  # the new_width is the constraint
+            self._height = new_width // 2  # keep 2:1 aspect ratio
             self._width = new_width
 
         self._radius = self._height // 2
 
         self._create_switch()
-
-        # preferred_width = new_height * 2
-
-        # if preferred_width <= new_width: # the new_height is the constraint
-        #     self._height = new_height
-        #     self._width = preferred_width
-        # else:                           # the new_width is the constraint
-        #     self._height = new_width // 2 # keep 2:1 aspect ratio
-        #     self._width = new_width
-
-        # self._radius = self._height // 2
-
-        # self._create_switch()
-
-
-
-
-
 
 
 ######  color support functions  ######
@@ -551,8 +531,8 @@ def _color_to_tuple(value):
         g = (value >> 8) & 0xFF
         b = value & 0xFF
         return [r, g, b]
-    else:
-        raise ValueError("Color must be a tuple or 24-bit integer value.")
+
+    raise ValueError("Color must be a tuple or 24-bit integer value.")
 
 
 def _color_fade(start_color, end_color, fraction):
@@ -576,8 +556,3 @@ def _color_fade(start_color, end_color, fraction):
             (start_color[i] - end_color[i]) * fraction
         )
     return faded_color
-
-
-
-
-
