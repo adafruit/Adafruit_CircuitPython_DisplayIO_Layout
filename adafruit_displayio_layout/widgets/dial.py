@@ -35,7 +35,7 @@
 
 import gc
 
-#import time
+# import time
 import terminalio
 import math
 import displayio
@@ -46,7 +46,8 @@ from adafruit_display_shapes.line import Line
 from adafruit_display_shapes.triangle import Triangle
 
 from adafruit_display_text import bitmap_label
-#from adafruit_display_text import label
+
+# from adafruit_display_text import label
 
 from bitmap_scale_rotate import blit_rotate_scale
 
@@ -86,6 +87,7 @@ class Dial(Widget):
     :param background_color: background color (RGB tuple
      or 24-bit hex value), set None for transparent
     """
+
     # ***** Add label_anchor_point and label_anchor_on_widget (rename?????) *****
 
     # This Switch has multiple class inheritances.
@@ -635,6 +637,7 @@ def draw_labels(
 
 import math
 
+
 def blit_rotate_scale(
     destination,  # destination bitmap
     ox=None,
@@ -653,8 +656,7 @@ def blit_rotate_scale(
     if source is None:
         pass
 
-
-# Check the input limits
+    # Check the input limits
 
     if ox is None:
         ox = destination.width / 2
@@ -780,4 +782,3 @@ def blit_rotate_scale(
 
         rowu += duCol
         rowv += dvCol
-

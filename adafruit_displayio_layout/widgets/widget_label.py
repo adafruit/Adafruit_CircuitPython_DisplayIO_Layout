@@ -31,6 +31,7 @@
 
 from adafruit_display_text import bitmap_label
 
+
 class WidgetLabel(bitmap_label.Label):
     """A WidgetLabel class to connect a label to a widget.
     The ``anchor_point`` and ``anchor_point_on_widget`` along with
