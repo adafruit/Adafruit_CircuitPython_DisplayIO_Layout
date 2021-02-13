@@ -32,10 +32,7 @@
 
 import displayio
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 4dfdce6 (Initial commit with Widget, Control and WidgetLabel class definitions, includes horizontal switch widget definition and PyPortal example)
 class Widget(displayio.Group):
     """A Widget class definition for graphical display elements.
 
@@ -57,19 +54,11 @@ class Widget(displayio.Group):
         name="",
         anchor_point=None,
         anchored_position=None,
-<<<<<<< HEAD
         bounding_box=None,  # pixel extent of the widget [x0, y0, width, height]
         **kwargs,
     ):
 
         super().__init__(**kwargs)  # should send x,y and scale (optional) to Group
-=======
-        bounding_box=None, # pixel extent of the widget [x0, y0, width, height]
-        **kwargs,
-        ):
-
-        super().__init__(**kwargs) # should send x,y and scale (optional) to Group
->>>>>>> 4dfdce6 (Initial commit with Widget, Control and WidgetLabel class definitions, includes horizontal switch widget definition and PyPortal example)
 
         self._width = width
         self._height = height
@@ -79,12 +68,7 @@ class Widget(displayio.Group):
 
         # self.bounding_box: pixel extent of the widget [x0, y0, width, height]
         if bounding_box is None:
-<<<<<<< HEAD
             if (width is not None) and (height is not None):
-=======
-            if ( (width is not None) and
-                 (height is not None) ):
->>>>>>> 4dfdce6 (Initial commit with Widget, Control and WidgetLabel class definitions, includes horizontal switch widget definition and PyPortal example)
                 self._bounding_box = [0, 0, width, height]
             else:
                 self._bounding_box = [0, 0, 0, 0]
@@ -94,7 +78,6 @@ class Widget(displayio.Group):
     def _update_position(self):
         # Reposition self.x, self.y based on anchor_point and anchored_position
         if (self._anchor_point is not None) and (self._anchored_position is not None):
-<<<<<<< HEAD
             self.x = (
                 self._anchored_position[0]
                 - int(self._anchor_point[0] * self._bounding_box[2])
@@ -105,10 +88,6 @@ class Widget(displayio.Group):
                 - int(self._anchor_point[1] * self._bounding_box[3])
                 - self._bounding_box[1]
             )
-=======
-            self.x=self._anchored_position[0]-int(self._anchor_point[0]*self._bounding_box[2]) - self._bounding_box[0]
-            self.y=self._anchored_position[1]-int(self._anchor_point[1]*self._bounding_box[3]) - self._bounding_box[1]
->>>>>>> 4dfdce6 (Initial commit with Widget, Control and WidgetLabel class definitions, includes horizontal switch widget definition and PyPortal example)
 
     @property
     def anchor_point(self):
@@ -146,7 +125,3 @@ class Widget(displayio.Group):
     def height(self):
         """The widget height, in pixels. Must be defined at instance."""
         return self._height
-<<<<<<< HEAD
-=======
-
->>>>>>> 4dfdce6 (Initial commit with Widget, Control and WidgetLabel class definitions, includes horizontal switch widget definition and PyPortal example)
