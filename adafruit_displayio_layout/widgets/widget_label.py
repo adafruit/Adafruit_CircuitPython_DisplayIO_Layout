@@ -44,7 +44,21 @@ class WidgetLabel(bitmap_label.Label):
         **kwargs,
     ):
 
+<<<<<<< HEAD:adafruit_displayio_layout/widgets/widget_label.py
         super().__init__(font, text=Widget.name, **kwargs)
+=======
+<<<<<<< HEAD
+=======
+    	for arg in kwargs:
+    		print(arg)
+
+>>>>>>> 4dfdce6 (Initial commit with Widget, Control and WidgetLabel class definitions, includes horizontal switch widget definition and PyPortal example)
+		super().__init__(font, text=Widget.name, **kwargs)
+
+		self.anchor_point_on_widget = anchor_point_on_widget
+		self.update_label_position(Widget.bounding_box)
+		Widget.append(self)
+>>>>>>> main:widgets/widget_label.py
 
         self.anchor_point_on_widget = anchor_point_on_widget
         self.update_label_position(Widget.bounding_box)
