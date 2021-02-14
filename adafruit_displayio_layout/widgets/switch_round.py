@@ -82,6 +82,9 @@ class SwitchRound(Widget, Control):
 
     def __init__(
         self,
+        x=0,
+        y=0,
+        height=40,
         value=False,
         touch_padding=0,
         anchor_point=None,
@@ -106,7 +109,7 @@ class SwitchRound(Widget, Control):
     ):
 
         # initialize the Widget superclass (x, y, scale)
-        super().__init__(**kwargs, max_size=5)
+        super().__init__(x=x, y=y, height=height, **kwargs, max_size=5)
         # Define how many graphical elements will be in this group
         # using "max_size=XX"
         #
@@ -127,6 +130,7 @@ class SwitchRound(Widget, Control):
         self._height = self.height
         self._radius = self.height // 2
 
+        # If width is not provided, then use the preferred aspect ratio
         if self._width is None:
             self._width = 4 * self._radius
         else:
@@ -149,11 +153,11 @@ class SwitchRound(Widget, Control):
         self._switch_stroke = switch_stroke
 
         if text_stroke is None:
-            text_stroke = switch_stroke  # width of text lines
+            text_stroke = switch_stroke  # width of lines for the (0/1) text shapes
         self._text_stroke = text_stroke
 
         self._display_button_text = (
-            display_button_text  # state variable whether text (0/1) is displayed
+            display_button_text  # state variable whether (0/1) text shapes is displayed
         )
 
         self._touch_padding = touch_padding
@@ -171,6 +175,7 @@ class SwitchRound(Widget, Control):
         self._create_switch()
 
     def _create_switch(self):
+        # The main function that creates the switch display elements
 
         switch_x = self._radius
         switch_y = self._radius
@@ -236,7 +241,7 @@ class SwitchRound(Widget, Control):
                 stroke=self._switch_stroke,
             )
 
-        # The "0" text circle
+        # The "0" text circle shape
         self._text_0 = Circle(
             x0=circle_x0,
             y0=circle_y0,
@@ -246,14 +251,9 @@ class SwitchRound(Widget, Control):
             stroke=self._text_stroke,
         )
 
-        # The "1" text rectangle
-        # Needs to adapt to flip and horizontal
+        # The "1" text rectangle shape
         text1_x_offset = (-1 * self._switch_stroke) + 1
         text1_y_offset = -self._radius // 2
-
-        # if flip:
-        #     text1_x_offset = -1 * text1_x_offset
-        #     text1_y_offset = -1 * text1_y_offset
 
         self._text_1 = Rect(
             x=circle_x0 + text1_x_offset,
@@ -268,7 +268,6 @@ class SwitchRound(Widget, Control):
         # bounding_box defines the "local" x and y.
         # Must be offset by self.x and self.y to get the raw display coordinates
         #
-
         if self._horizontal:  # Horizontal orientation
             self._bounding_box = [
                 0,
@@ -291,7 +290,7 @@ class SwitchRound(Widget, Control):
             self._bounding_box[3] + 2 * self._touch_padding,
         ]
 
-        # Store initial positions of all moving elements
+        # Store initial positions of moving elements to be used in _draw_function
         self._switch_initial_x = self._switch_circle.x
         self._switch_initial_y = self._switch_circle.y
 
@@ -306,7 +305,8 @@ class SwitchRound(Widget, Control):
         else:
             self._draw_position(0)
 
-        # pop any items off the current self group
+        # pop any items off the current self group, in case this is updating
+        # an existing switch
         for _ in range(len(self)):
             self.pop()
 
@@ -314,7 +314,8 @@ class SwitchRound(Widget, Control):
         self.append(self._switch_roundrect)
         self.append(self._switch_circle)
 
-        # Create the widget label  *** Should this be pushed up to the Widget class?
+        # Create the widget label
+        #             *** Should this responsibility be pushed up to the Widget class?
         self.widget_label = None
         if self.name != "":
             from adafruit_displayio_layout.widgets.widget_label import WidgetLabel
@@ -339,29 +340,34 @@ class SwitchRound(Widget, Control):
                 self._text_0.hidden = False
                 self._text_1.hidden = True
 
-        # update the position, if required
+        # update the anchor position, if required
+        # this calls the parent Widget class to update the anchored_position
+        # due to any changes that might have occurred in the bounding_box
         self._update_position()
 
     def _get_offset_position(self, position):
         # Function to calculate the offset position (x, y, angle) of the moving
-        # elements of an animated widget
-        # input parameter `position` is a value from 0.0 to 1.0 indicating start
-        # and end position
+        # elements of an animated widget.  Designed to be flexible depending upon
+        # the widget's desired response.
         #
-        # Designed to be flexible depending upon the widget's response
+        # The input parameter `position` is a value from 0.0 to 1.0 indicating the
+        # start (0.0) and end (1.0) positions.
         #
-        # values should be set in the __init__ function:
+        # For this linear translation, the following values are set in __init__:
         #     self._x_motion: x-direction movement in pixels
         #     self._y_motion: y-direction movement in pixels
         #     self._angle_motion: angle movement
         #
-        # A linear movement function (but can be modified for other motion acceleration)
-        if position < 0:
-            position = 0
-        if position > 1:
-            position = 1
 
-        # if multiple elements are present, they could each have their own movement functions.
+        # Constrains the position between the endpoints.
+        if position < 0:
+            position = 0.0
+        if position > 1:
+            position = 1.0
+
+        # This defines the tranfer function between position and motion.
+        # for switch, this is a linear translation function, rotation is actually ignored.
+        # Alternate functions (log, power, exponential) could be used
         x_offset = int(self._x_motion * position)
         y_offset = int(self._y_motion * position)
         angle_offset = self._angle_motion * position
@@ -413,13 +419,33 @@ class SwitchRound(Widget, Control):
             self._text_0.hidden = False
             self._text_1.hidden = True
 
-    def selected(self, touch_point):
-        # requires passing display to allow auto_refresh off when redrawing
-        # touch_point is adjusted for group's x,y position before sending to super()
+    def _animate_switch(self):
+        # The animation function for the switch.
+        # 1.  Move the switch
+        # 2.  Update the self._value to the opposite of its current value.
+        #
+        # Depending upon your widget's animation requirements,
+        # you can change this function to control the acceleration
+        # and motion of your element.
+        #
+        # Key animation feature:
+        #  - Uses the timer to control the speed of the motion.  This ensure
+        #      that the movement speed will be the same on different boards.
+        #
 
-        start_time = time.monotonic()
+        start_time = time.monotonic()  # set the starting time for animation
 
         while True:
+
+            # This determines the direction of movement, depending upon if the
+            # switch is going from on->off or off->on
+            #
+            # Note: This is currently written with a constant speed of movement.
+            # Adjust this `position` function if you want a nonlinear
+            # acceleration of the motion.  There will be interaction between
+            # this function and `_draw_position` and `_get_offset_position`
+            # to control the position and the motion speed.
+            #
             if self._value:
                 position = (
                     1 - (time.monotonic() - start_time) / self._animation_time
@@ -428,6 +454,8 @@ class SwitchRound(Widget, Control):
                 position = (
                     time.monotonic() - start_time
                 ) / self._animation_time  # fraction from 0 to 1
+
+            # Update the moving elements based on the current position
 
             self._draw_position(position)  # update the switch position
 
@@ -442,12 +470,20 @@ class SwitchRound(Widget, Control):
                 self._value = False
                 break
 
-            touch_x = (
-                touch_point[0] - self.x
-            )  # adjust touch position for the local position
-            touch_y = touch_point[1] - self.y
+    def selected(self, touch_point):
 
-            super().selected((touch_x, touch_y, 0))
+        # When the switch is selected, it should be animated and change its value
+
+        self._animate_switch()  # show the animation and switch the self._value
+
+        touch_x = (
+            touch_point[0] - self.x
+        )  # adjust touch position for the local position
+        touch_y = touch_point[1] - self.y
+
+        # Call the parent's .selected function in case there is any work up there.
+        # touch_point is adjusted for group's x,y position before sending to super()
+        super().selected((touch_x, touch_y, 0))
 
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
         """Returns True if the touch_point is within the widget's touch_boundary."""
@@ -491,8 +527,11 @@ class SwitchRound(Widget, Control):
         self._radius = new_height // 2
         self._create_switch()
 
-    def resize(self, new_width, new_height):  #
-
+    def resize(self, new_width, new_height):
+        """Resize the switch to a new requested width and height.
+        :param int new_width
+        :param int new_height
+        """
         # Fit the new button size within the requested maximum width/height
         # dimensions, but keeping an aspect ratio of 2:1 (width:height)
 
