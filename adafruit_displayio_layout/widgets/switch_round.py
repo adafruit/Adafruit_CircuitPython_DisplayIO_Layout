@@ -103,6 +103,7 @@ class SwitchRound(Widget, Control):
         animation_time=0.2,  # animation duration (in seconds)
         horizontal=True,  # horizontal orientation
         flip=False,  # flip the direction of the switch movement
+        font=None,  # if None, uses terminalio.FONT for widget label
         label_anchor_point=(1, 0.5),  # default label position
         label_anchor_on_widget=(-0.05, 0.5),  # default label position on widget
         **kwargs,
@@ -156,9 +157,8 @@ class SwitchRound(Widget, Control):
             text_stroke = switch_stroke  # width of lines for the (0/1) text shapes
         self._text_stroke = text_stroke
 
-        self._display_button_text = (
-            display_button_text  # state variable whether (0/1) text shapes is displayed
-        )
+        self._display_button_text = display_button_text
+        # state variable whether (0/1) text shapes is displayed
 
         self._touch_padding = touch_padding
 
@@ -169,6 +169,7 @@ class SwitchRound(Widget, Control):
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
 
+        self.font = font
         self._label_anchor_point = label_anchor_point
         self._label_anchor_on_widget = label_anchor_on_widget
 
@@ -319,9 +320,13 @@ class SwitchRound(Widget, Control):
         self.widget_label = None
         if self.name != "":
             from adafruit_displayio_layout.widgets.widget_label import WidgetLabel
-            import terminalio
 
-            font = terminalio.FONT
+            if self.font == None:
+                import terminalio
+
+                font = terminalio.FONT
+            else:
+                font = self.font
             self.widget_label = WidgetLabel(
                 font,
                 self,
