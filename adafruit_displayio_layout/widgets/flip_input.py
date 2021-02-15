@@ -11,13 +11,14 @@ class FlipInput(Widget, Control):
         value_list=None,
         font=None,
         color=0xFFFFFF,
-        touch_padding=0,
         value=0,  # initial value, index into the value_list
         debug=False,
+        arrow_touch_padding=0,  # touch padding on the arrow sides of the Widget
         arrow_color=None,
         arrow_outline=None,
         arrow_height=None,
         arrow_width=None,
+        alt_touch_padding=0,  # touch padding on the non-arrow sides of the Widget
         horizontal=True,
         **kwargs,
     ):
@@ -31,45 +32,19 @@ class FlipInput(Widget, Control):
         # initialize the Control superclass
         super(Control, self).__init__()
 
-        self._value_list = value_list
+        self.value_list = value_list
         self._value = value
 
         self._color = color
         self._font = font
         # preload the glyphs
 
-        self._touch_padding = touch_padding
+        self._arrow_touch_padding = arrow_touch_padding
+        self._alt_touch_padding = alt_touch_padding
+
         self._horizontal = horizontal
 
-        # create the text
-
-        # set the bounding box to be the max size of the text plus padding
-        ######
-
-        self.touch_boundary = [0, 0, 0, 0]
-
-        # loop through the value_list and find the largest bounding_box
-        for this_value in value_list:
-            self._label = label.Label(
-                text=this_value,
-                font=self._font,
-                color=self._color,
-                base_alignment=True,
-            )
-            self._bounding_box[0] = min(
-                self._bounding_box[0], self._label.bounding_box[0]
-            )
-            self._bounding_box[1] = min(
-                self._bounding_box[1], self._label.bounding_box[1]
-            )
-            self._bounding_box[2] = max(
-                self._bounding_box[2], self._label.bounding_box[2]
-            )
-            self._bounding_box[3] = max(
-                self._bounding_box[3], self._label.bounding_box[3]
-            )
-
-        print("original bounding_box: {}".format(self._bounding_box))
+        # Find the maximum bounding box of the text and determine the baseline (x,y) start point (top, left)
 
         left = None
         right = None
@@ -100,36 +75,44 @@ class FlipInput(Widget, Control):
                     top = min(top, -(glyph.height + glyph.dy))
 
                 if bottom is None:
-                    bottom = glyph.dy
+                    bottom = -glyph.dy
                 else:
-                    bottom = glyph.dy
+                    bottom = max(bottom, -glyph.dy)
 
                 xposition = xposition + glyph.shift_x
 
-        ascent = self._font.ascent
-        descent = self._font.descent
-        # self._bounding_box=[left, top, right-left, bottom-top]
         self._bounding_box = [0, 0, right - left, bottom - top]
+
+        # Create the text label
+
+        self._label = label.Label(
+            text=value_list[value],
+            font=self._font,
+            color=self._color,
+            base_alignment=True,
+        )
         self._label.x = -left
         self._label.y = -top
 
+        # self._update_value(self._value)
+
         # set the touch_boundary including the touch_padding
 
-        self._update_value(self._value)
-
-        if horizontal:  # horizontal orientation, add padding to x-dimension
+        if (
+            horizontal
+        ):  # horizontal orientation, add arrow padding to x-dimension and alt_padding to y-dimension
             self.touch_boundary = [
-                self._bounding_box[0] - self._touch_padding,
-                self._bounding_box[1],
-                self._bounding_box[2] + 2 * self._touch_padding,
-                self._bounding_box[3],
+                self._bounding_box[0] - self._arrow_touch_padding,
+                self._bounding_box[1] - self._alt_touch_padding,
+                self._bounding_box[2] + 2 * self._arrow_touch_padding,
+                self._bounding_box[3] + 2 * self._alt_touch_padding,
             ]
-        else:  # vertical orientation, add padding to y-dimension
+        else:  # vertical orientation, add arrow padding to y-dimension and alt_padding to x-dimension
             self.touch_boundary = [
-                self._bounding_box[0],
-                self._bounding_box[1] - self._touch_padding,
-                self._bounding_box[2],
-                self._bounding_box[3] + 2 * self._touch_padding,
+                self._bounding_box[0] - self._alt_touch_padding,
+                self._bounding_box[1] - self._arrow_touch_padding,
+                self._bounding_box[2] + 2 * self._alt_touch_padding,
+                self._bounding_box[3] + 2 * self._arrow_touch_padding,
             ]
 
         # create the Up/Down arrows
@@ -159,7 +142,7 @@ class FlipInput(Widget, Control):
                 if arrow_height is None:
                     arrow_height = self._bounding_box[3]
                 if arrow_width is None:
-                    arrow_width = touch_padding
+                    arrow_width = arrow_touch_padding
 
                 if arrow_width > 0:
                     mid_point_y = self._bounding_box[1] + self._bounding_box[3] // 2
@@ -193,7 +176,7 @@ class FlipInput(Widget, Control):
                     )
             else:  # vertical orientation, add upper and lower arrows
                 if arrow_height is None:
-                    arrow_height = max(10, touch_padding)
+                    arrow_height = arrow_touch_padding
                 if arrow_width is None:
                     arrow_width = self._bounding_box[2]
 
@@ -231,7 +214,7 @@ class FlipInput(Widget, Control):
 
     def _update_value(self, new_value):
         # Could add animation here
-        self._label.text = str(self._value_list[new_value])
+        self._label.text = str(self.value_list[new_value])
         self._update_position()  # call Widget superclass function to reposition
 
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
@@ -286,6 +269,6 @@ class FlipInput(Widget, Control):
 
     @value.setter
     def value(self, new_value):
-        new_value = new_value % len(self._value_list)
+        new_value = new_value % len(self.value_list)
         self._update_value(new_value)
         self._value = new_value

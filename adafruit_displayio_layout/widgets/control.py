@@ -45,7 +45,9 @@ class Control:
         """Checks if the Control was touched.  Returns True if the touch_point
         is within the Control's touch_boundary."""
 
-        # The touch_point should be in local coordinates for this item.
+        # IMPORTANT: The touch_point should be in local coordinates for this item!!!
+        #     That means, any widget should adjust for self.x and self.y before passing
+        #     the touchpoint up to this superclass function.
 
         if (self.touch_boundary is not None) and (
             (
