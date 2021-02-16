@@ -114,7 +114,7 @@ class SwitchRound(Widget, Control):
         # Define how many graphical elements will be in this group
         # using "max_size=XX"
         #
-        # Group elements for SwitchRoundHorizontal:
+        # Group elements for SwitchRound:
         #  1. switch_roundrect: The switch background
         #  2. switch_circle: The switch button
         #  3. Optional - widget label
