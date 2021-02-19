@@ -1,40 +1,35 @@
-# The MIT License (MIT)
+# SPDX-FileCopyrightText: 2021 Kevin Matocha
 #
-# Copyright (c) 2021 Kevin Matocha (kmatch98)
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-#
-# CircuitPython GUI Widget Class for visual elements
-#
-# Properties:
-#   - width
-#   - height
-#   - name
-#   - anchor_point
-#   - anchored_position
+# SPDX-License-Identifier: MIT
+"""
+
+`widget`
+================================================================================
+CircuitPython GUI Widget Class for visual elements
+
+* Author(s): Kevin Matocha
+
+Implementation Notes
+--------------------
+
+**Hardware:**
+
+**Software and Dependencies:**
+
+* Adafruit CircuitPython firmware for the supported boards:
+  https://github.com/adafruit/circuitpython/releases
+
+"""
 
 import displayio
 
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
+
 
 class Widget(displayio.Group):
-    """A Widget class definition for graphical display elements.
+    """
+    A Widget class definition for graphical display elements.
 
     :param int x: pixel position
     :param int y: pixel position
@@ -45,7 +40,9 @@ class Widget(displayio.Group):
     :param float anchor_point: (X,Y) values from 0.0 to 1.0 to define the anchor
      point relative to the switch bounding box
     :param int anchored_position: (x,y) pixel value for the location
-     of the anchor_point"""
+     of the anchor_point
+
+    """
 
     def __init__(
         self,
@@ -66,7 +63,8 @@ class Widget(displayio.Group):
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
 
-        # self.bounding_box: pixel extent of the widget [x0, y0, width, height]
+        # self._bounding_box: pixel extent of the widget [x0, y0, width, height]
+        # The bounding box should be updated based on the specifics of the widget
         if bounding_box is None:
             if (width is not None) and (height is not None):
                 self._bounding_box = [0, 0, width, height]
@@ -76,7 +74,13 @@ class Widget(displayio.Group):
         self._update_position()
 
     def _update_position(self):
-        # Reposition self.x, self.y based on anchor_point and anchored_position
+        """
+        Internal Widget class function for updating the x,y position based upon
+        the `anchor_point` and `anchored_position`.
+
+        :return: None
+        """
+
         if (self._anchor_point is not None) and (self._anchored_position is not None):
             self.x = (
                 self._anchored_position[0]
@@ -91,8 +95,13 @@ class Widget(displayio.Group):
 
     @property
     def anchor_point(self):
-        """The anchor point for positioning the switch, works in concert
-        with `anchored_position`."""
+        """The anchor point for positioning the widget, works in concert
+        with `anchored_position`  The relative (X,Y) position of the widget where the
+        anchored_position is placed.  For example (0.0, 0.0) is the Widget's upper left corner,
+        (0.5, 0.5) is the Widget's center point, and (1.0, 1.0) is the Widget's lower right corner.
+
+        :param anchor_point: In relative units of the Widget size.
+        :type anchor_point: Tuple[float, float]"""
         return self._anchor_point
 
     @anchor_point.setter
@@ -102,8 +111,14 @@ class Widget(displayio.Group):
 
     @property
     def anchored_position(self):
-        """The anchored position for positioning the switch, works in concert
-        with `anchor_point`."""
+        """The anchored position (in pixels) for positioning the widget, works in concert
+        with `anchor_point`.  The `anchored_position` is the x,y pixel position
+        for the placement of the Widget's `anchor_point`.
+
+        :param anchored_position: The (x,y) pixel position for the anchored_position (in pixels).
+        :type anchored_position: Tuple[int, int]
+
+        """
         return self._anchored_position
 
     @anchored_position.setter
@@ -113,15 +128,35 @@ class Widget(displayio.Group):
 
     @property
     def bounding_box(self):
-        """The boundary of the widget. [x, y, width, height] in widget coordinates."""
+        """The boundary of the widget. [x, y, width, height] in Widget's local coordinates (in pixels)."""
         return self._bounding_box
 
     @property
     def width(self):
-        """The widget width, in pixels. Must be defined at instance."""
+        """The widget width, in pixels."""
         return self._width
 
     @property
     def height(self):
-        """The widget height, in pixels. Must be defined at instance."""
+        """The widget height, in pixels."""
         return self._height
+
+    def resize(self, new_width, new_height):
+        """Resizes the widget dimensions for use with automated layout functions.
+
+        **The `resize` function should be overridden by the subclass definition.**
+
+        The width and height are provided together so the subclass `resize`
+        function can apply any constraints that require consideration of both width
+        and height (such as maintaining a preferred aspect ratio).  The Widget should
+        be resized to the maximum size that can fit within the dimensions defined by
+        the requested *new_width* and *new_height*. After resizing, the Widget
+        `bounding_box` should also be updated.
+
+        :param int new_width: target maximum width (in pixels)
+        :param int new_height: target maximum height (in pixels)
+        :return: None
+
+        """
+        self._width = new_width
+        self._height = new_height
