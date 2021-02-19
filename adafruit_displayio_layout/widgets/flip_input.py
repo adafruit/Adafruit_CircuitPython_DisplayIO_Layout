@@ -13,6 +13,9 @@ def constrain(val, min_val, max_val):
     return min(max_val, max(min_val, val))
 
 
+# draw_position - Allows values < 0.0 and > 1.0 for "springy" easing functions
+
+
 def draw_position(
     target_bitmap,
     bitmap1,
@@ -22,25 +25,19 @@ def draw_position(
     position=0.0,
     horizontal=True,
 ):
-    # print("position: {}".format(position))
 
     x_offset1 = bitmap1_offset[0]
     y_offset1 = bitmap1_offset[1]
     x_offset2 = bitmap2_offset[0]
     y_offset2 = bitmap2_offset[1]
 
-    # print("offset1 x,y: {},{}, offset2 x,y: {},{}, 1: w,h: {},{}, 2: w,h: {},{}, target: {},{}".format(
-    #                     x_offset1, y_offset1, x_offset2, y_offset2,
-    #                     bitmap1.width, bitmap1.height,
-    #                     bitmap2.width, bitmap2.height,
-    #                     target_bitmap.width, target_bitmap.height)
-    #                 )
+    # print('position: {}'.format(position))
 
-    if position <= 0.0:
+    if position == 0.0:
         target_bitmap.fill(0)
         target_bitmap.blit(x_offset1, y_offset1, bitmap1)
         return
-    if position >= 1.0:
+    if position == 1.0:
         target_bitmap.fill(0)
         target_bitmap.blit(x_offset2, y_offset2, bitmap2)
         return
@@ -48,43 +45,70 @@ def draw_position(
     if horizontal:
         target_bitmap.fill(0)
         x_index = round(position * target_bitmap.width)
-        # print("horiz position: {}, x_index: {}".format(position, x_index))
-        # print('target_bitmap width: {}, height: {}'.format(target_bitmap.width, target_bitmap.height))
-        # print('bitmap1 width: {}, height: {}'.format(bitmap1.width, bitmap1.height))
-        # print('bitmap2 width: {}, height: {}'.format(bitmap2.width, bitmap2.height))
-        target_bitmap.blit(
-            x_offset1, y_offset1, bitmap1, x1=min(x_index, bitmap1.width)
-        )
-        target_bitmap.blit(
-            constrain(
-                target_bitmap.width - x_index + x_offset2, 0, target_bitmap.width
-            ),
+        blit_constrained(target_bitmap, x_offset1, y_offset1, bitmap1, x1=x_index)
+        blit_constrained(
+            target_bitmap,
+            target_bitmap.width - x_index + x_offset2,
             y_offset2,
             bitmap2,
             x1=0,
-            x2=min(x_index, bitmap2.width),
+            x2=x_index,
         )
 
     else:
         target_bitmap.fill(0)
         y_index = round(position * target_bitmap.height)
-        # print("vert position: {}, y_index: {}".format(position, y_index))
-        # print('target_bitmap width: {}, height: {}'.format(target_bitmap.width, target_bitmap.height))
-        # print('bitmap1 width: {}, height: {}'.format(bitmap1.width, bitmap1.height))
-        # print('bitmap2 width: {}, height: {}'.format(bitmap2.width, bitmap2.height))
-        target_bitmap.blit(
-            x_offset1, y_offset1, bitmap1, y1=min(y_index, bitmap1.height)
-        )
-        # print("doing: A: {}".format(target_bitmap.height-y_index+y_offset2))
-        target_bitmap.blit(
+
+        blit_constrained(target_bitmap, x_offset1, y_offset1, bitmap1, y1=y_index)
+        blit_constrained(
+            target_bitmap,
             x_offset2,
-            constrain(
-                target_bitmap.height - y_index + y_offset2, 0, target_bitmap.height
-            ),
+            target_bitmap.height - y_index + y_offset2,
             bitmap2,
             y1=0,
-            y2=min(y_index, bitmap2.height),
+            y2=y_index,
         )
+
+
+def blit_constrained(target, x, y, source, x1=None, y1=None, x2=None, y2=None):
+    if x1 is None:
+        x1 = 0
+    if y1 is None:
+        y1 = 0
+    if x2 is None:
+        x2 = source.width
+    if y2 is None:
+        y2 = source.height
+
+    if x < 0:
+        x1 -= x  # offset the clip region in positive direction
+        x2 -= x
+        x = 0
+    if x1 < 0:
+        x = x - x1
+        x1 = 0  # move to origin
+    if x2 > source.width:
+        x2 = source.width
+
+    if y < 0:
+        y1 -= y  # offset the clip region
+        y2 -= y
+        y = 0
+    if y1 < 0:
+        y = y - y1
+        y1 = 0
+    if y2 > source.height:
+        y2 = source.height
+
+    if (
+        (x > target.width)
+        or (y > target.height)
+        or (x1 > source.width)
+        or (y1 > source.height)
+    ):
+        return
+
+    target.blit(x, y, source, x1=x1, y1=y1, x2=x2, y2=y2)
 
 
 def animate_bitmap(
@@ -98,8 +122,10 @@ def animate_bitmap(
     end_position,
     animation_time,
     horizontal,
-    easing_function_in=None,
-    easing_function_out=None,
+    easing_functions=[
+        easing.LinearInterpolation,
+        easing.LinearInterpolation,
+    ],  # in, out
 ):
     import time
 
@@ -107,10 +133,6 @@ def animate_bitmap(
     max_position = max(start_position, end_position)
     min_position = min(start_position, end_position)
     start_time = time.monotonic()
-
-    easing_function = (
-        easing.LinearInterpolation
-    )  # default easing function for animation
 
     if start_position > end_position:  # direction is decreasing: "out"
         temp = bitmap2
@@ -121,12 +143,10 @@ def animate_bitmap(
         bitmap2_offset = bitmap1_offset
         bitmap1_offset = temp_offset
 
-        if easing_function_in is not None:
-            easing_function = easing_function_out
+        easing_function = easing_functions[1]  # use the "out" easing function
 
     else:  # direction is increasing: "in"
-        if easing_function_in is not None:
-            easing_function = easing_function_in
+        easing_function = easing_functions[0]  # use the "in" easing function
 
     display.auto_refresh = False
     draw_position(
@@ -139,39 +159,6 @@ def animate_bitmap(
         horizontal=horizontal,
     )
     display.auto_refresh = True
-
-    #
-    # easing_function=easing.LinearInterpolation
-    # easing_function=easing.QuadraticEaseIn
-    # easing_function=easing.QuadraticEaseOut
-    # easing_function=easing.QuadraticEaseInOut
-    # easing_function=easing.CubicEaseIn
-    # easing_function=easing.CubicEaseOut
-    # easing_function=easing.CubicEaseInOut
-    # easing_function=easing.QuarticEaseIn
-    # easing_function=easing.QuarticEaseOut
-    # easing_function=easing.QuarticEaseInOut
-    # easing_function=easing.QuinticEaseIn
-    # easing_function=easing.QuinticEaseOut
-    # easing_function=easing.QuinticEaseInOut
-    # easing_function=easing.SineEaseIn
-    # easing_function=easing.SineEaseOut
-    # easing_function=easing.SineEaseInOut
-    # easing_function=easing.CircularEaseIn
-    # easing_function=easing.CircularEaseOut
-    # easing_function=easing.CircularEaseInOut
-    # easing_function=easing.ExponentialEaseIn
-    # easing_function=easing.ExponentialEaseOut
-    # easing_function=easing.ExponentialEaseInOut
-    # easing_function=easing.ElasticEaseIn
-    # easing_function=easing.ElasticEaseOut
-    # easing_function=easing.ElasticEaseInOut
-    # easing_function=easing.BackEaseIn
-    # easing_function=easing.BackEaseOut
-    # easing_function=easing.BackEaseInOut
-    # easing_function=easing.BounceEaseIn
-    # easing_function=easing.BounceEaseOut
-    # easing_function=easing.BounceEaseInOut
 
     while True:
 
@@ -229,8 +216,7 @@ class FlipInput(Widget, Control):
         alt_touch_padding=0,  # touch padding on the non-arrow sides of the Widget
         horizontal=True,
         animation_time=None,
-        easing_function_in=None,
-        easing_function_out=None,
+        easing_mode=None,
         **kwargs,
     ):
 
@@ -259,10 +245,35 @@ class FlipInput(Widget, Control):
 
         self._animation_time = animation_time
 
-        self._easing_function_in = (
-            easing_function_in  # animation functions, see `widgets/easing.py`
-        )
-        self._easing_function_out = easing_function_out
+        self._easing_mode = easing_mode
+
+        # `easing_dict` is the mapping function for the easing_mode string input
+        # and translating to the "easing" animation motion functions, see `widgets/easing.py`
+        easing_dict = {
+            "linear": [easing.LinearInterpolation, easing.LinearInterpolation],
+            "quadratic": [easing.QuadraticEaseIn, easing.QuadraticEaseOut],
+            "cubic": [easing.CubicEaseIn, easing.CubicEaseOut],
+            "quartic": [easing.QuarticEaseIn, easing.QuarticEaseOut],
+            "quintic": [easing.QuinticEaseIn, easing.QuinticEaseOut],
+            "sine": [easing.SineEaseIn, easing.SineEaseOut],
+            "circular": [easing.CircularEaseIn, easing.CircularEaseOut],
+            "exponential": [easing.ExponentialEaseIn, easing.ExponentialEaseOut],
+            "elastic": [easing.ElasticEaseInOut, easing.ElasticEaseInOut],
+            "back": [easing.BackEaseIn, easing.BackEaseOut],
+            "bounce": [easing.BounceEaseIn, easing.BounceEaseOut],
+        }
+
+        print("easing_mode: {}".format(self._easing_mode))
+        try:
+            self._easing_functions = easing_dict[
+                (self._easing_mode).lower()
+            ]  # convert to lower case
+        except:  # default to Linear interpolation
+            print("easing_mode not found: Defaulting to LinearInterpolation.")
+            self._easing_functions = [
+                easing.LinearInterpolation,
+                easing.LinearInterpolation,
+            ]
 
         # Find the maximum bounding box of the text and determine the baseline (x,y) start point (top, left)
 
@@ -508,8 +519,6 @@ class FlipInput(Widget, Control):
                 self._label.y + self._label.tilegrid.y,
             ]
 
-            # hide the label group.
-            # print("2 self._label.x,y: {},{} bitmap width, height: {}, {}, label.tilegrid x,y: {},{}".format(self._label.x, self._label.y, self._label.bitmap.width, self._label.bitmap.height, self._label.tilegrid.x, self._label.tilegrid.y))
             # animate between old and new bitmaps
             animate_bitmap(
                 display=self._display,
@@ -522,8 +531,7 @@ class FlipInput(Widget, Control):
                 end_position=end_position,
                 animation_time=self._animation_time,
                 horizontal=self._horizontal,
-                easing_function_in=self._easing_function_in,
-                easing_function_out=self._easing_function_out,
+                easing_functions=self._easing_functions,
             )
 
             # unhide the label group
