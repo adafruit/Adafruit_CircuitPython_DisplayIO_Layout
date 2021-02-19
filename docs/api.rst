@@ -6,3 +6,9 @@
 
 .. automodule:: adafruit_displayio_layout.layouts.grid_layout
    :members:
+
+.. automodule:: adafruit_displayio_layout.widgets.widget
+   :members:
+
+.. automodule:: adafruit_displayio_layout.widgets.control
+   :members:

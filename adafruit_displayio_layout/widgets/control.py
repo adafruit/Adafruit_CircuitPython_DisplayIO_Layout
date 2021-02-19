@@ -21,6 +21,8 @@ Implementation Notes
 
 """
 
+# pylint: disable=unnecessary-pass
+
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
@@ -43,7 +45,10 @@ class Control:
         )
 
     def contains(self, touch_point):
-        """Checks if the Control was touched.  Returns True if the touch_point is within the Control's touch_boundary.
+        # pylint: disable=unsubscriptable-object
+
+        """Checks if the Control was touched.  Returns True if the touch_point is
+        within the Control's touch_boundary.
 
         :param touch_point: x,y location of the screen, converted to local coordinates.
         :return: Boolean

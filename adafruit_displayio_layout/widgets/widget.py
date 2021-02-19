@@ -54,6 +54,7 @@ class Widget(displayio.Group):
         bounding_box=None,  # pixel extent of the widget [x0, y0, width, height]
         **kwargs,
     ):
+        # pylint: disable=too-many-arguments
 
         super().__init__(**kwargs)  # should send x,y and scale (optional) to Group
 
@@ -128,7 +129,8 @@ class Widget(displayio.Group):
 
     @property
     def bounding_box(self):
-        """The boundary of the widget. [x, y, width, height] in Widget's local coordinates (in pixels)."""
+        """The boundary of the widget. [x, y, width, height] in Widget's local
+        coordinates (in pixels)."""
         return self._bounding_box
 
     @property
