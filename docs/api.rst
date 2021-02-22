@@ -9,6 +9,14 @@
 
 .. automodule:: adafruit_displayio_layout.widgets.widget
    :members:
+   :private-members:
+   :member-order: bysource
 
 .. automodule:: adafruit_displayio_layout.widgets.control
    :members:
+   :member-order: bysource
+
+.. automodule:: adafruit_displayio_layout.widgets.switch_round
+   :members:
+   :inherited-members:
+   :member-order: bysource
