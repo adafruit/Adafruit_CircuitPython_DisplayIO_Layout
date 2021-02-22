@@ -36,7 +36,7 @@
 import gc
 
 # import time
-import terminalio
+# import terminalio
 import math
 import displayio
 
@@ -86,6 +86,13 @@ class Dial(Widget):
 
     :param background_color: background color (RGB tuple
      or 24-bit hex value), set None for transparent
+
+    ..figure:: gui_layout_coordinates.png
+      :scale: 50 %
+      :alt: Diagram of layout coordinates
+
+      Diagram showing the global and local coordinates and the associated
+      class variables.
     """
 
     # ***** Add label_anchor_point and label_anchor_on_widget (rename?????) *****
@@ -119,7 +126,7 @@ class Dial(Widget):
         minor_ticks=5,
         minor_tick_stroke=1,
         minor_tick_length=5,
-        tick_label_font=terminalio.FONT,
+        tick_label_font=None,
         tick_label_color=0x880000,
         rotate_tick_labels=True,
         tick_label_scale=1.0,
@@ -140,8 +147,12 @@ class Dial(Widget):
         #  3. Needle bitmap
 
         self._value = value
+
+        self.value_font = value_font
         if value_font is None:
-            self.value_font = terminalio.FONT
+            # import terminalio
+            # self.value_font = terminalio.FONT
+            pass
         else:
             self.value_font = value_font
 

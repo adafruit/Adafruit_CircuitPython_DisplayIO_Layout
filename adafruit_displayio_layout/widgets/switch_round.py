@@ -1,25 +1,26 @@
-# The MIT License (MIT)
+# SPDX-FileCopyrightText: 2021 Kevin Matocha
 #
-# Copyright (c) 2021 Kevin Matocha (kmatch98)
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
+# SPDX-License-Identifier: MIT
+"""
+
+`switch_round`
+================================================================================
+CircuitPython GUI Widget Class for visual elements
+
+* Author(s): Kevin Matocha
+
+Implementation Notes
+--------------------
+
+**Hardware:**
+
+**Software and Dependencies:**
+
+* Adafruit CircuitPython firmware for the supported boards:
+  https://github.com/adafruit/circuitpython/releases
+
+"""
+
 ################################
 # A round switch widget for CircuitPython, using displayio and adafruit_display_shapes
 #
@@ -39,7 +40,10 @@ from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.rect import Rect
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets.control import Control
+from adafruit_displayio_layout.widgets.easing import BackEaseInOut as easing
 
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
 class SwitchRound(Widget, Control):
     """A horizontal sliding switch widget.  The origin is set using ``x`` and ``y``.
@@ -49,7 +53,6 @@ class SwitchRound(Widget, Control):
     :param int width: width of the switch in pixels, set to ``None`` to auto-size
      relative to the height
     :param int height: height of the switch in pixels
-    :param str name: name of the switch
     :param float anchor_point: (X,Y) values from 0.0 to 1.0 to define the anchor
      point relative to the switch bounding box
     :param int anchored_position: (x,y) pixel value for the location
@@ -75,10 +78,48 @@ class SwitchRound(Widget, Control):
     :param Boolean display_button_text: Set True to display the 0/1 text
      on the sliding switch
     :param float animation_time: time for the switching animation, in seconds
-     a value of 0.2 is a good starting point"""
+     a value of 0.2 is a good starting point
 
-    # This Switch has multiple class inheritances.
-    # It is a subclass of Group->Widget and a sublcass of Control.
+Details of the `SwitchRound` widget
+
+    The `SwitchRound` widget is a graphical element that responds to touch elements
+    to provide sliding switch on/off behavior.  Whenever touched, the switch toggles
+    to its alternate value. The following sections describe the construction of the
+    `SwitchRound` widget, in the hopes that it will serve as an example of the key
+    properties and responses for widgets.
+
+    The `SwitchRound` widget inherits from two classes, it is a subclass of Group->Widget
+    and a sublcass of Control.  The `Widget` class helps define the positioning and
+    sizing of the switch, while the `Control` class defines the touch-response behavior.
+
+Group structure: Display elements that make up SwitchRound
+
+Coordinate systems:
+See the `Widget` class definition
+
+Construction sequence:
+- Build stationary items
+- Build moving items
+- Store initial position
+- Define "keyframes" and/or translation vector
+- Define draw position function (0.0 to 1.0 and beyond)
+- Define motion "easing" function
+
+Translation, keyframes, motion functions and easing, and animation time handling.
+Resizing with constraints
+Orientation - peculiarity of width and height
+Bounding box - see Widget class definition
+Touch boundary, touch-padding - see Widget class definition
+
+Class structure - review if inheritance is captured in the documentation
+
+Highlight options:
+- orientation
+- touch-padding
+- text on switch
+- Coloring
+
+    """
 
     def __init__(
         self,
@@ -103,23 +144,19 @@ class SwitchRound(Widget, Control):
         animation_time=0.2,  # animation duration (in seconds)
         horizontal=True,  # horizontal orientation
         flip=False,  # flip the direction of the switch movement
-        font=None,  # if None, uses terminalio.FONT for widget label
-        label_anchor_point=(1, 0.5),  # default label position
-        label_anchor_on_widget=(-0.05, 0.5),  # default label position on widget
         **kwargs,
     ):
 
         # initialize the Widget superclass (x, y, scale)
-        super().__init__(x=x, y=y, height=height, **kwargs, max_size=5)
+        super().__init__(x=x, y=y, height=height, **kwargs, max_size=4)
         # Define how many graphical elements will be in this group
         # using "max_size=XX"
         #
         # Group elements for SwitchRound:
-        #  1. switch_roundrect: The switch background
-        #  2. switch_circle: The switch button
-        #  3. Optional - widget label
-        #  4. Optional: text_0: The "0" circle on the switch button
-        #  5. Optional: text_1: The "1" rectangle  on the switch button
+        #  0. switch_roundrect: The switch background
+        #  1. switch_circle: The switch button
+        #  2. Optional: text_0: The "0" circle on the switch button
+        #  3. Optional: text_1: The "1" rectangle  on the switch button
 
         # initialize the Control superclass
         super(Control, self).__init__()
@@ -168,10 +205,6 @@ class SwitchRound(Widget, Control):
 
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
-
-        self.font = font
-        self._label_anchor_point = label_anchor_point
-        self._label_anchor_on_widget = label_anchor_on_widget
 
         self._create_switch()
 
@@ -315,25 +348,6 @@ class SwitchRound(Widget, Control):
         self.append(self._switch_roundrect)
         self.append(self._switch_circle)
 
-        # Create the widget label
-        #             *** Should this responsibility be pushed up to the Widget class?
-        self.widget_label = None
-        if self.name != "":
-            from adafruit_displayio_layout.widgets.widget_label import WidgetLabel
-
-            if self.font == None:
-                import terminalio
-
-                font = terminalio.FONT
-            else:
-                font = self.font
-            self.widget_label = WidgetLabel(
-                font,
-                self,
-                anchor_point=self._label_anchor_point,
-                anchor_point_on_widget=self._label_anchor_on_widget,
-            )
-
         # If display_button_text is True, append the correct text element (0 or 1)
         if self._display_button_text:
             self.append(self._text_0)
@@ -362,13 +376,7 @@ class SwitchRound(Widget, Control):
         #     self._x_motion: x-direction movement in pixels
         #     self._y_motion: y-direction movement in pixels
         #     self._angle_motion: angle movement
-        #
 
-        # Constrains the position between the endpoints.
-        if position < 0:
-            position = 0.0
-        if position > 1:
-            position = 1.0
 
         # This defines the tranfer function between position and motion.
         # for switch, this is a linear translation function, rotation is actually ignored.
@@ -382,6 +390,10 @@ class SwitchRound(Widget, Control):
     def _draw_position(self, position):
         # Draw the position of the slider.
         # The position parameter is a float between 0 and 1 (0= off, 1= on).
+
+
+        # apply the "easing" function to the requested position to adjust motion
+        position=easing(position)
 
         # Get the position offset from the motion function
         x_offset, y_offset, angle_offset = self._get_offset_position(position)
@@ -476,8 +488,13 @@ class SwitchRound(Widget, Control):
                 break
 
     def selected(self, touch_point):
+        """Response function when Switch is selected.  When selected, the switch
+        position and value is changed with an animation.
 
-        # When the switch is selected, it should be animated and change its value
+        :param touch_point: x,y location of the screen, in absolute display coordinates.
+        :return: None
+
+        """
 
         self._animate_switch()  # show the animation and switch the self._value
 
@@ -491,7 +508,13 @@ class SwitchRound(Widget, Control):
         super().selected((touch_x, touch_y, 0))
 
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
-        """Returns True if the touch_point is within the widget's touch_boundary."""
+        """Checks if the Widget was touched.  Returns True if the touch_point
+        is within the Control's touch_boundary.
+
+        :param touch_point: x,y location of the screen, in absolute display coordinates.
+        :return: Boolean
+
+        """
         touch_x = (
             touch_point[0] - self.x
         )  # adjust touch position for the local position
@@ -501,7 +524,10 @@ class SwitchRound(Widget, Control):
 
     @property
     def value(self):
-        """The current switch value (Boolean)."""
+        """The current switch value (Boolean).
+
+        :return: Boolean
+        """
         return self._value
 
     @value.setter
@@ -534,8 +560,11 @@ class SwitchRound(Widget, Control):
 
     def resize(self, new_width, new_height):
         """Resize the switch to a new requested width and height.
-        :param int new_width
-        :param int new_height
+
+        :param int new_width: requested maximum width
+        :param int new_height: requested maximum height
+        :return: None
+
         """
         # Fit the new button size within the requested maximum width/height
         # dimensions, but keeping an aspect ratio of 2:1 (width:height)
@@ -581,9 +610,9 @@ def _color_to_tuple(value):
 
 def _color_fade(start_color, end_color, fraction):
     """Linear extrapolation of a color between two RGB colors (tuple or 24-bit integer).
-    : param start_color: starting color
-    : param end_color: ending color
-    : param fraction: Floating point number  ranging from 0 to 1 indicating what
+    :param start_color: starting color
+    :param end_color: ending color
+    :param fraction: Floating point number  ranging from 0 to 1 indicating what
     fraction of interpolation between start_color and end_color.
     """
 
