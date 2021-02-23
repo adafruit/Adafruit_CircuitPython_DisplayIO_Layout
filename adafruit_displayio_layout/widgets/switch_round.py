@@ -307,7 +307,7 @@ class SwitchRound(Widget, Control):
     ):
 
         # initialize the Widget superclass (x, y, scale)
-        super().__init__(x=x, y=y, height=height, **kwargs, max_size=4)
+        super().__init__(x=x, y=y, height=height, width=width, **kwargs, max_size=4)
         # Define how many graphical elements will be in this group
         # using "max_size=XX"
         #
@@ -334,6 +334,7 @@ class SwitchRound(Widget, Control):
             self._width = 4 * self._radius
         else:
             self._width = self.width
+            print('width set!')
 
         if background_outline_color_off is None:
             background_outline_color_off = background_color_off
