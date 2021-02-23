@@ -259,6 +259,9 @@ class SwitchRound(Widget, Control):
 
     """
 
+    # pylint: disable=too-many-instance-attributes, too-many-arguments, too-many-locals
+    # pylint: disable=too-many-branches, too-many-statements
+
     def __init__(
         self,
         x=0,
@@ -298,6 +301,8 @@ class SwitchRound(Widget, Control):
         #  3. Optional: text_1: The "1" rectangle  on the switch button
 
         # initialize the Control superclass
+
+        # pylint: disable=bad-super-call
         super(Control, self).__init__()
 
         self._horizontal = horizontal
@@ -530,7 +535,9 @@ class SwitchRound(Widget, Control):
         # The position parameter is a float between 0 and 1 (0= off, 1= on).
 
         # Get the position offset from the motion function
-        x_offset, y_offset, angle_offset = self._get_offset_position(position)
+        x_offset, y_offset, _ = self._get_offset_position(
+            position
+        )  # ignore angle_offset
 
         # Update the switch and text x- and y-positions
         self._switch_circle.x = self._switch_initial_x + x_offset
