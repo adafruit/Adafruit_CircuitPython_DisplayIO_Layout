@@ -166,8 +166,8 @@ class Widget(displayio.Group):
 
     def __init__(
         self,
-        x,
-        y,
+        x=0,
+        y=0,
         scale=1,
         width=None,
         height=None,
