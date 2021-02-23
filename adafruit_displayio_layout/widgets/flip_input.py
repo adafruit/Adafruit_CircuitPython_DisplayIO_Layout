@@ -478,6 +478,8 @@ class FlipInput(Widget, Control):
 
             self._display.auto_refresh = False
 
+            gc.collect()
+
             # create the animation bitmap
             animation_bitmap = displayio.Bitmap(
                 self._bounding_box[2], self._bounding_box[3], 2

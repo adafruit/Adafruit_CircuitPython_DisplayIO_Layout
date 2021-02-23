@@ -613,26 +613,24 @@ class SwitchRound(Widget, Control):
 
         while True:
 
-            # This determines the direction of movement, depending upon if the
+            # Determines the direction of movement, depending upon if the
             # switch is going from on->off or off->on
-            #
-            # Note: This is currently written with a constant speed of movement.
-            # Adjust this `position` function if you want a nonlinear
-            # acceleration of the motion.  There will be interaction between
-            # this function and `_draw_position` and `_get_offset_position`
-            # to control the position and the motion speed.
-            #
+
+            # constrain the elapsed time
+            elapsed_time=time.monotonic()-start_time
+            if elapsed_time > self._animation_time:
+                elapsed_time = self._animation_time
+
             if self._value:
                 position = (
-                    1 - (time.monotonic() - start_time) / self._animation_time
+                    1 - (elapsed_time) / self._animation_time
                 )  # fraction from 0 to 1
             else:
                 position = (
-                    time.monotonic() - start_time
+                    elapsed_time
                 ) / self._animation_time  # fraction from 0 to 1
 
             # Update the moving elements based on the current position
-
             # apply the "easing" function to the requested position to adjust motion
             self._draw_position(easing(position))  # update the switch position
 
