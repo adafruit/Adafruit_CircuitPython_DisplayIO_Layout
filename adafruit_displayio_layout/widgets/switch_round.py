@@ -208,7 +208,12 @@ class SwitchRound(Widget, Control):
 
     Go play around with the different easing functions and observe how the motion
     behavior changes.  You can use these functions in multiple dimensions to get all
-    varieties of behavior that you can take advantage of.
+    varieties of behavior that you can take advantage of.  Here's a good website
+    that lets you visualize some of the behavior of the easing functions:
+    <https://easings.net>.  Note: Some of the "springy" easing functions have values
+    slightly below 0.0 and slightly above 1.0, so if you want to use these, be sure
+    to check that your ``_draw_position`` method behaves itself for that larger range
+    of position inputs.
 
     **Orientation and a peculiarity of width and height definitions for SwitchRound**
 
@@ -255,6 +260,18 @@ class SwitchRound(Widget, Control):
     I hope this `SwitchRound` widget will help turn on some new ideas and highlight some
     of the new capabilities of the `Widget` and `Control` classes.  Now go see what else
     you can create and extend from here!
+
+    **A Final Word**
+
+    The design of the Widget and Control classes are open for inputs.  If you think
+    an addition or change will be useful, add it and please submit a pull request so
+    other can use it too!  Also, keep in mind you don't even need to follow these classes
+    to get the job done.  The Widget and Class definitions are designed to give guidance
+    about one way to make things work, and try to share some code.  If it's standing in
+    your way, do something else!  If you want to use the ``grid_layout`` or other layout tools
+    in this library, you only *really* need to have methods for positioning and resizing.
+    **Don't let any of these class definitions hold you back, let your imagination run
+    wild and make some cool widgets!**
 
 
     """
