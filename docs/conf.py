@@ -8,6 +8,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.append("/Users/margaret/Documents/GitHub/Adafruit_CircuitPython_Display_Shapes/")
 
 # -- General configuration ------------------------------------------------
 
