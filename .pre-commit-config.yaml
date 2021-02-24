@@ -17,3 +17,11 @@ repos:
     -   id: check-yaml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
+-   repo: local
+    hooks:
+    -   id: pylint_examples
+        name: pylint-examples
+        entry: /usr/bin/env bash -c
+        args: ['([[ ! -d "examples" ]] || for example in $(find . -path "./examples/*.py"); do pylint --disable=missing-docstring,invalid-name,bad-whitespace $example; done)']
+        language: system
+        description: Run example-specific pylint rules
