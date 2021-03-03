@@ -6,3 +6,12 @@
 
 .. automodule:: adafruit_displayio_layout.layouts.grid_layout
    :members:
+
+.. automodule:: adafruit_displayio_layout.widgets.widget
+   :members:
+   :private-members:
+   :member-order: bysource
+
+.. automodule:: adafruit_displayio_layout.widgets.control
+   :members:
+   :member-order: bysource
