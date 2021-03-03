@@ -1,8 +1,8 @@
 Introduction
 ============
 
-.. image:: https://readthedocs.org/projects/adafruit-circuitpython-displayio_layout/badge/?version=latest
-    :target: https://circuitpython.readthedocs.io/projects/displayio_layout/en/latest/
+.. image:: https://readthedocs.org/projects/adafruit-circuitpython-displayio-layout/badge/?version=latest
+    :target: https://circuitpython.readthedocs.io/projects/displayio-layout/en/latest/
     :alt: Documentation Status
 
 .. image:: https://img.shields.io/discord/327254708534116352.svg
