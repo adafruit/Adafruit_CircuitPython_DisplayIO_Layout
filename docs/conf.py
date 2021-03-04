@@ -8,8 +8,6 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
-# sys.path.append("/Adafruit_CircuitPython_Display_Shapes/")
-
 
 # -- General configuration ------------------------------------------------
 
@@ -30,7 +28,7 @@ inheritance_graph_attrs = dict(rankdir="TB")
 # Uncomment the below if you use native CircuitPython modules such as
 # digitalio, micropython and busio. List the modules you use. Without it, the
 # autodoc module docs will fail to generate with a warning.
-autodoc_mock_imports = ["displayio"]
+autodoc_mock_imports = ["displayio", "adafruit_display_shapes"]
 
 
 intersphinx_mapping = {
