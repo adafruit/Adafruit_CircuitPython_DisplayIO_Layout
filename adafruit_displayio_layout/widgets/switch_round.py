@@ -5,7 +5,7 @@
 
 `switch_round`
 ================================================================================
-CircuitPython GUI Round Sliding Switch Widget
+A sliding switch widget with a round shape.
 
 * Author(s): Kevin Matocha
 
@@ -40,19 +40,38 @@ from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.rect import Rect
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets.control import Control
-from adafruit_displayio_layout.widgets.easing import BackEaseInOut as easing
+
+# modify the "easing" function that is imported to change the switch animation behaviour
+from adafruit_displayio_layout.widgets.easing import back_easeinout as easing
+
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
 
 class SwitchRound(Widget, Control):
-    """A sliding switch widget with a round shape.
+    """
 
     .. note:: Jump directly to:
 
         - :ref:`SwitchRound input parameters <parameters>`
         - :ref:`SwitchRound methods <methods>`
+
+
+    .. _links:
+
+    **Sections: Description of the SwitchRound widget**
+        - :ref:`Quickstart: Importing and using SwitchRound <switch_round_details>`
+        - :ref:`Summary: SwitchRound Features and input variables <feature_summary>`
+        - :ref:`Description of features <features>`
+        - :ref:`Internal details: How the SwitchRound widget works <internals>`
+        - :ref:`Group structure: Display elements that make up SwitchRound <group_structure>`
+        - :ref:`Coordinate systems and use of anchor_point and anchored_position <coordinates>`
+        - :ref:`The Widget construction sequence <construction>`
+        - :ref:`Making it move <move>`
+        - :ref:`Orientation and a peculiarity of width and height definitions for SwitchRound <orientation>`
+        - :ref:`Setting the touch response boundary <touch>`
+        - :ref:`Summary and a final word <summary>`
 
 
     .. _switch_round_details:
@@ -102,6 +121,8 @@ class SwitchRound(Widget, Control):
         - ``examples/displayio_layout_switch_multiple.py``
 
 
+    .. _feature_summary:
+
     **Summary: SwitchRound Features and input variables**
 
     The `SwitchRound` widget has numerous options for controlling its position, visible appearance,
@@ -138,6 +159,8 @@ class SwitchRound(Widget, Control):
           the ``touch_boundary`` is used to determine the region on the Widget that returns
           `True` in the `contains` function.)
 
+    .. _features:
+
     **Description of features**
 
         The `SwitchRound` widget is a sliding switch that changes state whenever it is
@@ -157,6 +180,8 @@ class SwitchRound(Widget, Control):
         variable to increase the touch-responsive area. The duration of
         animation between on/off can be set using the ``animation_time`` input variable.
 
+    .. _internals:
+
     **Internal details: How the SwitchRound widget works**
 
     The `SwitchRound` widget is a graphical element that responds to touch elements
@@ -165,15 +190,18 @@ class SwitchRound(Widget, Control):
     `SwitchRound` widget, in the hopes that it will serve as a first example of the key
     properties and responses for widgets.
 
-    The `SwitchRound` widget inherits from two classes, it is a subclass of Group->Widget
-    and a subclass of Control.  The `Widget` class helps define the positioning and
-    sizing of the switch, while the `Control` class defines the touch-response behavior.
+    The `SwitchRound` widget inherits from two classes, it is a subclass of `Widget` (which
+    itself is a subclass of `displayio.Group`) and a subclass of `Control`.  The `Widget`
+    class helps define the positioning and sizing of the switch, while the `Control` class
+    helps define the touch-response behavior.
 
-    The following several sections describe the structure and inner workings of SwitchRound.
+    The following several sections describe the structure and inner workings of `SwitchRound`.
+
+    .. _group_structure:
 
     **Group structure: Display elements that make up SwitchRound**
 
-        The Widget is a subclass of ``displayio.Group``, thus we can append graphical
+        The `Widget` class is a subclass of `displayio.Group`, thus we can append graphical
         elements to the Widget for displaying on the screen.  The switch consists of the
         following graphical elements:
 
@@ -185,17 +213,21 @@ class SwitchRound(Widget, Control):
         The optional text items can be displayed or hidden using the ``display_button_text``
         input variable.
 
+    .. _coordinates:
+
     **Coordinate systems and use of anchor_point and anchored_position**
 
         See the `Widget` class definition for clarification on the methods for positioning
         the switch, including the difference in the display coordinate system and the Widget's
         local coordinate system.
 
+    .. _construction:
+
     **The Widget construction sequence**
 
-        Here is the set of steps that are used to define this switch widget.
+        Here is the set of steps used to define this sliding switch widget.
 
-        1. Initialize the stationary items
+        1. Initialize the stationary display items
         2. Initialize the moving display elements
         3. Store initial position of the moving display elements
         4. Define "keyframes" to determine the translation vector
@@ -220,19 +252,21 @@ class SwitchRound(Widget, Control):
         sliding switch, we also use this ``position`` value (0.0 to 1.0) to gradually
         grade the color of the components between their "on" and "off" colors.
 
+    .. _move:
+
     **Making it move**
 
         Everything above has set the ground rules for motion, but doesn't cause it to move.
         However, you have set almost all the pieces in place to respond to requests to change
         the position.  All that is left is the **Extra** method that performs the animation,
-        called ``_animate_switch``. The ``animate_switch`` method is triggered by a touch
+        called ``_animate_switch``. The ``_animate_switch`` method is triggered by a touch
         event through the ``selected`` Control class method.  Once triggered, this method
         checks how much time has elapsed.  Based on the elapsed time and the ``animation_time``
-        input variable, the ``animate_switch`` function calculates the ``position`` where
+        input variable, the ``_animate_switch`` function calculates the ``position`` where
         the switch should be.  Then, it takes this ``position`` to call the ``_draw_position``
         method that will update the display elements based on the requested position.
 
-        But there's even one more trick to the animation.  The ``animate_switch`` calculates
+        But there's even one more trick to the animation.  The ``_animate_switch`` calculates
         the target position based on a linear relationship between the time and the position.
         However, to give the animation a better "feel", it is desirable to tweak the motion
         function depending upon how this widget should behave or what suits your fancy. To
@@ -260,6 +294,8 @@ class SwitchRound(Widget, Control):
             to check that your ``_draw_position`` method behaves itself for that range
             of position inputs.
 
+    .. _orientation:
+
     **Orientation and a peculiarity of width and height definitions for SwitchRound**
 
         In setting the switch sizing, use height and width to set the narrow and wide
@@ -273,6 +309,8 @@ class SwitchRound(Widget, Control):
         maximum size where it can fit within the bounding box that you specified.  The switch
         aspect ratio will remain at the "preferred" aspect ratio of of 2:1 (width to height)
         after the resizing.
+
+    .. _touch:
 
     **Setting the touch response boundary**
 
@@ -289,7 +327,9 @@ class SwitchRound(Widget, Control):
         function with the touch_point value adjusted for the switch's ``.x`` and ``.y`` values.
         This offset adjustment is required since the `Control.contains` function operates only
         on the widget's local coordinate system.  It's good to keep in mind which coordinate
-        system you are working in, so you'll write your code to respond to the right inputs!
+        system you are working in, to ensure your code responds to the right inputs!
+
+    .. _summary:
 
     **Summary**
 
@@ -309,8 +349,8 @@ class SwitchRound(Widget, Control):
     **A Final Word**
 
     The design of the Widget and Control classes are open for inputs.  If you think
-    an addition or change will be useful, add it and please submit a pull request so
-    other can use it too!  Also, keep in mind you don't even need to follow these classes
+    a additions or changes are useful, add it and please submit a pull request so
+    others can use it too!  Also, keep in mind you don't even need to follow these classes
     to get the job done.  The Widget and Class definitions are designed to give guidance
     about one way to make things work, and to try to share some code.  If it's standing in
     your way, do something else!  If you want to use the ``grid_layout`` or other layout tools

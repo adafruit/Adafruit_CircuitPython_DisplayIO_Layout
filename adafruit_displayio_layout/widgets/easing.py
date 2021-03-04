@@ -76,209 +76,303 @@ Implementation Notes
 import math
 
 # Modeled after the line y = x
-def LinearInterpolation(p):
-    return p
+def linear_interpolation(pos):
+    """
+    Easing function for animations: Linear Interpolation.
+    """
+    return pos
 
 
 # Modeled after the parabola y = x^2
-def QuadraticEaseIn(p):
-    return p * p
+def quadratic_easein(pos):
+    """
+    Easing function for animations: Quadratic Ease In
+    """
+    return pos * pos
 
 
 # Modeled after the parabola y = -x^2 + 2x
-def QuadraticEaseOut(p):
-    return -(p * (p - 2))
+def quadratic_easeout(pos):
+    """
+    Easing function for animations: Quadratic Ease Out.
+    """
+    return -(pos * (pos - 2))
 
 
 # Modeled after the piecewise quadratic
 # y = (1/2)((2x)^2)             ; [0, 0.5)
 # y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
-def QuadraticEaseInOut(p):
-    if p < 0.5:
-        return 2 * p * p
-    return (-2 * p * p) + (4 * p) - 1
+def quadratic_easeinout(pos):
+    """
+    Easing function for animations: Quadratic Ease In & Out
+    """
+    if pos < 0.5:
+        return 2 * pos * pos
+    return (-2 * pos * pos) + (4 * pos) - 1
 
 
 # Modeled after the cubic y = x^3
-def CubicEaseIn(p):
-    return p * p * p
+def cubic_easein(pos):
+    """
+    Easing function for animations: Cubic Ease In
+    """
+    return pos * pos * pos
 
 
 # Modeled after the cubic y = (x - 1)^3 + 1
-def CubicEaseOut(p):
-    f = p - 1
-    return f * f * f + 1
+def cubic_easeout(pos):
+    """
+    Easing function for animations: Cubic Ease Out
+    """
+    fos = pos - 1
+    return fos * fos * fos + 1
 
 
 # Modeled after the piecewise cubic
 # y = (1/2)((2x)^3)       ; [0, 0.5)
 # y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
-def CubicEaseInOut(p):
-    if p < 0.5:
-        return 4 * p * p * p
-    f = (2 * p) - 2
-    return 0.5 * f * f * f + 1
+def cubic_easeinout(pos):
+    """
+    Easing function for animations: Cubic Ease In & Out
+    """
+    if pos < 0.5:
+        return 4 * pos * pos * pos
+    fos = (2 * pos) - 2
+    return 0.5 * fos * fos * fos + 1
 
 
 # Modeled after the quartic x^4
-def QuarticEaseIn(p):
-    return p * p * p * p
+def quartic_easein(pos):
+    """
+    Easing function for animations: Quartic Ease In
+    """
+    return pos * pos * pos * pos
 
 
 # Modeled after the quartic y = 1 - (x - 1)^4
-def QuarticEaseOut(p):
-    f = p - 1
-    return f * f * f * (1 - p) + 1
+def quartic_easeout(pos):
+    """
+    Easing function for animations: Quartic Ease Out
+    """
+    fos = pos - 1
+    return fos * fos * fos * (1 - pos) + 1
 
 
 # Modeled after the piecewise quartic
 # y = (1/2)((2x)^4)        ; [0, 0.5)
 # y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
-def QuarticEaseInOut(p):
-    if p < 0.5:
-        return 8 * p * p * p * p
-    f = p - 1
-    return -8 * f * f * f * f + 1
+def quartic_easeinout(pos):
+    """
+    Easing function for animations: Quartic Ease In & Out
+    """
+    if pos < 0.5:
+        return 8 * pos * pos * pos * pos
+    fos = pos - 1
+    return -8 * fos * fos * fos * fos + 1
 
 
 # Modeled after the quintic y = x^5
-def QuinticEaseIn(p):
-    return p * p * p * p * p
+def quintic_easein(pos):
+    """
+    Easing function for animations: Quintic Ease In
+    """
+    return pos * pos * pos * pos * pos
 
 
 # Modeled after the quintic y = (x - 1)^5 + 1
-def QuinticEaseOut(p):
-    f = p - 1
-    return f * f * f * f * f + 1
+def quintic_easeout(pos):
+    """
+    Easing function for animations: Quintic Ease Out
+    """
+    fos = pos - 1
+    return fos * fos * fos * fos * fos + 1
 
 
 # Modeled after the piecewise quintic
 # y = (1/2)((2x)^5)       ; [0, 0.5)
 # y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
-def QuinticEaseInOut(p):
-    if p < 0.5:
-        return 16 * p * p * p * p * p
-    f = (2 * p) - 2
-    return 0.5 * f * f * f * f * f + 1
+def quintic_easeinout(pos):
+    """
+    Easing function for animations: Quintic Ease In & Out
+    """
+    if pos < 0.5:
+        return 16 * pos * pos * pos * pos * pos
+    fos = (2 * pos) - 2
+    return 0.5 * fos * fos * fos * fos * fos + 1
 
 
 # Modeled after quarter-cycle of sine wave
-def SineEaseIn(p):
-    return math.sin((p - 1) * math.pi / 2) + 1
+def sine_easein(pos):
+    """
+    Easing function for animations: Sine Ease In
+    """
+    return math.sin((pos - 1) * math.pi / 2) + 1
 
 
 # Modeled after quarter-cycle of sine wave (different phase)
-def SineEaseOut(p):
-    return math.sin(p * math.pi / 2)
+def sine_easeout(pos):
+    """
+    Easing function for animations: Sine Ease Out
+    """
+    return math.sin(pos * math.pi / 2)
 
 
 # Modeled after half sine wave
-def SineEaseInOut(p):
-    return 0.5 * (1 - math.cos(p * math.pi))
+def sine_easeinout(pos):
+    """
+    Easing function for animations: Sine Ease In & Out
+    """
+    return 0.5 * (1 - math.cos(pos * math.pi))
 
 
 # Modeled after shifted quadrant IV of unit circle
-def CircularEaseIn(p):
-    return 1 - math.sqrt(1 - (p * p))
+def circular_easein(pos):
+    """
+    Easing function for animations: Circular Ease In
+    """
+    return 1 - math.sqrt(1 - (pos * pos))
 
 
 # Modeled after shifted quadrant II of unit circle
-def CircularEaseOut(p):
-    return math.sqrt((2 - p) * p)
+def circular_easeout(pos):
+    """
+    Easing function for animations: Circular Ease Out
+    """
+    return math.sqrt((2 - pos) * pos)
 
 
 # Modeled after the piecewise circular function
 # y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)
 # y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
-def CircularEaseInOut(p):
-    if p < 0.5:
-        return 0.5 * (1 - math.sqrt(1 - 4 * (p * p)))
-    return 0.5 * (math.sqrt(-((2 * p) - 3) * ((2 * p) - 1)) + 1)
+def circular_easeinout(pos):
+    """
+    Easing function for animations: Circular Ease In & Out
+    """
+    if pos < 0.5:
+        return 0.5 * (1 - math.sqrt(1 - 4 * (pos * pos)))
+    return 0.5 * (math.sqrt(-((2 * pos) - 3) * ((2 * pos) - 1)) + 1)
 
 
 # Modeled after the exponential function y = 2^(10(x - 1))
-def ExponentialEaseIn(p):
-    if p == 0:
-        return p
-    return math.pow(2, 10 * (p - 1))
+def exponential_easein(pos):
+    """
+    Easing function for animations: Exponential Ease In
+    """
+    if pos == 0:
+        return pos
+    return math.pow(2, 10 * (pos - 1))
 
 
 # Modeled after the exponential function y = -2^(-10x) + 1
-def ExponentialEaseOut(p):
-    if p == 1:
-        return p
-    return 1 - math.pow(2, -10 * p)
+def exponential_easeout(pos):
+    """
+    Easing function for animations: Exponential Ease Out
+    """
+    if pos == 1:
+        return pos
+    return 1 - math.pow(2, -10 * pos)
 
 
 # Modeled after the piecewise exponential
 # y = (1/2)2^(10(2x - 1))         ; [0,0.5)
 # y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
-def ExponentialEaseInOut(p):
-    if (p == 0.0) or (p == 1.0):
-        return p
-    if p < 0.5:
-        return 0.5 * math.pow(2, (20 * p) - 10)
-    return (-0.5 * math.pow(2, (-20 * p) + 10)) + 1
+def exponential_easeinout(pos):
+    """
+    Easing function for animations: Exponential Ease In & Out
+    """
+    if pos in (0.0, 1.0):
+        return pos
+    if pos < 0.5:
+        return 0.5 * math.pow(2, (20 * pos) - 10)
+    return (-0.5 * math.pow(2, (-20 * pos) + 10)) + 1
 
 
 # Modeled after the damped sine wave y = sin(13pi/2*x)*pow(2, 10 * (x - 1))
-def ElasticEaseIn(p):
-    return math.sin(13 * p * math.pi / 2) * math.pow(2, 10 * (p - 1))
+def elastic_easein(pos):
+    """
+    Easing function for animations: Elastic Ease In
+    """
+    return math.sin(13 * pos * math.pi / 2) * math.pow(2, 10 * (pos - 1))
 
 
 # Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*pow(2, -10x) + 1
-def ElasticEaseOut(p):
-    return math.sin(-13 * math.pi / 2 * (p + 1)) * math.pow(2, -10 * p) + 1
+def elastic_easeout(pos):
+    """
+    Easing function for animations: Elastic Ease Out
+    """
+    return math.sin(-13 * math.pi / 2 * (pos + 1)) * math.pow(2, -10 * pos) + 1
 
 
 # Modeled after the piecewise exponentially-damped sine wave:
 # y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
 # y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
-def ElasticEaseInOut(p):
-    if p < 0.5:
-        return 0.5 * math.sin(13 * math.pi * p) * math.pow(2, 10 * ((2 * p) - 1))
+def elastic_easeinout(pos):
+    """
+    Easing function for animations: Elastic Ease In & Out
+    """
+    if pos < 0.5:
+        return 0.5 * math.sin(13 * math.pi * pos) * math.pow(2, 10 * ((2 * pos) - 1))
     return 0.5 * (
-        math.sin(-13 * math.pi / 2 * ((2 * p - 1) + 1)) * pow(2, -10 * (2 * p - 1)) + 2
+        math.sin(-13 * math.pi / 2 * ((2 * pos - 1) + 1)) * pow(2, -10 * (2 * pos - 1))
+        + 2
     )
 
 
 # Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
-def BackEaseIn(p):
-    return p * p * p - p * math.sin(p * math.pi)
+def back_easein(pos):
+    """
+    Easing function for animations: Back Ease In
+    """
+    return pos * pos * pos - pos * math.sin(pos * math.pi)
 
 
 # Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
-def BackEaseOut(p):
-    f = 1 - p
-    return 1 - (f * f * f - f * math.sin(f * math.pi))
+def back_easeout(pos):
+    """
+    Easing function for animations: Back Ease Out
+    """
+    fos = 1 - pos
+    return 1 - (fos * fos * fos - fos * math.sin(fos * math.pi))
 
 
 # Modeled after the piecewise overshooting cubic function:
 # y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
 # y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
-def BackEaseInOut(p):
-    if p < 0.5:
-        f = 2 * p
-        return 0.5 * (f * f * f - f * math.sin(f * math.pi))
-    f = 1 - (2 * p - 1)
-    return 0.5 * (1 - (f * f * f - f * math.sin(f * math.pi))) + 0.5
+def back_easeinout(pos):
+    """
+    Easing function for animations: Back Ease In & Out
+    """
+    if pos < 0.5:
+        fos = 2 * pos
+        return 0.5 * (fos * fos * fos - fos * math.sin(fos * math.pi))
+    fos = 1 - (2 * pos - 1)
+    return 0.5 * (1 - (fos * fos * fos - fos * math.sin(fos * math.pi))) + 0.5
 
 
-def BounceEaseIn(p):
-    return 1 - BounceEaseOut(1 - p)
+def bounce_easein(pos):
+    """
+    Easing function for animations: Bounce Ease In
+    """
+    return 1 - bounce_easeout(1 - pos)
 
 
-def BounceEaseOut(p):
-    if p < 4 / 11.0:
-        return (121 * p * p) / 16.0
-    if p < 8 / 11.0:
-        return (363 / 40.0 * p * p) - (99 / 10.0 * p) + (17 / 5.0)
-    if p < 9 / 10.0:
-        return (4356 / 361.0 * p * p) - (35442 / 1805.0 * p) + 16061 / 1805.0
-    return (54 / 5.0 * p * p) - (513 / 25.0 * p) + 268 / 25.0
+def bounce_easeout(pos):
+    """
+    Easing function for animations: Bounce Ease Out
+    """
+    if pos < 4 / 11.0:
+        return (121 * pos * pos) / 16.0
+    if pos < 8 / 11.0:
+        return (363 / 40.0 * pos * pos) - (99 / 10.0 * pos) + (17 / 5.0)
+    if pos < 9 / 10.0:
+        return (4356 / 361.0 * pos * pos) - (35442 / 1805.0 * pos) + 16061 / 1805.0
+    return (54 / 5.0 * pos * pos) - (513 / 25.0 * pos) + 268 / 25.0
 
 
-def BounceEaseInOut(p):
-    if p < 0.5:
-        return 0.5 * BounceEaseIn(p * 2)
-    return 0.5 * BounceEaseOut(p * 2 - 1) + 0.5
+def bounce_easeinout(pos):
+    """
+    Easing function for animations: Bounce Ease In & Out
+    """
+    if pos < 0.5:
+        return 0.5 * bounce_easein(pos * 2)
+    return 0.5 * bounce_easeout(pos * 2 - 1) + 0.5
