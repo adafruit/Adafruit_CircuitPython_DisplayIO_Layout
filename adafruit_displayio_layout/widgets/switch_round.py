@@ -69,7 +69,8 @@ class SwitchRound(Widget, Control):
         - :ref:`Coordinate systems and use of anchor_point and anchored_position <coordinates>`
         - :ref:`The Widget construction sequence <construction>`
         - :ref:`Making it move <move>`
-        - :ref:`Orientation and a peculiarity of width and height definitions for SwitchRound <orientation>`
+        - :ref:`Orientation and a peculiarity of width and height definitions for
+          SwitchRound <orientation>`
         - :ref:`Setting the touch response boundary <touch>`
         - :ref:`Summary and a final word <summary>`
 
