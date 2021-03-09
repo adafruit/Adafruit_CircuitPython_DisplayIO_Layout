@@ -19,13 +19,16 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.inheritance_diagram",
 ]
+
+inheritance_graph_attrs = dict(rankdir="TB")
 
 # TODO: Please Read!
 # Uncomment the below if you use native CircuitPython modules such as
 # digitalio, micropython and busio. List the modules you use. Without it, the
 # autodoc module docs will fail to generate with a warning.
-autodoc_mock_imports = ["displayio"]
+autodoc_mock_imports = ["displayio", "adafruit_display_shapes"]
 
 
 intersphinx_mapping = {
@@ -95,6 +98,7 @@ todo_include_todos = False
 todo_emit_warnings = True
 
 napoleon_numpy_docstring = False
+
 
 # -- Options for HTML output ----------------------------------------------
 
