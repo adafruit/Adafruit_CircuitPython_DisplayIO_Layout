@@ -72,6 +72,12 @@ class GridLayout(displayio.Group):
                 button_size_x = cell["cell_size"][0]
                 button_size_y = cell["cell_size"][1]
 
+                new_position = (
+                    int(grid_position_x * self._width / grid_size_x) + self.cell_padding,
+                    int(grid_position_y * self._height / grid_size_y)
+                    + self.cell_padding
+                )
+
                 print(
                     "setting width to: {}".format(
                         int(button_size_x * self._width / grid_size_x)
@@ -89,6 +95,7 @@ class GridLayout(displayio.Group):
                             int(button_size_y * self._height / grid_size_y)
                             - 2 * self.cell_padding
                         ),
+                        new_position
                     )
                 else:
                     # try width and height properties.
@@ -102,11 +109,10 @@ class GridLayout(displayio.Group):
                     )
 
                 cell["content"].x = (
-                    int(grid_position_x * self._width / grid_size_x) + self.cell_padding
+                    new_position[0]
                 )
                 cell["content"].y = (
-                    int(grid_position_y * self._height / grid_size_y)
-                    + self.cell_padding
+                    new_position[1]
                 )
 
                 self.append(cell["content"])

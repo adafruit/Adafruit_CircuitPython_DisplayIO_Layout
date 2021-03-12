@@ -199,7 +199,7 @@ class Widget(displayio.Group):
 
         self._update_position()
 
-    def resize(self, new_width, new_height):
+    def resize(self, new_width, new_height, position=None):
         """Resizes the widget dimensions (for use with automated layout functions).
 
         **IMPORTANT:** The `resize` function should be overridden by the subclass definition.
@@ -211,6 +211,7 @@ class Widget(displayio.Group):
         the requested *new_width* and *new_height*. After resizing, the Widget's
         `bounding_box` should also be updated.
 
+        :param position: optional tuple with x,y position if subclasses want to use
         :param int new_width: target maximum width (in pixels)
         :param int new_height: target maximum height (in pixels)
         :return: None
