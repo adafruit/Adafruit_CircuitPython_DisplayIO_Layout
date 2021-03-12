@@ -217,6 +217,7 @@ class Widget(displayio.Group):
         :return: None
 
         """
+        # pylint: disable=unused-argument
         self._width = new_width
         self._height = new_height
 

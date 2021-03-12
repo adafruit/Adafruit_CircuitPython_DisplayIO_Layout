@@ -858,7 +858,7 @@ class SwitchRound(Widget, Control):
         self._radius = new_height // 2
         self._create_switch()
 
-    def resize(self, new_width, new_height):
+    def resize(self, new_width, new_height, position=None):
         """Resize the switch to a new requested width and height.
 
         :param int new_width: requested maximum width
@@ -866,6 +866,7 @@ class SwitchRound(Widget, Control):
         :return: None
 
         """
+        # pylint: disable=unused-argument
         # Fit the new button size within the requested maximum width/height
         # dimensions, but keeping an aspect ratio of 2:1 (width:height)
 
