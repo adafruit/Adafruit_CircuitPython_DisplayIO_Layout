@@ -22,3 +22,7 @@
    :inherited-members:
 
 .. inheritance-diagram:: adafruit_displayio_layout.widgets.switch_round
+
+.. automodule:: adafruit_displayio_layout.widgets.icon_widget
+   :members:
+   :member-order: bysource
