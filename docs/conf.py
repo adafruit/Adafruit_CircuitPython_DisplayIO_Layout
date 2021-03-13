@@ -28,7 +28,13 @@ inheritance_graph_attrs = dict(rankdir="TB")
 # Uncomment the below if you use native CircuitPython modules such as
 # digitalio, micropython and busio. List the modules you use. Without it, the
 # autodoc module docs will fail to generate with a warning.
-autodoc_mock_imports = ["displayio", "adafruit_display_shapes", "terminalio"]
+autodoc_mock_imports = [
+    "displayio",
+    "adafruit_display_shapes",
+    "terminalio",
+    "adafruit_imageload",
+    "adafruit_display_text",
+]
 
 
 intersphinx_mapping = {
