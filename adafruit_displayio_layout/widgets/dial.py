@@ -104,12 +104,12 @@ class Dial(Widget):
         start_angle=None,
         clip_needle=False,
         # trims off the needle outside of the dial region, used for sweep_angles < 180
-        needle_width=3,
+        needle_width=7,
         # triangle with this base width, best if this is odd
         needle_color=0x880000,
         value=None,
         value_font=None,
-        display_value=True,
+        display_value=False,
         value_color=0xFF0000,
         value_format_string=":0.0f",
         min_value=0.0,
@@ -436,6 +436,8 @@ class Dial(Widget):
             self._needle_width = round(
                 self._needle_width_requested * self._dial_radius / needle_length_showing
             )
+        else:
+            self._needle_width = self._needle_width_requested
 
     def _update_value(self):
 
@@ -493,8 +495,8 @@ class Dial(Widget):
         # Get the position offset from the motion function
         angle_offset = self._get_offset_position(position)
 
-        d_x = self._needle_width / 2 * math.cos(angle_offset)
-        d_y = self._needle_width / 2 * math.sin(angle_offset)
+        d_x = (self._needle_width / 2) * math.cos(angle_offset)
+        d_y = (self._needle_width / 2) * math.sin(angle_offset)
 
         x_0 = round(self._dial_center[0] - d_x)
         y_0 = round(self._dial_center[1] - d_y)
@@ -593,7 +595,8 @@ def draw_ticks(
     sweep_angle,
     tick_color_index=1,
 ):
-    """Helper function for drawing ticks on the dial widget.
+    """Helper function for drawing ticks on the dial widget.  Can be used to
+    customize the dial face.
 
     :param displayio.Bitmap target_bitmap: Bitmap where ticks will be drawn into
     :param (int,int) dial_center: the (x,y) pixel location in the bitmap of
@@ -662,7 +665,8 @@ def draw_labels(
     rotate_labels=True,
     tick_label_scale=1.0,
 ):
-    """Helper function for drawing text labels on the dial widget.
+    """Helper function for drawing text labels on the dial widget.  Can be used
+    to customize the dial face.
 
     :param displayio.Bitmap target_bitmap: Bitmap where ticks will be drawn into
     :param Font font: the font to be used to draw the tick mark text labels
