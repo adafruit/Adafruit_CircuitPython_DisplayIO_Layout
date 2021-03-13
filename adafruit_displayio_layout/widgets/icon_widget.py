@@ -75,7 +75,8 @@ class IconWidget(Widget, Control):
 
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
 
-        """Checks if the IconWidget was touched.  Returns True if the touch_point is within the IconWidget's touch_boundary.
+        """Checks if the IconWidget was touched.  Returns True if the touch_point is
+        within the IconWidget's touch_boundary.
 
         :param touch_point: x,y location of the screen, converted to local coordinates.
         :type touch_point: Tuple[x,y]
