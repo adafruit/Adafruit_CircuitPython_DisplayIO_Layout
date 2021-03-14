@@ -2,16 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 #############################
-# This is a trial of the Dial using Adafruit_DisplayIO_Layout
-#
+"""
+This is a basic demonstration of a Dial widget.
+"""
 
 import time
 import board
 import displayio
 import terminalio
 from adafruit_displayio_layout.widgets.dial import Dial
-
-from adafruit_bitmap_font import bitmap_font
 
 # Fonts used for the Dial tick labels
 tick_font = terminalio.FONT
@@ -37,7 +36,7 @@ my_dial = Dial(
     min_value=minimum_value,  # set the minimum value shown on the dial
     max_value=maximum_value,  # set the maximum value shown on the dial
     tick_label_font=tick_font,  # the font used for the tick labels
-    tick_label_scale=2.0, # the scale factor for the tick label font
+    tick_label_scale=2.0,  # the scale factor for the tick label font
 )
 
 my_group = displayio.Group(max_size=1)
