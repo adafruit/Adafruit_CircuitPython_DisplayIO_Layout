@@ -146,7 +146,7 @@ class Dial(Widget):
 
        Diagram showing the impact of the ``clip_needle`` input parameter,
        with the dial's boundary shown. For ``sweep_angle`` values less than
-       180 degrees, the needlecan protrude a long way from the dial ticks. By
+       180 degrees, the needle can protrude a long way from the dial ticks. By
        setting ``clip_needle = True``, the needle graphic will be clipped at the edge
        of the dial boundary (see comparison in the graphic above). The left dial is
        created with ``clip_needle = False``, meaning that the dial is not clipped.  The
