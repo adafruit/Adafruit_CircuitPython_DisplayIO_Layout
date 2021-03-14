@@ -50,13 +50,60 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.
 
 
 class SwitchRound(Widget, Control):
-    """
 
+    """
     .. note:: Jump directly to:
 
-        - :ref:`SwitchRound input parameters <parameters>`
-        - :ref:`SwitchRound methods <methods>`
+        - :ref:`SwitchRound: Input parameters <parameters>`
+        - :ref:`SwitchRound: Methods <methods>`
+        - :ref:`SwitchRound: Description of implementation <links>`
 
+    .. _parameters:
+
+    :param int x: pixel position, defaults to 0
+    :param int y: pixel position, defaults to 0
+    :param int width: width of the switch in pixels, if set to None (**recommended**)
+     the width will auto-size relative to the height, defaults to None
+    :param int height: height of the switch in pixels, defaults to 40 pixels
+    :param int touch_padding: the width of an additional border surrounding the switch
+     that extends the touch response boundary, defaults to 0
+    :param Boolean horizontal: To set vertical orientation, set ``horizontal``
+     to False, defaults to True
+    :param Boolean flip: Setting ``flip`` to True will flip the on and off
+     direction, default is True
+    :param float anchor_point: (X,Y) values from 0.0 to 1.0 to define the anchor
+     point relative to the switch bounding box, default is None
+    :param int anchored_position: (x,y) pixel value for the location
+     of the anchor_point, default is None
+    :param fill_color_off: (*RGB tuple
+     or 24-bit hex value*) switch off-state fill color, default is ``(66, 44, 66)`` gray.
+    :param fill_color_on: (*RGB tuple
+     or 24-bit hex value*) switch on-state fill color, default is ``(0, 100, 0)`` green.
+    :param outline_color_off: (*RGB tuple
+     or 24-bit hex value*) switch off-state outline color, default is ``(30, 30, 30)``
+     dark gray.
+    :param outline_color_on: (*RGB tuple
+     or 24-bit hex value*) switch on-state outline color, default is ``(0, 60, 0)`` green
+    :param background_color_off: (*RGB tuple
+     or 24-bit hex value*) background off-state color, default is ``(255, 255, 255)`` white
+    :param background_color_on: (*RGB tuple
+     or 24-bit hex value*) background on-state color, default is ``(0, 60, 0)`` dark green
+    :param background_outline_color_off: (*RGB tuple
+     or 24-bit hex value*) background outline color in off-state, if set to None this
+     will default to ``background_color_off``, default is None
+    :param background_outline_color_on: (*RGB tuple
+     or 24-bit hex value*) background outline color in on-state, if set to None this
+     will default to ``background_color_on``, default is None
+    :param int switch_stroke: outline stroke width for the switch and background,
+     in pixels, default is 2
+    :param int text_stroke: outline stroke width (in pixels) for the 0/1 text shape
+     outlines, if set to None it will use the value for ``switch_stroke``, default
+     value is None
+    :param Boolean display_button_text: Set True to display the 0/1 text shapes
+     on the sliding switch, set False to hide the 0/1 text shapes, default value is True
+    :param float animation_time: time for the switching animation, in seconds, default
+     value is 0.2 seconds.
+    :param Boolean value: the initial value for the switch, default is False
 
     .. _links:
 
@@ -360,57 +407,6 @@ class SwitchRound(Widget, Control):
     .. note:: **Never let any of these class definitions hold you back, let your imagination run
         wild and make some cool widgets!**
 
-    .. _parameters:
-
-    **SwitchRound input parameters**
-
-    :param int x: pixel position, defaults to 0
-    :param int y: pixel position, defaults to 0
-    :param int width: width of the switch in pixels, if set to None (**recommended**)
-     the width will auto-size relative to the height, defaults to None
-    :param int height: height of the switch in pixels, defaults to 40 pixels
-    :param int touch_padding: the width of an additional border surrounding the switch
-     that extends the touch response boundary, defaults to 0
-    :param Boolean horizontal: To set vertical orientation, set ``horizontal``
-     to False, defaults to True
-    :param Boolean flip: Setting ``flip`` to True will flip the on and off
-     direction, default is True
-    :param float anchor_point: (X,Y) values from 0.0 to 1.0 to define the anchor
-     point relative to the switch bounding box, default is None
-    :param int anchored_position: (x,y) pixel value for the location
-     of the anchor_point, default is None
-    :param fill_color_off: (*RGB tuple
-     or 24-bit hex value*) switch off-state fill color, default is ``(66, 44, 66)`` gray.
-    :param fill_color_on: (*RGB tuple
-     or 24-bit hex value*) switch on-state fill color, default is ``(0, 100, 0)`` green.
-    :param outline_color_off: (*RGB tuple
-     or 24-bit hex value*) switch off-state outline color, default is ``(30, 30, 30)``
-     dark gray.
-    :param outline_color_on: (*RGB tuple
-     or 24-bit hex value*) switch on-state outline color, default is ``(0, 60, 0)`` green
-    :param background_color_off: (*RGB tuple
-     or 24-bit hex value*) background off-state color, default is ``(255, 255, 255)`` white
-    :param background_color_on: (*RGB tuple
-     or 24-bit hex value*) background on-state color, default is ``(0, 60, 0)`` dark green
-    :param background_outline_color_off: (*RGB tuple
-     or 24-bit hex value*) background outline color in off-state, if set to None this
-     will default to ``background_color_off``, default is None
-    :param background_outline_color_on: (*RGB tuple
-     or 24-bit hex value*) background outline color in on-state, if set to None this
-     will default to ``background_color_on``, default is None
-    :param int switch_stroke: outline stroke width for the switch and background,
-     in pixels, default is 2
-    :param int text_stroke: outline stroke width (in pixels) for the 0/1 text shape
-     outlines, if set to None it will use the value for ``switch_stroke``, default
-     value is None
-    :param Boolean display_button_text: Set True to display the 0/1 text shapes
-     on the sliding switch, set False to hide the 0/1 text shapes, default value is True
-    :param float animation_time: time for the switching animation, in seconds, default
-     value is 0.2 seconds.
-    :param Boolean value: the initial value for the switch, default is False
-
-    See :ref:`SwitchRound details <switch_round_details>` for more information on usage and how it's
-    designed.
 
     .. _methods:
 
