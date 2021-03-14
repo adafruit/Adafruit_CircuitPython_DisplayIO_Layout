@@ -22,7 +22,7 @@ Implementation Notes
 """
 
 # pylint: disable=too-many-lines, too-many-instance-attributes, too-many-arguments
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, too-many-statements
 
 
 import math
@@ -36,6 +36,7 @@ except NameError:
 
 from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.widget import Widget
+from terminalio import FONT as terminalio_FONT
 
 
 class Dial(Widget):
@@ -44,13 +45,15 @@ class Dial(Widget):
     :param int x: pixel position
     :param int y: pixel position
 
-    :param int width: requested width in pixels
-    :param int height: requested height in pixels
+    :param int width: requested width, in pixels
+    :param int height: requested height, in pixels
     :param int padding: keepout padding amount around the border, in pixels
 
     :param float sweep_angle: dial rotation, in degrees, maximum value is 360 degrees
     :param float start_angle: starting angle, in degrees.  Defaults
-     to `None` for symmetry along vertical axis
+     to `None` for symmetry along vertical axis.  Vertical is defined as 0 degrees.
+     Negative values are counter-clockwise degrees; positive values
+     are clockwise degrees.
 
     :param float min_value: the minimum value displayed on the dial
     :param float max_value: the maximum value displayed the dial
@@ -97,8 +100,6 @@ class Dial(Widget):
 
     See file: ``examples/displayio_layout_dial_simpletest.py``
 
-
-
     .. figure:: dial.gif
        :scale: 100 %
        :figwidth: 50%
@@ -135,6 +136,22 @@ class Dial(Widget):
 
        Diagram showing the various parameters for setting the dial labels
        and major and minor tick marks.
+
+    .. figure:: dial_variables_clip_needle.png
+       :scale: 35 %
+       :figwidth: 70%
+       :align: center
+       :alt: Diagram showing the impact of ``clip_needle`` Boolean value.
+
+       Diagram showing the impact of the ``clip_needle`` input parameter,
+       with the dial's boundary shown. For ``sweep_angle`` values less than
+       180 degrees, the needlecan protrude a long way from the dial ticks. By
+       setting ``clip_needle = True``, the needle graphic will be clipped at the edge
+       of the dial boundary (see comparison in the graphic above). The left dial is
+       created with ``clip_needle = False``, meaning that the dial is not clipped.  The
+       right dial is created with ``clip_needle = True`` and the needle is clipped at
+       the edge of the dial.  Use additional ``padding`` to expose more length of
+       needle, even when clipped.
     """
 
     # The dial is a subclass of Group->Widget.
@@ -143,7 +160,7 @@ class Dial(Widget):
         self,
         width=100,
         height=100,
-        padding=0,  # keepout amount around border, in pixels
+        padding=12,  # keepout amount around border, in pixels
         sweep_angle=90,  # maximum value is 180 degrees
         start_angle=None,
         clip_needle=False,
@@ -198,7 +215,10 @@ class Dial(Widget):
         else:
             self._value = value
 
-        self._value_font = value_font
+        if value_font is None:
+            self._value_font = terminalio_FONT
+        else:
+            self._value_font = value_font
         self._value_color = value_color
         self._display_value = display_value
         self._value_format_string = value_format_string
@@ -230,7 +250,10 @@ class Dial(Widget):
 
         self._tick_color = tick_color
         self._tick_label_color = tick_label_color
-        self._tick_label_font = tick_label_font
+        if tick_label_font is None:
+            self._tick_label_font = terminalio_FONT
+        else:
+            self._tick_label_font = tick_label_font
         self._tick_label_scale = tick_label_scale
         self._rotate_tick_labels = rotate_tick_labels
 
