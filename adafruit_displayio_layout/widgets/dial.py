@@ -34,9 +34,10 @@ try:
 except NameError:
     pass  # utilize the blit_rotate_scale function defined herein
 
+
+from terminalio import FONT as terminalio_FONT
 from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.widget import Widget
-from terminalio import FONT as terminalio_FONT
 
 
 class Dial(Widget):
