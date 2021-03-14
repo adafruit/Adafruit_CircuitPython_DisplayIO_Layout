@@ -169,7 +169,7 @@ class Dial(Widget):
         minor_tick_stroke=1,
         minor_tick_length=5,
         tick_label_font=None,
-        tick_label_color=0x880000,
+        tick_label_color=0xFFFFFF,
         rotate_tick_labels=True,
         tick_label_scale=1.0,
         background_color=None,
