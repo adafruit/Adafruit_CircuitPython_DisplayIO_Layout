@@ -29,3 +29,8 @@
    :inherited-members:
 
 .. inheritance-diagram:: adafruit_displayio_layout.widgets.dial
+
+.. automodule:: adafruit_displayio_layout.widgets.icon_widget
+   :members:
+   :member-order: bysource
+

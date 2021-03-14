@@ -33,6 +33,8 @@ autodoc_mock_imports = [
     "adafruit_display_shapes",
     "vectorio",
     "bitmaptools",
+    "terminalio",
+    "adafruit_imageload",
     "adafruit_display_text",
 ]
 
