@@ -91,6 +91,50 @@ class Dial(Widget):
      anchor point relative to the dial's bounding box
     :param (int,int) anchored_position: (x,y) pixel value for the location
      of the `anchor_point`
+
+
+    **Simple example of dial and moving needle**
+
+    See file: ``examples/displayio_layout_dial_simpletest.py``
+
+
+
+    .. figure:: dial.gif
+       :scale: 100 %
+       :figwidth: 50%
+       :align: center
+       :alt: Diagram of the dial widget with needle in motion.
+
+       This is a diagram of a dial widget with the needle moving from its
+       minimum to maximum positions.
+
+    .. figure:: dial_variables_angles.png
+       :scale: 50 %
+       :figwidth: 70%
+       :align: center
+       :alt: Diagram showing the definition of ``start_angle`` and ``sweep_angle``,
+        both are in units of degrees.
+
+       Diagram showing the definition of ``start_angle`` and ``sweep_angle``,
+       both are in units of degrees.
+
+    .. figure:: dial_variables_min_max_values.png
+       :scale: 50 %
+       :figwidth: 70%
+       :align: center
+       :alt: Diagram showing the defintion of ``min_value`` and ``max_value``.
+
+       Diagram showing the defintion of ``min_value`` and ``max_value``.
+
+    .. figure:: dial_variables_ticks.png
+       :scale: 50 %
+       :figwidth: 70%
+       :align: center
+       :alt: Diagram showing the various parameters for setting the dial labels
+        and major and minor tick marks.
+
+       Diagram showing the various parameters for setting the dial labels
+       and major and minor tick marks.
     """
 
     # The dial is a subclass of Group->Widget.
@@ -243,7 +287,7 @@ class Dial(Widget):
             tick_length=self._major_tick_length,
             start_angle=self._start_angle,
             sweep_angle=self._sweep_angle,
-            tick_color_index=1,
+            tick_color_index=2,
         )
 
         draw_ticks(  # minor ticks
@@ -255,7 +299,7 @@ class Dial(Widget):
             tick_length=self._minor_tick_length,
             start_angle=self._start_angle,
             sweep_angle=self._sweep_angle,
-            tick_color_index=1,
+            tick_color_index=2,
         )
 
         draw_labels(
@@ -278,8 +322,8 @@ class Dial(Widget):
             self.dial_palette[0] = 0x000000
         else:
             self.dial_palette[0] = self._background_color
-        self.dial_palette[1] = self._tick_color
-        self.dial_palette[2] = self._tick_label_color
+        self.dial_palette[1] = self._tick_label_color
+        self.dial_palette[2] = self._tick_color
 
         # create the dial tilegrid and append to the self Widget->Group
         self.dial_tilegrid = displayio.TileGrid(
@@ -593,7 +637,7 @@ def draw_ticks(
     tick_length,
     start_angle,
     sweep_angle,
-    tick_color_index=1,
+    tick_color_index=2,
 ):
     """Helper function for drawing ticks on the dial widget.  Can be used to
     customize the dial face.

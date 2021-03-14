@@ -8,16 +8,13 @@
 import time
 import board
 import displayio
+import terminalio
 from adafruit_displayio_layout.widgets.dial import Dial
 
 from adafruit_bitmap_font import bitmap_font
 
-glyphs = "0123456789"
-
 # Fonts used for the Dial tick labels
-tick_font_file = "fonts/BitstreamVeraSans-Bold-16.pcf"
-tick_font = bitmap_font.load_font(tick_font_file)
-tick_font.load_glyphs(glyphs)
+tick_font = terminalio.FONT
 
 display = board.DISPLAY  # create the display on the PyPortal or Clue (for example)
 # otherwise change this to setup the display
@@ -39,7 +36,8 @@ my_dial = Dial(
     sweep_angle=240,  # total sweep angle of 240 degrees
     min_value=minimum_value,  # set the minimum value shown on the dial
     max_value=maximum_value,  # set the maximum value shown on the dial
-    tick_label_font=tick_font,  #
+    tick_label_font=tick_font,  # the font used for the tick labels
+    tick_label_scale=2.0, # the scale factor for the tick label font
 )
 
 my_group = displayio.Group(max_size=1)
