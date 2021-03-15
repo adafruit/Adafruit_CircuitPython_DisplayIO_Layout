@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 """
 
-`Annotation`
+`annotation`
 ================================================================================
 A widget for annotating other widgets or freeform positions.
 
@@ -34,56 +34,66 @@ class Annotation(Widget):
      be used freeform by using ``(x,y)`` parameter.
 
     :param int x: x-direction pixel position for the end of the annotation line for
-     freeform positioning, will be ignored if a ``widget`` and ``anchor_point`` and/or
-     ``anchored_position`` are provided
-    :param int x: x-direction pixel position for the end of the annotation line for
-     freeform positioning, will be ignored if a ``widget`` and ``anchor_point`` and/or
-     ``anchored_position`` are provided
+     freeform positioning, ``(x,y)`` will be ignored if a ``widget`` and ``anchor_point`` and/or
+     ``anchored_position`` are provided.
+    :param int y: y-direction pixel position for the end of the annotation line for
+     freeform positioning.
 
     :param Widget widget: the widget to be annotated, all dimensions are relative to
       this widget.  The annotation line position will be defined by either
-      the `anchor_point` (in relative dimensions of the size of the widget)
-      or the `anchored_position` (in raw pixel dimensions relative to the origin
+      the ``anchor_point`` (in relative dimensions of the size of the widget)
+      or the ``anchored_position`` (in raw pixel dimensions relative to the origin
       of the widget).
 
     :param str text: text to be displayed in the annotation.
     :param Font font: font to be used for the text.
 
-    :param anchor_point: starting point for the annotation line, where `anchor_point` is an
+    :param anchor_point: starting point for the annotation line, where ``anchor_point`` is an
       (A,B) tuple in relative units of the size of the widget,
       for example (0.0, 0.0) is the upper left corner, and (1.0, 1.0) is the lower
-      right corner of the widget.  If `anchor_point` is `None`, then `anchored_position`
+      right corner of the widget.  If ``anchor_point`` is `None`, then ``anchored_position``
       is used to set the annotation line starting point, in widget size relative units
-      (default is (0.0, 0.0))
+      (default is (0.0, 0.0)).
     :type anchor_point: Tuple[float, float]
 
     :param anchored_position: pixel position starting point for the annotation line
-     where `anchored_position` is an (x,y) tuple in pixel units relative to the
-     upper left corner of the widget, in pixel units (default is None)
+     where ``anchored_position`` is an (x,y) tuple in pixel units relative to the
+     upper left corner of the widget, in pixel units (default is None).
     :type anchored_position: Tuple[int, int]
 
-    :param position_offset: Used to 'nudge' the line position to where you want, this
+    :param position_offset: Used to *nudge* the line position to where you want, this
      is an (x,y) pixel offset added to the annotation line starting
-     point, either set by `anchor_point` or `anchored_position` (in pixel units).
+     point, either set by ``anchor_point`` or ``anchored_position`` (in pixel units).
     :type position_offset: Tuple[int, int]
 
     :param int delta_x: the pixel x-offset for the second end of the line where the text
-      will reside, in pixel units (default: -15)
+      will reside, in pixel units (default: -15).
     :param int delta_y: the pixel y-offset for the second end of the line where the text
-      will reside, in pixel units (default: -10)
+      will reside, in pixel units (default: -10).
 
     :param int stroke: the annotation line width (in pixels). [NOT currently implemented]
 
     :param int line_color: the color of the annotation line (default: 0xFFFFFF).
     :param int text_color: the color of the text, if set to `None` color will be
-      set to `line_color` (default: same as `line_color`).
+      set to ``line_color`` (default: same as ``line_color``).
 
     :param text_offset: a (x,y) pixel offset to adjust text position relative
-      to annotation line, in pixel units (default: (0,-1))
+      to annotation line, in pixel units (default: (0,-1)).
     :type text_offset: Tuple[int, int]
 
     :param Boolean text_under: set `True` for text to be placed below the
-      annotation line (default: False)
+      annotation line (default: False).
+
+    .. figure:: annotation_example.png
+      :scale: 125 %
+      :align: center
+      :alt: Example of the annotation widget.
+
+      Example of the annotation widget showing two widget
+      annotations (using ``widget`` and ``anchor_point`` input parameters) and a
+      freeform annotation (using ``x`` and ``y`` input parameters).
+
+      File location: *examples/displayio_layout_annotation_simpletest.py*
     """
 
     def __init__(
