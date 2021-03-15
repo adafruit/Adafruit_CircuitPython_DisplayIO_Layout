@@ -50,7 +50,7 @@ class IconWidget(Widget, Control):
     :param float max_angle: the maximum degrees of rotation during animation, set 0 for
      no rotation, in degrees (default: 0 degrees)
     :param float animation_time: the time for the animation in seconds, set to 0.0 for
-     no animation, a value of 0.15 is a good starting point (default: 0.15 seconds)
+     no animation, a value of 0.15 is a good starting point (default: 0.0 seconds)
 
     :param int x: x location the icon widget should be placed. Pixel coordinates.
     :param int y: y location the icon widget should be placed. Pixel coordinates.
