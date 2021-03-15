@@ -29,9 +29,6 @@ from adafruit_display_shapes.line import Line
 from adafruit_displayio_layout.widgets.widget import Widget
 
 
-
-
-
 class Annotation(Widget):
     """A widget to be used to annotate other widgets with text and lines, but can also
      be used freeform by using ``(x,y)`` parameter.
