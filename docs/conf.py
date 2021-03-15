@@ -34,6 +34,7 @@ autodoc_mock_imports = [
     "terminalio",
     "adafruit_imageload",
     "adafruit_display_text",
+    "bitmaptools",
 ]
 
 
