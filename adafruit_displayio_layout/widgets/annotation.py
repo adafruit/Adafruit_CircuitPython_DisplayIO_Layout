@@ -23,10 +23,13 @@ Implementation Notes
 
 # pylint: disable=too-many-arguments, too-many-locals, unused-argument
 
-from adafruit_displayio_layout.widgets.widget import Widget
-from adafruit_display_shapes.line import Line
-from adafruit_display_text import bitmap_label
 from terminalio import FONT
+from adafruit_display_text import bitmap_label
+from adafruit_display_shapes.line import Line
+from adafruit_displayio_layout.widgets.widget import Widget
+
+
+
 
 
 class Annotation(Widget):
