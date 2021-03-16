@@ -35,6 +35,7 @@ autodoc_mock_imports = [
     "adafruit_imageload",
     "adafruit_display_text",
     "bitmaptools",
+    "_pixelbuf",
 ]
 
 

@@ -64,16 +64,17 @@ class IconWidget(Widget, Control):
      displayio.Group constructor. If omitted we default to
      grid_size width * grid_size height to make room for all (1, 1) sized cells.
     :param int wheel_initial_value: When using palette animation, this is the initial value
-     of the colorwheel parameter used with ``_pixelbuf.colorwheel``
+     of the colorwheel parameter used with ``_pixelbuf.colorwheel`` (default: 0)
     :param int wheel_increment: To add palette animation, set this to the value of
      how much you want the ``_pixelbuf.colorwheel`` function to increment each time that
      ``unselected`` is called (default: 0 for no palette animation)
     :param int wheel_grading: This is the step sized used when calling colorwheel for
-     each color index in the palette (default: 5), basically it's how far apart each
+     each color index in the palette, basically it's how far apart each
      color in the palette will be set. Use a low value if you want each color to be
      close to each other or a high value to spread out into a wider range of colors.
+     (default: 5)
     :param int palette_skip_indices: integer or list of integers with the palette
-     indices that should not be changed when using the palette animations (default: None)
+     indices that will be kept constant using the palette animations (default: None)
 
     """
 
