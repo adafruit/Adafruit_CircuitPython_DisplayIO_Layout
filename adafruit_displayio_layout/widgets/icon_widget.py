@@ -25,6 +25,7 @@ import gc
 import time
 import terminalio
 import bitmaptools
+from _pixelbuf import colorwheel
 from displayio import TileGrid, Bitmap, Palette
 import adafruit_imageload
 from adafruit_display_text import bitmap_label
@@ -62,6 +63,17 @@ class IconWidget(Widget, Control):
     :param int max_size: (Optional) this will get passed through to the
      displayio.Group constructor. If omitted we default to
      grid_size width * grid_size height to make room for all (1, 1) sized cells.
+    :param int wheel_initial_value: When using palette animation, this is the initial value
+     of the colorwheel parameter used with ``_pixelbuf.colorwheel``
+    :param int wheel_increment: To add palette animation, set this to the value of
+     how much you want the ``_pixelbuf.colorwheel`` function to increment each time that
+     ``unselected`` is called (default: 0 for no palette animation)
+    :param int wheel_grading: This is the step sized used when calling colorwheel for
+     each color index in the palette (default: 5), basically it's how far apart each
+     color in the palette will be set. Use a low value if you want each color to be
+     close to each other or a high value to spread out into a wider range of colors.
+    :param int palette_skip_indices: integer or list of integers with the palette
+     indices that should not be changed when using the palette animations (default: None)
 
     """
 
@@ -76,7 +88,12 @@ class IconWidget(Widget, Control):
         max_scale=1.0,
         max_angle=8,
         animation_time=0.0,
-        **kwargs
+        wheel_initial_value=1,  # initial wheel color value
+        wheel_increment=0,  # how much the wheel
+        wheel_grading=5,  # sets the colorwheel distance between palette colors
+        palette_skip_indices=None,  # single value or list of palette color indices to
+        # remain constant during animations
+        **kwargs,
     ):
 
         super().__init__(**kwargs)  # initialize superclasses
@@ -121,6 +138,16 @@ class IconWidget(Widget, Control):
         self._zoom_tilegrid = None
 
         self.value = False  # initial value
+
+        self._wheel_value = wheel_initial_value  # initial color wheel value
+        self._wheel_increment = (
+            wheel_increment  # color wheel increment for palette changing
+        )
+        self._wheel_grading = wheel_grading
+        if isinstance(palette_skip_indices, list):
+            self._palette_skip_indices = palette_skip_indices
+        else:
+            self._palette_skip_indices = [palette_skip_indices]
 
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
 
@@ -246,3 +273,17 @@ class IconWidget(Widget, Control):
             gc.collect()
 
         self.value = False
+
+    def unselected(self):
+        """Performs animations when the button is not selected.  Provides a color
+        wheel palette animation (if wheel_increment > 0)."""
+        if self._wheel_increment:
+            self._wheel_value = self._wheel_value + self._wheel_increment
+            for i in range(0, len(self._palette)):
+                if i in self._palette_skip_indices:
+                    pass
+                else:
+                    self._palette[i] = colorwheel(
+                        self._wheel_value + i * self._wheel_grading
+                    )
+            self.display.refresh()
