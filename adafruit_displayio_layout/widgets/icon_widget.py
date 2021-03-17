@@ -25,8 +25,7 @@ import gc
 import time
 import terminalio
 import bitmaptools
-from _pixelbuf import colorwheel
-from displayio import TileGrid, Bitmap, Palette
+from displayio import TileGrid, OnDiskBitmap, ColorConverter, Bitmap, Palette
 import adafruit_imageload
 from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.control import Control
@@ -44,10 +43,12 @@ class IconWidget(Widget, Control):
 
     :param string label_text: the text that will be shown beneath the icon image.
     :param string icon: the filepath of the bmp image to be used as the icon.
+    :param boolean on_disk: if True use OnDiskBitmap instead of imageload.
+     This can be helpful to save memory. Defaults to False
 
     :param float max_scale: the maximum zoom during animation, set 1.0 for no animation
      a value of 1.4 is a good starting point (default: 1.0, no animation),
-     ``max_scale`` must be >= 1.0
+     ``max_scale`` must be between 1.0 and 1.5.
     :param float max_angle: the maximum degrees of rotation during animation, set 0 for
      no rotation, in degrees (default: 0 degrees)
     :param float animation_time: the time for the animation in seconds, set to 0.0 for
@@ -64,28 +65,38 @@ class IconWidget(Widget, Control):
      displayio.Group constructor. If omitted we default to
      grid_size width * grid_size height to make room for all (1, 1) sized cells.
     :param int wheel_initial_value: When using palette animation, this is the initial value
-     of the colorwheel parameter used with ``_pixelbuf.colorwheel`` (default: 0)
+     of the colorwheel parameter used with ``_pixelbuf.colorwheel``
     :param int wheel_increment: To add palette animation, set this to the value of
      how much you want the ``_pixelbuf.colorwheel`` function to increment each time that
      ``unselected`` is called (default: 0 for no palette animation)
     :param int wheel_grading: This is the step sized used when calling colorwheel for
-     each color index in the palette, basically it's how far apart each
+     each color index in the palette (default: 5), basically it's how far apart each
      color in the palette will be set. Use a low value if you want each color to be
      close to each other or a high value to spread out into a wider range of colors.
-     (default: 5)
     :param int palette_skip_indices: integer or list of integers with the palette
-     indices that will be kept constant using the palette animations (default: None)
+     indices that should not be changed when using the palette animations (default: None)
 
     """
 
-    # pylint: disable=bad-super-call, too-many-instance-attributes
+    # pylint: disable=bad-super-call, too-many-instance-attributes, too-many-locals
     # pylint: disable=too-many-arguments, unused-argument
+
+    _max_scale = 1.5
+    _max_pixels = 80
+    _max_color_depth = 512
+    _zoom_bitmap = Bitmap(
+        round(_max_scale * _max_pixels),
+        round(_max_scale * _max_pixels),
+        _max_color_depth,
+    )
+    _zoom_palette = Palette(_max_color_depth)
 
     def __init__(
         self,
         display,
         label_text,
         icon,
+        on_disk=False,
         max_scale=1.0,
         max_angle=8,
         animation_time=0.0,
@@ -97,33 +108,44 @@ class IconWidget(Widget, Control):
         **kwargs,
     ):
 
+        print("kwargs: {}".format(kwargs))
+
         super().__init__(**kwargs)  # initialize superclasses
         super(Control, self).__init__()
 
         self.display = display
+        self._icon = icon
 
-        self._image, self._palette = adafruit_imageload.load(icon)
-        tile_grid = TileGrid(self._image, pixel_shader=self._palette)
+        if on_disk:
+            print("on_disk")
+            self._file = open(icon, "rb")
+            image = OnDiskBitmap(self._file)
+            tile_grid = TileGrid(image, pixel_shader=ColorConverter())
+        else:
+            image, palette = adafruit_imageload.load(self._icon)
+            tile_grid = TileGrid(image, pixel_shader=palette)
+
         self.append(tile_grid)
         _label = bitmap_label.Label(
             terminalio.FONT,
             scale=1,
             text=label_text,
             anchor_point=(0.5, 0),
-            anchored_position=(self._image.width // 2, self._image.height),
+            anchored_position=(image.width // 2, image.height),
         )
         self.append(_label)
         self.touch_boundary = (
             self.x,
             self.y,
-            self._image.width,
-            self._image.height + _label.bounding_box[3],
+            image.width,
+            image.height + _label.bounding_box[3],
         )
 
         # verify the animation settings
         self._start_scale = 1.0
 
-        max_scale = max(1.0, max_scale)  # constrain to > 1.0
+        # constrain maximum_scaling between 1.0 and 1.5
+        self._max_scale = min(max(1.0, max_scale), IconWidget._max_scale)
         if max_scale == 1.0:  # no animation
             self._animation_time = 0
         else:
@@ -179,38 +201,34 @@ class IconWidget(Widget, Control):
 
         if self._animation_time > 0:
             ###
-            ## Create the zoom palette, bitmap and tilegrid
+            ## Update the zoom palette and bitmap buffers and append the tilegrid
             ###
 
-            # copy the image palette, add a transparent color at the end
-            self._zoom_color_depth = len(self._palette) + 1
+            _image, _palette = adafruit_imageload.load(self._icon)
 
-            self._zoom_palette = Palette(self._zoom_color_depth)
-            for i in range(len(self._palette)):
-                self._zoom_palette[i] = self._palette[i]
-            self._zoom_palette[self._zoom_color_depth - 1] = 0x000000
-            self._zoom_palette.make_transparent(self._zoom_color_depth - 1)
+            # copy the image palette, add a transparent color at the end
+            for i, color in enumerate(_palette):
+                IconWidget._zoom_palette[i] = color
+            IconWidget._zoom_palette[len(IconWidget._zoom_palette) - 1] = 0x000000
+            IconWidget._zoom_palette.make_transparent(len(IconWidget._zoom_palette) - 1)
 
             # create the zoom bitmap larger than the original image to allow for zooming
-            self._zoom_bitmap = Bitmap(
-                round(self._image.width * self._end_scale),
-                round(self._image.height * self._end_scale),
-                len(self._zoom_palette),
-            )
-            self._zoom_bitmap.fill(self._zoom_color_depth - 1)  # transparent fill
-            self._zoom_bitmap.blit(
-                (self._zoom_bitmap.width - self._image.width) // 2,
-                (self._zoom_bitmap.height - self._image.height) // 2,
-                self._image,
+            IconWidget._zoom_bitmap.fill(
+                len(IconWidget._zoom_palette) - 1
+            )  # transparent fill
+            IconWidget._zoom_bitmap.blit(
+                (IconWidget._zoom_bitmap.width - _image.width) // 2,
+                (IconWidget._zoom_bitmap.height - _image.height) // 2,
+                _image,
             )  # blit the image into the center of the zoom_bitmap
 
             # place zoom_bitmap at same location as image
             self._zoom_tilegrid = TileGrid(
-                self._zoom_bitmap, pixel_shader=self._zoom_palette
+                IconWidget._zoom_bitmap, pixel_shader=IconWidget._zoom_palette
             )
-            self._zoom_tilegrid.x = -(self._zoom_bitmap.width - self._image.width) // 2
+            self._zoom_tilegrid.x = -(IconWidget._zoom_bitmap.width - _image.width) // 2
             self._zoom_tilegrid.y = (
-                -(self._zoom_bitmap.height - self._image.height) // 2
+                -(IconWidget._zoom_bitmap.height - _image.height) // 2
             )
             self.append(self._zoom_tilegrid)  # add to the self group.
 
@@ -222,12 +240,12 @@ class IconWidget(Widget, Control):
                     1.0, easein(elapsed_time / self._animation_time)
                 )  # fractional position
                 bitmaptools.rotozoom(
-                    dest_bitmap=self._zoom_bitmap,
-                    ox=self._zoom_bitmap.width // 2,
-                    oy=self._zoom_bitmap.height // 2,
-                    source_bitmap=self._image,
-                    px=self._image.width // 2,
-                    py=self._image.height // 2,
+                    dest_bitmap=IconWidget._zoom_bitmap,
+                    ox=IconWidget._zoom_bitmap.width // 2,
+                    oy=IconWidget._zoom_bitmap.height // 2,
+                    source_bitmap=_image,
+                    px=_image.width // 2,
+                    py=_image.height // 2,
                     scale=self._start_scale
                     + position * (self._end_scale - self._start_scale),
                     angle=position * self._angle / 2,
@@ -235,6 +253,9 @@ class IconWidget(Widget, Control):
                 self.display.refresh()
                 if elapsed_time > self._animation_time:
                     break
+            del _image
+            del _palette
+            gc.collect()
 
     def released(self, touch_point):
         """Performs un-zoom animation when released.
@@ -244,20 +265,22 @@ class IconWidget(Widget, Control):
         :return: None
         """
 
+        _image, _palette = adafruit_imageload.load(self._icon)
+
         if (self._animation_time > 0) and self.value:
             # Animation: shrink down to the original size
             start_time = time.monotonic()
             while True:
                 elapsed_time = time.monotonic() - start_time
                 position = max(0.0, easeout(1 - (elapsed_time / self._animation_time)))
-                self._zoom_bitmap.fill(self._zoom_color_depth - 1)
+                IconWidget._zoom_bitmap.fill(len(IconWidget._zoom_palette) - 1)
                 bitmaptools.rotozoom(
-                    dest_bitmap=self._zoom_bitmap,
-                    ox=self._zoom_bitmap.width // 2,
-                    oy=self._zoom_bitmap.height // 2,
-                    source_bitmap=self._image,
-                    px=self._image.width // 2,
-                    py=self._image.height // 2,
+                    dest_bitmap=IconWidget._zoom_bitmap,
+                    ox=IconWidget._zoom_bitmap.width // 2,
+                    oy=IconWidget._zoom_bitmap.height // 2,
+                    source_bitmap=_image,
+                    px=_image.width // 2,
+                    py=_image.height // 2,
                     scale=self._start_scale
                     + position * (self._end_scale - self._start_scale),
                     angle=position * self._angle / 2,
@@ -268,23 +291,8 @@ class IconWidget(Widget, Control):
 
             # clean up the zoom display elements
             self.pop(-1)  # remove self from the group
-            del self._zoom_tilegrid
-            del self._zoom_bitmap
-            del self._zoom_palette
+            del _image
+            del _palette
             gc.collect()
 
         self.value = False
-
-    def unselected(self):
-        """Performs animations when the button is not selected.  Provides a color
-        wheel palette animation (if wheel_increment > 0)."""
-        if self._wheel_increment:
-            self._wheel_value = self._wheel_value + self._wheel_increment
-            for i in range(0, len(self._palette)):
-                if i in self._palette_skip_indices:
-                    pass
-                else:
-                    self._palette[i] = colorwheel(
-                        self._wheel_value + i * self._wheel_grading
-                    )
-            self.display.refresh()
