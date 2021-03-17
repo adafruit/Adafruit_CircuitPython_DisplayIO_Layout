@@ -100,11 +100,6 @@ class IconWidget(Widget, Control):
         max_scale=1.0,
         max_angle=8,
         animation_time=0.0,
-        wheel_initial_value=1,  # initial wheel color value
-        wheel_increment=0,  # how much the wheel
-        wheel_grading=5,  # sets the colorwheel distance between palette colors
-        palette_skip_indices=None,  # single value or list of palette color indices to
-        # remain constant during animations
         **kwargs,
     ):
 
@@ -162,16 +157,6 @@ class IconWidget(Widget, Control):
 
         self.value = False  # initial value
 
-        self._wheel_value = wheel_initial_value  # initial color wheel value
-        self._wheel_increment = (
-            wheel_increment  # color wheel increment for palette changing
-        )
-        self._wheel_grading = wheel_grading
-        if isinstance(palette_skip_indices, list):
-            self._palette_skip_indices = palette_skip_indices
-        else:
-            self._palette_skip_indices = [palette_skip_indices]
-
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
 
         """Checks if the IconWidget was touched.  Returns True if the touch_point is
@@ -189,7 +174,7 @@ class IconWidget(Widget, Control):
 
         return super().contains((touch_x, touch_y, 0))
 
-    def selected(self, touch_point):
+    def zoom_animation(self, touch_point):
         """Performs zoom animation when pressed.
 
         :param touch_point: x,y location of the screen, converted to local coordinates.
@@ -257,7 +242,7 @@ class IconWidget(Widget, Control):
             del _palette
             gc.collect()
 
-    def released(self, touch_point):
+    def zoom_out_animation(self, touch_point):
         """Performs un-zoom animation when released.
 
         :param touch_point: x,y location of the screen, converted to local coordinates.
