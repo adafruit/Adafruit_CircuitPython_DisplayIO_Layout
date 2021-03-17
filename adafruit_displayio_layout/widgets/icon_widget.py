@@ -41,16 +41,18 @@ class IconWidget(Widget, Control):
     adafruit_imageload and a text label centered beneath it. Includes optional
     animation to increase the icon size when pressed.
 
-    :param string label_text: the text that will be shown beneath the icon image.
-    :param string icon: the filepath of the bmp image to be used as the icon.
-    :param boolean on_disk: if True use OnDiskBitmap instead of imageload.
+    :param displayio.Display display: the display where the ``IconWidget`` is displayed,
+     used for handling animations.
+    :param str label_text: the text that will be shown beneath the icon image.
+    :param str icon: the filepath of the bmp image to be used as the icon.
+    :param bool on_disk: if True use OnDiskBitmap instead of imageload.
      This can be helpful to save memory. Defaults to False
 
     :param float max_scale: the maximum zoom during animation, set 1.0 for no animation
      a value of 1.4 is a good starting point (default: 1.0, no animation),
      ``max_scale`` must be between 1.0 and 1.5.
-    :param float max_angle: the maximum degrees of rotation during animation, set 0 for
-     no rotation, in degrees (default: 0 degrees)
+    :param float max_angle: the maximum degrees of rotation during animation, positive values
+     are clockwise, set 0 for no rotation, in degrees (default: 0 degrees)
     :param float animation_time: the time for the animation in seconds, set to 0.0 for
      no animation, a value of 0.15 is a good starting point (default: 0.0 seconds)
 
@@ -64,18 +66,6 @@ class IconWidget(Widget, Control):
     :param int max_size: (Optional) this will get passed through to the
      displayio.Group constructor. If omitted we default to
      grid_size width * grid_size height to make room for all (1, 1) sized cells.
-    :param int wheel_initial_value: When using palette animation, this is the initial value
-     of the colorwheel parameter used with ``_pixelbuf.colorwheel``
-    :param int wheel_increment: To add palette animation, set this to the value of
-     how much you want the ``_pixelbuf.colorwheel`` function to increment each time that
-     ``unselected`` is called (default: 0 for no palette animation)
-    :param int wheel_grading: This is the step sized used when calling colorwheel for
-     each color index in the palette (default: 5), basically it's how far apart each
-     color in the palette will be set. Use a low value if you want each color to be
-     close to each other or a high value to spread out into a wider range of colors.
-    :param int palette_skip_indices: integer or list of integers with the palette
-     indices that should not be changed when using the palette animations (default: None)
-
     """
 
     # pylint: disable=bad-super-call, too-many-instance-attributes, too-many-locals
@@ -100,15 +90,8 @@ class IconWidget(Widget, Control):
         max_scale=1.0,
         max_angle=8,
         animation_time=0.0,
-        wheel_initial_value=1,  # initial wheel color value
-        wheel_increment=0,  # how much the wheel
-        wheel_grading=5,  # sets the colorwheel distance between palette colors
-        palette_skip_indices=None,  # single value or list of palette color indices to
-        # remain constant during animations
         **kwargs,
     ):
-
-        print("kwargs: {}".format(kwargs))
 
         super().__init__(**kwargs)  # initialize superclasses
         super(Control, self).__init__()
@@ -117,7 +100,6 @@ class IconWidget(Widget, Control):
         self._icon = icon
 
         if on_disk:
-            print("on_disk")
             self._file = open(icon, "rb")
             image = OnDiskBitmap(self._file)
             tile_grid = TileGrid(image, pixel_shader=ColorConverter())
@@ -162,16 +144,6 @@ class IconWidget(Widget, Control):
 
         self.value = False  # initial value
 
-        self._wheel_value = wheel_initial_value  # initial color wheel value
-        self._wheel_increment = (
-            wheel_increment  # color wheel increment for palette changing
-        )
-        self._wheel_grading = wheel_grading
-        if isinstance(palette_skip_indices, list):
-            self._palette_skip_indices = palette_skip_indices
-        else:
-            self._palette_skip_indices = [palette_skip_indices]
-
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
 
         """Checks if the IconWidget was touched.  Returns True if the touch_point is
@@ -189,7 +161,7 @@ class IconWidget(Widget, Control):
 
         return super().contains((touch_x, touch_y, 0))
 
-    def selected(self, touch_point):
+    def zoom_animation(self, touch_point):
         """Performs zoom animation when pressed.
 
         :param touch_point: x,y location of the screen, converted to local coordinates.
@@ -257,7 +229,7 @@ class IconWidget(Widget, Control):
             del _palette
             gc.collect()
 
-    def released(self, touch_point):
+    def zoom_out_animation(self, touch_point):
         """Performs un-zoom animation when released.
 
         :param touch_point: x,y location of the screen, converted to local coordinates.
