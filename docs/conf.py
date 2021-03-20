@@ -31,6 +31,8 @@ inheritance_graph_attrs = dict(rankdir="TB")
 autodoc_mock_imports = [
     "displayio",
     "adafruit_display_shapes",
+    "vectorio",
+    "bitmaptools",
     "terminalio",
     "adafruit_imageload",
     "adafruit_display_text",
@@ -43,7 +45,7 @@ intersphinx_mapping = {
 }
 
 # Show the docstring from both the class and its __init__() method.
-autoclass_content = "both"
+autoclass_content = "init"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

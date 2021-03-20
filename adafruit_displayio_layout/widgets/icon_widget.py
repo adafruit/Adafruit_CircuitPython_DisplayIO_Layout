@@ -24,7 +24,7 @@ Implementation Notes
 
 
 import terminalio
-from displayio import TileGrid
+from displayio import TileGrid, OnDiskBitmap, ColorConverter
 import adafruit_imageload
 from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.control import Control
@@ -39,6 +39,8 @@ class IconWidget(Widget, Control):
 
     :param string label_text: the text that will be shown beneath the icon image.
     :param string icon: the filepath of the bmp image to be used as the icon.
+    :param boolean on_disk: if True use OnDiskBitmap instead of imageload.
+     This can be helpful to save memory. Defaults to False
 
     :param int x: x location the icon widget should be placed. Pixel coordinates.
     :param int y: y location the icon widget should be placed. Pixel coordinates.
@@ -53,10 +55,16 @@ class IconWidget(Widget, Control):
 
     """
 
-    def __init__(self, label_text, icon, **kwargs):
+    def __init__(self, label_text, icon, on_disk=False, **kwargs):
         super().__init__(**kwargs)
-        image, palette = adafruit_imageload.load(icon)
-        tile_grid = TileGrid(image, pixel_shader=palette)
+
+        if on_disk:
+            self._file = open(icon, "rb")
+            image = OnDiskBitmap(self._file)
+            tile_grid = TileGrid(image, pixel_shader=ColorConverter())
+        else:
+            image, palette = adafruit_imageload.load(icon)
+            tile_grid = TileGrid(image, pixel_shader=palette)
         self.append(tile_grid)
         _label = bitmap_label.Label(
             terminalio.FONT,
