@@ -57,5 +57,9 @@ setup(
     # simple. Or you can use find_packages().
     # TODO: IF LIBRARY FILES ARE A PACKAGE FOLDER,
     #       CHANGE `py_modules=['...']` TO `packages=['...']`
-    packages=["adafruit_displayio_layout"],
+    packages=[
+        "adafruit_displayio_layout",
+        "adafruit_displayio_layout.layouts",
+        "adafruit_displayio_layout.widgets",
+    ],
 )
