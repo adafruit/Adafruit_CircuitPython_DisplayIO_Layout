@@ -38,7 +38,7 @@ class IconAnimated(IconWidget):
     OnDiskBitmap and a text label centered beneath it. Includes optional
     animation to increase the icon size when pressed.
 
-    .. Warning::  The `init_class` class function should be called before instancing any
+    .. Warning::  The `init_class` class function must be called before instancing any
         IconAnimated widgets.
 
     :param str label_text: the text that will be shown beneath the icon image.
@@ -81,9 +81,9 @@ class IconAnimated(IconWidget):
         Initializes the IconAnimated Class variables, including preallocating memory
         buffers for the icon zoom bitmap and icon palette.
 
-        .. Note::  The `init_class` class function should be called before instancing any
+        .. Note::  The `init_class` class function must be called before instancing any
                 IconAnimated widgets. Usage example:
-                ``IconAnimated(display=board.DISPLAY, max_scale=1.5,
+                ``IconAnimated.init_class(display=board.DISPLAY, max_scale=1.5,
                 max_size=(80,80), max_color_depth=256)``
 
         :param displayio.Display display: The display where the icons will be displayed.
