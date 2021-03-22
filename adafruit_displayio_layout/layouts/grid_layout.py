@@ -72,12 +72,6 @@ class GridLayout(displayio.Group):
                 button_size_x = cell["cell_size"][0]
                 button_size_y = cell["cell_size"][1]
 
-                print(
-                    "setting width to: {}".format(
-                        int(button_size_x * self._width / grid_size_x)
-                        - 2 * self.cell_padding
-                    )
-                )
                 if hasattr(cell["content"], "resize"):
                     # if it has resize function
                     cell["content"].resize(
