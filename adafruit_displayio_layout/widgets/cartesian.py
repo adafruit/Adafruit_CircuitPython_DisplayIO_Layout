@@ -78,14 +78,15 @@ class Cartesian(Widget):
         pointer_color: int = 0xFFFFFF,
         **kwargs,
     ) -> None:
-        # TODO Make axes, separate from data            [X]
-        # TODO Replace with drawline/vectorio           [X]
-        # TODO Make a rectangle function                [ ]
+        # TODO Make axes, separate from data            [√]
+        # TODO Replace with drawline/vectorio           [√]
+        # TODO Make a rectangle function                [√]
         # TODO Include functions to equal space ticks   [ ]
         # TODO Make labels and text                     [ ]
         # TODO Make Styles applicable                   [ ]
         # TODO Animate when overflow                    [ ]
         # TODO Add Subticks functionality               [ ]
+        # TODO ticks evenly distributed                 [ ]
 
         super().__init__(**kwargs, max_size=3)
         self._origin_x = x
