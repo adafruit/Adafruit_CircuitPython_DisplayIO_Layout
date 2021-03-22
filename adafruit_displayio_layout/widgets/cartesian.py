@@ -29,7 +29,6 @@ import displayio
 import board
 import terminalio
 from adafruit_displayio_layout.widgets.widget import Widget
-from adafruit_displayio_layout.widgets import _blit_rotate_scale
 import vectorio
 
 try:
@@ -80,6 +79,13 @@ class Cartesian(Widget):
         pointer_color: int = 0xFFFFFF,
         **kwargs,
     ) -> None:
+        # TODO Make axes, separate from data            [X]
+        # TODO Replace with drawline/vectorio           [ ]
+        # TODO Make a rectangle function                [ ]
+        # TODO Include functions to equal space ticks   [ ]
+        # TODO Make labels and text                     [ ]
+        # TODO Make Styles applicable                   [ ]
+        # TODO Animate when overflow                    [ ]
 
         super().__init__(**kwargs, max_size=3)
         self._origin_x = x
@@ -116,15 +122,23 @@ class Cartesian(Widget):
         )
         self._tick_bitmap.fill(1)
 
-        self._axesx_bitmap = displayio.Bitmap(
-            self._axes_line_thickness, self._usable_height, 3
+        axesx_height = (
+            2
+            + self._axes_line_thickness
+            + self._font_height
+            + self._tick_line_height // 2
         )
-        self._axesx_bitmap.fill(2)
+        self._axesx_bitmap = displayio.Bitmap(self._usable_width, axesx_height, 4)
+        self._axesx_bitmap.fill(0)
 
-        self._axesy_bitmap = displayio.Bitmap(
-            self._usable_width, self._axes_line_thickness, 3
+        self._axesy_width = (
+            2
+            + self._axes_line_thickness
+            + self._font_height
+            + self._tick_line_height // 2
         )
-        self._axesy_bitmap.fill(2)
+        self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self._usable_height, 4)
+        self._axesy_bitmap.fill(0)
 
         self._screen_bitmap = displayio.Bitmap(
             self._usable_width, self._usable_height, 3
@@ -134,9 +148,23 @@ class Cartesian(Widget):
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = self._tick_color
         self._screen_palette[2] = self._axes_line_color
-        self._screen_palette[3] = 0x00FFFF
+        self._screen_palette[3] = 0x990099
         self._screen_palette[4] = 0xFFFFFF
         self._screen_palette[5] = self._display_color
+
+        self._axesx_tilegrid = displayio.TileGrid(
+            self._axesx_bitmap,
+            pixel_shader=self._screen_palette,
+            x=self._origin_x,
+            y=self._origin_y + self._usable_height,
+        )
+
+        self._axesy_tilegrid = displayio.TileGrid(
+            self._axesy_bitmap,
+            pixel_shader=self._screen_palette,
+            x=self._origin_x - self._axesy_width,
+            y=self._origin_y,
+        )
 
         self._screen_tilegrid = displayio.TileGrid(
             self._screen_bitmap,
@@ -149,6 +177,8 @@ class Cartesian(Widget):
         self._draw_ticks()
         self._draw_pointers()
         self.append(self._pointer_vector_shape)
+        self.append(self._axesx_tilegrid)
+        self.append(self._axesy_tilegrid)
         self.append(self._screen_tilegrid)
 
     @staticmethod
@@ -162,24 +192,15 @@ class Cartesian(Widget):
         return font_width, font_height
 
     def _draw_axes(self):
-        bitmaptools.rotozoom(
-            self._screen_bitmap,
-            ox=self._margin,
-            oy=self._usable_height,
-            source_bitmap=self._axesx_bitmap,
-            px=self._axesx_bitmap.width,
-            py=self._axesx_bitmap.height,
-            angle=0.0,  # in radians
-        )
-
-        bitmaptools.rotozoom(
-            self._screen_bitmap,
-            ox=int(self._usable_width + self._margin),
-            oy=self._usable_height,
-            source_bitmap=self._axesy_bitmap,
-            px=self._axesy_bitmap.width,
-            py=self._axesy_bitmap.height,
-            angle=0.0,
+        y = self._tick_line_height // 2
+        bitmaptools.draw_line(self._axesx_bitmap, 0, y, self._usable_width - 1, y, 3)
+        bitmaptools.draw_line(
+            self._axesy_bitmap,
+            self._axesy_width - 1,
+            0,
+            self._axesy_width - 1,
+            self._usable_height - 1,
+            3,
         )
 
     def _draw_ticks(self):
@@ -188,19 +209,9 @@ class Cartesian(Widget):
                 bitmaptools.rotozoom(
                     self._screen_bitmap,
                     ox=i,
-                    oy=self._usable_height,
+                    oy=self._usable_height + self._tick_line_height // 2,
                     source_bitmap=self._tick_bitmap,
-                    px=int(self._tick_bitmap.width / 2),
-                    py=self._tick_bitmap.height,
-                    angle=0.0,  # in radians
-                )
-            else:
-                _blit_rotate_scale(  # translate and rotate the tick into the target_bitmap
-                    destination=self._screen_bitmap,
-                    ox=i,
-                    oy=0,
-                    source=self._tick_bitmap,
-                    px=int(self._tick_bitmap / 2),
+                    px=int(self._tick_bitmap.width),
                     py=self._tick_bitmap.height,
                     angle=0.0,  # in radians
                 )
@@ -209,20 +220,10 @@ class Cartesian(Widget):
             if "rotozoom" in dir(bitmaptools):  # if core function is available
                 bitmaptools.rotozoom(
                     self._screen_bitmap,
-                    ox=self._margin,
+                    ox=0,
                     oy=i,
                     source_bitmap=self._tick_bitmap,
-                    px=int(self._tick_bitmap.width / 2),
-                    py=int(self._tick_bitmap.height / 2),
-                    angle=(90 * math.pi / 180),  # in radians
-                )
-            else:
-                _blit_rotate_scale(  # translate and rotate the tick into the target_bitmap
-                    destination=self._screen_bitmap,
-                    ox=i,
-                    oy=0,
-                    source=self._tick_bitmap,
-                    px=int(self._tick_bitmap.width / 2),
+                    px=int(self._tick_bitmap.width),
                     py=int(self._tick_bitmap.height / 2),
                     angle=(90 * math.pi / 180),  # in radians
                 )
