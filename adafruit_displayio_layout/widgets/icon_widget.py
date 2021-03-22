@@ -75,8 +75,8 @@ class IconWidget(Widget, Control):
         )
         self.append(_label)
         self.touch_boundary = (
-            self.x,
-            self.y,
+            0,
+            0,
             image.width,
             image.height + _label.bounding_box[3],
         )
