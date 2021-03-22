@@ -50,8 +50,8 @@ class IconWidget(Widget, Control):
     :param int anchored_position: (x,y) pixel value for the location of the anchor_point
     :type anchored_position: Tuple[int, int]
     :param int max_size: (Optional) this will get passed through to the
-     displayio.Group constructor. If omitted we default to
-     grid_size width * grid_size height to make room for all (1, 1) sized cells.
+     displayio.Group constructor. ``max_size`` should be set to the maximum number of
+     graphical elements that will be held within the Group of this widget.
 
     """
 
@@ -77,8 +77,8 @@ class IconWidget(Widget, Control):
         )
         self.append(_label)
         self.touch_boundary = (
-            self.x,
-            self.y,
+            0,
+            0,
             image.width,
             image.height + _label.bounding_box[3],
         )
