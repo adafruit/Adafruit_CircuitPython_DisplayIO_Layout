@@ -8,7 +8,7 @@ Ensure your device works with this simple test.
     :linenos:
 
 Pygame simple test
-----------------
+------------------
 
 Display Hello World using Blinka_Displayio_PyGameDisplay.
 
