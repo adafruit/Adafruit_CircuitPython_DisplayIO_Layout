@@ -30,6 +30,7 @@ import board
 import terminalio
 import vectorio
 from adafruit_displayio_layout.widgets.widget import Widget
+
 try:
     import bitmaptools
 except NameError:
