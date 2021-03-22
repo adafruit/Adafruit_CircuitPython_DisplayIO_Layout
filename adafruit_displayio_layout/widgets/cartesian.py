@@ -25,7 +25,6 @@ Implementation Notes
 # pylint: disable=too-many-locals, too-many-statements
 
 import displayio
-import board
 import terminalio
 import vectorio
 from adafruit_displayio_layout.widgets.widget import Widget
@@ -43,8 +42,8 @@ class Cartesian(Widget):
     :param int y: y position of the plane origin
 
     :param int display_color: background color to use defaults to black (0x000000)
-    :param int width: requested width, in pixels defaults to screen width
-    :param int height: requested height, in pixels defaults to screen height
+    :param int width: requested width, in pixels defaults to 100 pixels
+    :param int height: requested height, in pixels defaults to 100 pixels
 
     :param int axes_color: axes lines color defaults to white (0xFFFFFF)
     :param int axes_stroke: axes lines thickness in pixels defaults to 2
@@ -63,10 +62,10 @@ class Cartesian(Widget):
     def __init__(
         self,
         x: int = 10,
-        y: int = board.DISPLAY.height - 10,
+        y: int = 10,
         display_color=0x000000,
-        width: int = board.DISPLAY.width,
-        height: int = board.DISPLAY.height,
+        width: int = 100,
+        height: int = 100,
         axes_color: int = 0xFFFFFF,
         axes_stroke: int = 2,
         tick_color: int = 0xFFFFFF,
