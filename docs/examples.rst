@@ -12,7 +12,7 @@ Pygame simple test
 
 Display Hello World using Blinka_Displayio_PyGameDisplay.
 
-.. literalinclude:: ..examples/displayio_layout_gridlayout_pygame_display_simpletest.py
+.. literalinclude:: ../examples/displayio_layout_gridlayout_pygame_display_simpletest.py
     :caption: examples/displayio_layout_gridlayout_pygame_display_simpletest.py
     :linenos:
 
