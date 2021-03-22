@@ -33,6 +33,10 @@ try:
     import bitmaptools
 except NameError:
     pass  # utilize the blit_rotate_scale function defined herein
+try:
+    from typing import Tuple
+except ImportError:
+    pass
 
 
 class Cartesian(Widget):
@@ -44,6 +48,9 @@ class Cartesian(Widget):
     :param int display_color: background color to use defaults to black (0x000000)
     :param int width: requested width, in pixels defaults to 100 pixels
     :param int height: requested height, in pixels defaults to 100 pixels
+
+    :param (int, int) axesx_range: X axes range
+    :param (int, int) axesy_range: Y axes range
 
     :param int axes_color: axes lines color defaults to white (0xFFFFFF)
     :param int axes_stroke: axes lines thickness in pixels defaults to 2
@@ -57,6 +64,43 @@ class Cartesian(Widget):
     :param int pointer_radius: pointer radius in pixels defaults to 1
     :param int pointer_color: pointer color defaults to white (0xFFFFFF)
 
+    **Quickstart: Importing and using Cartesian**
+
+    Here is one way of importing the `Cartesian` class so you can use it as
+    the name ``Plane``:
+
+    .. code-block:: python
+
+        from adafruit_displayio_layout.widgets.cartesian import Cartesian as Plane
+
+    Now you can create a plane at pixel position x=20, y=30 using:
+
+    .. code-block:: python
+
+        my_plane=Plane(x=20, y=30) # instance the switch at x=20, y=30
+
+    Once you setup your display, you can now add ``my_plane`` to your display using:
+
+    .. code-block:: python
+
+        display.show(my_plane) # add the group to the display
+
+    If you want to have multiple display elements, you can create a group and then
+    append the switch and the other elements to the group.  Then, you can add the full
+    group to the display as in this example:
+
+    .. code-block:: python
+
+        my_plane= Plane(20, 30) # instance the plane at x=20, y=30
+        my_group = displayio.Group(max_size=10) # make a group that can hold 10 items
+        my_group.append(my_plane) # Add my_plane to the group
+
+        #
+        # Append other display elements to the group
+        #
+
+        display.show(my_group) # add the group to the display
+
     """
 
     def __init__(
@@ -66,6 +110,8 @@ class Cartesian(Widget):
         display_color=0x000000,
         width: int = 100,
         height: int = 100,
+        xrange: Tuple[int, int] = (0, 100),
+        yrange: Tuple[int, int] = (0, 100),
         axes_color: int = 0xFFFFFF,
         axes_stroke: int = 2,
         tick_color: int = 0xFFFFFF,
@@ -80,12 +126,12 @@ class Cartesian(Widget):
         # TODO Make axes, separate from data            [√]
         # TODO Replace with drawline/vectorio           [√]
         # TODO Make a rectangle function                [√]
-        # TODO Include functions to equal space ticks   [ ]
+        # TODO Include functions to equal space ticks   [√]
         # TODO Make labels and text                     [ ]
         # TODO Make Styles applicable                   [ ]
         # TODO Animate when overflow                    [ ]
         # TODO Add Subticks functionality               [ ]
-        # TODO ticks evenly distributed                 [ ]
+        # TODO ticks evenly distributed                 [√]
 
         super().__init__(**kwargs, max_size=3)
         self._origin_x = x
@@ -113,9 +159,11 @@ class Cartesian(Widget):
         self._font_width = self._get_font_height(self._font, 1)[0]
         self._font_height = self._get_font_height(self._font, 1)[1]
 
-        self._usable_width = self._widget_width - 2 * self._margin
-        self._usable_height = self._widget_height - 2 * self._margin
-        self._tickx_separation = 2 * self._font_width + 2
+        self._usable_width = self._widget_width
+        self._usable_height = self._widget_height
+
+        self._tickx_separation = int(xrange[1] / self._usable_width * 10)
+        self._ticky_separation = int(yrange[1] / self._usable_height * 10)
 
         self._tick_bitmap = displayio.Bitmap(
             self._tick_line_thickness, self._tick_line_height, 3
@@ -134,7 +182,7 @@ class Cartesian(Widget):
         self._axesy_width = (
             2
             + self._axes_line_thickness
-            + self._font_height
+            + self._font_width
             + self._tick_line_height // 2
         )
         self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self._usable_height, 4)
@@ -143,7 +191,7 @@ class Cartesian(Widget):
         self._screen_bitmap = displayio.Bitmap(
             self._usable_width, self._usable_height, 3
         )
-
+        self._screen_bitmap.fill(0)
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = self._tick_color
@@ -192,27 +240,34 @@ class Cartesian(Widget):
         return font_width, font_height
 
     def _draw_axes(self):
-        y = self._tick_line_height // 2
-        bitmaptools.draw_line(self._axesx_bitmap, 0, y, self._usable_width - 1, y, 3)
+        # Draw x axes line
+        bitmaptools.draw_line(self._axesx_bitmap, 0, 0, self._usable_width - 1, 0, 2)
+        # Draw y axes line
         bitmaptools.draw_line(
             self._axesy_bitmap,
             self._axesy_width - 1,
             0,
             self._axesy_width - 1,
             self._usable_height - 1,
-            3,
+            2,
         )
 
     def _draw_ticks(self):
-        for i in range(self._margin, self._usable_width, self._tickx_separation):
-            bitmaptools.draw_line(
-                self._axesx_bitmap, i, self._tick_line_height // 2, i, 0, 2
-            )
+        # X axes ticks
 
-        for i in range(self._margin, self._usable_height, self._tickx_separation):
+        for i in range(
+            self._tickx_separation, self._usable_width, self._tickx_separation
+        ):
+            bitmaptools.draw_line(
+                self._axesx_bitmap, i, self._tick_line_height, i, 0, 2
+            )
+        # Y axes ticks
+        for i in range(
+            self._usable_height - 1 - self._ticky_separation, 0, -self._ticky_separation
+        ):
             bitmaptools.draw_line(
                 self._axesy_bitmap,
-                (self._axesy_width - self._tick_line_height // 2) - 1,
+                (self._axesy_width - self._tick_line_height) - 1,
                 i,
                 self._axesy_width - 1,
                 i,
