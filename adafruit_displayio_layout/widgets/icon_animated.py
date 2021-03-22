@@ -150,7 +150,6 @@ class IconAnimated(IconWidget):
             )
 
         super().__init__(label_text, icon, on_disk, **kwargs)  # initialize superclasses
-        print("icon: {}".format(self._icon))
 
         # constrain instance's maximum_scaling between 1.0 and the Class's max_scale
         if scale is None:
