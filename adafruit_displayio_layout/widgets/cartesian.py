@@ -28,9 +28,8 @@ import math
 import displayio
 import board
 import terminalio
-from adafruit_displayio_layout.widgets.widget import Widget
 import vectorio
-
+from adafruit_displayio_layout.widgets.widget import Widget
 try:
     import bitmaptools
 except NameError:
