@@ -27,9 +27,9 @@ Implementation Notes
 import displayio
 import terminalio
 import vectorio
+from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets import rectangle_helper
-from adafruit_display_text import bitmap_label
 
 try:
     import bitmaptools
