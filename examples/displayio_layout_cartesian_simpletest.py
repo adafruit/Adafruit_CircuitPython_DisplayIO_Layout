@@ -20,7 +20,7 @@ display = board.DISPLAY  # create the display on the PyPortal or Clue (for examp
 # for display chip driver and pinout you have (e.g. ILI9341)
 
 
-# Create a Dial widget
+# Create a Cartesian widget
 my_plane = Cartesian(
     x=150,  # x position for the plane
     y=100,  # y plane position

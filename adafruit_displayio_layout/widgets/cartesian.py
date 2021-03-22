@@ -24,7 +24,6 @@ Implementation Notes
 # pylint: disable=too-many-lines, too-many-instance-attributes, too-many-arguments
 # pylint: disable=too-many-locals, too-many-statements
 
-import math
 import displayio
 import board
 import terminalio
@@ -80,12 +79,13 @@ class Cartesian(Widget):
         **kwargs,
     ) -> None:
         # TODO Make axes, separate from data            [X]
-        # TODO Replace with drawline/vectorio           [ ]
+        # TODO Replace with drawline/vectorio           [X]
         # TODO Make a rectangle function                [ ]
         # TODO Include functions to equal space ticks   [ ]
         # TODO Make labels and text                     [ ]
         # TODO Make Styles applicable                   [ ]
         # TODO Animate when overflow                    [ ]
+        # TODO Add Subticks functionality               [ ]
 
         super().__init__(**kwargs, max_size=3)
         self._origin_x = x
@@ -205,28 +205,19 @@ class Cartesian(Widget):
 
     def _draw_ticks(self):
         for i in range(self._margin, self._usable_width, self._tickx_separation):
-            if "rotozoom" in dir(bitmaptools):  # if core function is available
-                bitmaptools.rotozoom(
-                    self._screen_bitmap,
-                    ox=i,
-                    oy=self._usable_height + self._tick_line_height // 2,
-                    source_bitmap=self._tick_bitmap,
-                    px=int(self._tick_bitmap.width),
-                    py=self._tick_bitmap.height,
-                    angle=0.0,  # in radians
-                )
+            bitmaptools.draw_line(
+                self._axesx_bitmap, i, self._tick_line_height // 2, i, 0, 2
+            )
 
         for i in range(self._margin, self._usable_height, self._tickx_separation):
-            if "rotozoom" in dir(bitmaptools):  # if core function is available
-                bitmaptools.rotozoom(
-                    self._screen_bitmap,
-                    ox=0,
-                    oy=i,
-                    source_bitmap=self._tick_bitmap,
-                    px=int(self._tick_bitmap.width),
-                    py=int(self._tick_bitmap.height / 2),
-                    angle=(90 * math.pi / 180),  # in radians
-                )
+            bitmaptools.draw_line(
+                self._axesy_bitmap,
+                (self._axesy_width - self._tick_line_height // 2) - 1,
+                i,
+                self._axesy_width - 1,
+                i,
+                2,
+            )
 
     def _draw_pointers(self):
         self._pointer = vectorio.Circle(3)
