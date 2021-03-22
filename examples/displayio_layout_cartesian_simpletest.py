@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2021 Jose David Montoya
+# SPDX-FileCopyrightText: 2021 Jose David M.
 #
 # SPDX-License-Identifier: MIT
 #############################
@@ -40,9 +40,11 @@ my_group.append(my_plane)
 display.show(my_group)  # add high level Group to the display
 
 posx = 0
-posy = 0
+posy = 100
 
 while True:
     my_plane.update_pointer(posx, posy)
     display.show(my_group)
     time.sleep(0.5)
+    posx = posx + 2
+    posy = posy - 2

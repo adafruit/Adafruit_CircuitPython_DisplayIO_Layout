@@ -1,11 +1,11 @@
-# SPDX-FileCopyrightText: 2021 Jose David Montoya
+# SPDX-FileCopyrightText: 2021 Jose David M.
 #
 # SPDX-License-Identifier: MIT
 """
 
 `cartesian`
 ================================================================================
-A cartasian plane widget for displaying graphical information.
+A cartesian plane widget for displaying graphical information.
 
 * Author(s): Jose David Montoya
 
@@ -28,6 +28,8 @@ import displayio
 import terminalio
 import vectorio
 from adafruit_displayio_layout.widgets.widget import Widget
+from adafruit_displayio_layout.widgets import rectangle_helper
+from adafruit_display_text import bitmap_label
 
 try:
     import bitmaptools
@@ -56,7 +58,8 @@ class Cartesian(Widget):
     :param int axes_stroke: axes lines thickness in pixels defaults to 2
 
     :param int major_tick_stroke: tick lines thickness in pixels dafaults to 1
-    :param int major_tick_lenght: tick lines lenght in pixels defaults to 5
+    :param int major_tick_length: tick lines length in pixels defaults to 5
+    :param List[str] tick_labels: a list of strings for the tick text labels
 
     :param int tick_label_font: tick label text font
     :param int tick_label_color: tick label text color
@@ -77,7 +80,7 @@ class Cartesian(Widget):
 
     .. code-block:: python
 
-        my_plane=Plane(x=20, y=30) # instance the switch at x=20, y=30
+        my_plane=Plane(x=20, y=30) # instance the plane at x=20, y=30
 
     Once you setup your display, you can now add ``my_plane`` to your display using:
 
@@ -86,7 +89,7 @@ class Cartesian(Widget):
         display.show(my_plane) # add the group to the display
 
     If you want to have multiple display elements, you can create a group and then
-    append the switch and the other elements to the group.  Then, you can add the full
+    append the plane and the other elements to the group.  Then, you can add the full
     group to the display as in this example:
 
     .. code-block:: python
@@ -113,7 +116,7 @@ class Cartesian(Widget):
         xrange: Tuple[int, int] = (0, 100),
         yrange: Tuple[int, int] = (0, 100),
         axes_color: int = 0xFFFFFF,
-        axes_stroke: int = 2,
+        axes_stroke: int = 1,
         tick_color: int = 0xFFFFFF,
         major_tick_stroke: int = 1,
         major_tick_length: int = 5,
@@ -127,11 +130,13 @@ class Cartesian(Widget):
         # TODO Replace with drawline/vectorio           [√]
         # TODO Make a rectangle function                [√]
         # TODO Include functions to equal space ticks   [√]
-        # TODO Make labels and text                     [ ]
+        # TODO Make labels and text                     [√]
         # TODO Make Styles applicable                   [ ]
         # TODO Animate when overflow                    [ ]
         # TODO Add Subticks functionality               [ ]
         # TODO ticks evenly distributed                 [√]
+        # TODO Make Ticker lines                        [√]
+        # TODO Updater to use local coordinates         [ ]
 
         super().__init__(**kwargs, max_size=3)
         self._origin_x = x
@@ -162,8 +167,8 @@ class Cartesian(Widget):
         self._usable_width = self._widget_width
         self._usable_height = self._widget_height
 
-        self._tickx_separation = int(xrange[1] / self._usable_width * 10)
-        self._ticky_separation = int(yrange[1] / self._usable_height * 10)
+        self._tickx_separation = int(xrange[1] / self._usable_width * 10) + 3
+        self._ticky_separation = int(yrange[1] / self._usable_height * 10) + 3
 
         self._tick_bitmap = displayio.Bitmap(
             self._tick_line_thickness, self._tick_line_height, 3
@@ -237,34 +242,100 @@ class Cartesian(Widget):
         elif hasattr(font, "ascent"):
             font_height = int(scale * font.ascent + font.ascent)
             font_width = 12
+        else:
+            font_height = 12
+            font_width = 12
         return font_width, font_height
 
     def _draw_axes(self):
         # Draw x axes line
-        bitmaptools.draw_line(self._axesx_bitmap, 0, 0, self._usable_width - 1, 0, 2)
-        # Draw y axes line
-        bitmaptools.draw_line(
-            self._axesy_bitmap,
-            self._axesy_width - 1,
-            0,
-            self._axesy_width - 1,
-            self._usable_height - 1,
-            2,
-        )
+        if self._axes_line_thickness == 1:
+            bitmaptools.draw_line(
+                self._axesx_bitmap, 0, 0, self._usable_width - 1, 0, 2
+            )
+            # Draw y axes line
+            bitmaptools.draw_line(
+                self._axesy_bitmap,
+                self._axesy_width - 1,
+                0,
+                self._axesy_width - 1,
+                self._usable_height - 1,
+                2,
+            )
+        else:
+            rectangle_helper(
+                0,
+                0,
+                self._axes_line_thickness,
+                self._axesx_bitmap.width - 1,
+                self._axesx_bitmap,
+                2,
+                self._screen_palette,
+                True,
+            )
+            rectangle_helper(
+                self._axesy_width - self._axes_line_thickness - 1,
+                0,
+                self._axesy_bitmap.height,
+                self._axes_line_thickness,
+                self._axesy_bitmap,
+                2,
+                self._screen_palette,
+                True,
+            )
 
     def _draw_ticks(self):
         # X axes ticks
-
+        tickcounter = 1
         for i in range(
             self._tickx_separation, self._usable_width, self._tickx_separation
         ):
+            if tickcounter == 3:
+                tickcounter = 0
+                shift_label_x = len(str(i)) * self._font_width
+                tick_text = bitmap_label.Label(
+                    self._font,
+                    text=str(i),
+                    x=self._origin_x + (i - shift_label_x // 2),
+                    y=self._origin_y
+                    + self._usable_height
+                    + self._axes_line_thickness
+                    + self._tick_line_height
+                    + self._font_height // 2
+                    + 1,
+                )
+                self.append(tick_text)
+
             bitmaptools.draw_line(
-                self._axesx_bitmap, i, self._tick_line_height, i, 0, 2
+                self._axesx_bitmap,
+                i,
+                self._tick_line_height + self._axes_line_thickness,
+                i,
+                0,
+                2,
             )
+            tickcounter = tickcounter + 1
+
         # Y axes ticks
+        tickcounter = 0
         for i in range(
             self._usable_height - 1 - self._ticky_separation, 0, -self._ticky_separation
         ):
+            if tickcounter == 2:
+                tickcounter = 0
+                shift_label_x = len(str(self._usable_height - i)) * self._font_width
+                tick_text = bitmap_label.Label(
+                    self._font,
+                    text=str(self._usable_height - i),
+                    x=self._origin_x
+                    - shift_label_x
+                    - self._axes_line_thickness
+                    - self._tick_line_height
+                    - 2,
+                    y=self._origin_y + i + self._font_height,
+                )
+                self.append(tick_text)
+
             bitmaptools.draw_line(
                 self._axesy_bitmap,
                 (self._axesy_width - self._tick_line_height) - 1,
@@ -273,6 +344,7 @@ class Cartesian(Widget):
                 i,
                 2,
             )
+            tickcounter = tickcounter + 1
 
     def _draw_pointers(self):
         self._pointer = vectorio.Circle(3)
