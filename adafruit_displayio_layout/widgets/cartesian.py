@@ -62,7 +62,7 @@ class Cartesian(Widget):
     :param List[str] tick_labels: a list of strings for the tick text labels
 
     :param int tick_label_font: tick label text font
-    :param int tick_label_color: tick label text color
+    :param int font_color: font color
 
     :param int pointer_radius: pointer radius in pixels defaults to 1
     :param int pointer_color: pointer color defaults to white (0xFFFFFF)
@@ -121,9 +121,10 @@ class Cartesian(Widget):
         major_tick_stroke: int = 1,
         major_tick_length: int = 5,
         tick_label_font=terminalio.FONT,
-        tick_label_color: int = 0xFFFFFF,
+        font_color: int = 0xFFFFFF,
         pointer_radius: int = 1,
         pointer_color: int = 0xFFFFFF,
+        subticks: bool = False,
         **kwargs,
     ) -> None:
         # TODO Make axes, separate from data            [√]
@@ -159,7 +160,7 @@ class Cartesian(Widget):
         self._pointer_color = pointer_color
 
         self._font = tick_label_font
-        self._font_color = tick_label_color
+        self._font_color = font_color
 
         self._font_width = self._get_font_height(self._font, 1)[0]
         self._font_height = self._get_font_height(self._font, 1)[1]
@@ -174,6 +175,8 @@ class Cartesian(Widget):
             self._tick_line_thickness, self._tick_line_height, 3
         )
         self._tick_bitmap.fill(1)
+
+        self._subticks = subticks
 
         axesx_height = (
             2
@@ -290,11 +293,23 @@ class Cartesian(Widget):
         for i in range(
             self._tickx_separation, self._usable_width, self._tickx_separation
         ):
-            if tickcounter == 3:
+            if self._subticks:
+                if tickcounter == 3:
+                    bitmaptools.draw_line(
+                        self._axesx_bitmap,
+                        i,
+                        self._tick_line_height // 2 + self._axes_line_thickness,
+                        i,
+                        self._axes_line_thickness,
+                        1,
+                    )
+
+            if tickcounter == 5:
                 tickcounter = 0
                 shift_label_x = len(str(i)) * self._font_width
                 tick_text = bitmap_label.Label(
                     self._font,
+                    color=self._font_color,
                     text=str(i),
                     x=self._origin_x + (i - shift_label_x // 2),
                     y=self._origin_y
@@ -306,26 +321,38 @@ class Cartesian(Widget):
                 )
                 self.append(tick_text)
 
-            bitmaptools.draw_line(
-                self._axesx_bitmap,
-                i,
-                self._tick_line_height + self._axes_line_thickness,
-                i,
-                0,
-                2,
-            )
+                bitmaptools.draw_line(
+                    self._axesx_bitmap,
+                    i,
+                    self._tick_line_height + self._axes_line_thickness,
+                    i,
+                    self._axes_line_thickness,
+                    1,
+                )
             tickcounter = tickcounter + 1
 
         # Y axes ticks
-        tickcounter = 0
+        tickcounter = 1
         for i in range(
             self._usable_height - 1 - self._ticky_separation, 0, -self._ticky_separation
         ):
-            if tickcounter == 2:
+            if self._subticks:
+                if tickcounter == 3:
+                    bitmaptools.draw_line(
+                        self._axesy_bitmap,
+                        (self._axesy_width - self._tick_line_height // 2) - 1,
+                        i,
+                        self._axesy_width - 1,
+                        i,
+                        1,
+                    )
+
+            if tickcounter == 5:
                 tickcounter = 0
                 shift_label_x = len(str(self._usable_height - i)) * self._font_width
                 tick_text = bitmap_label.Label(
                     self._font,
+                    color=self._font_color,
                     text=str(self._usable_height - i),
                     x=self._origin_x
                     - shift_label_x
@@ -336,14 +363,14 @@ class Cartesian(Widget):
                 )
                 self.append(tick_text)
 
-            bitmaptools.draw_line(
-                self._axesy_bitmap,
-                (self._axesy_width - self._tick_line_height) - 1,
-                i,
-                self._axesy_width - 1,
-                i,
-                2,
-            )
+                bitmaptools.draw_line(
+                    self._axesy_bitmap,
+                    (self._axesy_width - self._tick_line_height) - 1,
+                    i,
+                    self._axesy_width - 1,
+                    i,
+                    1,
+                )
             tickcounter = tickcounter + 1
 
     def _draw_pointers(self):
@@ -351,7 +378,7 @@ class Cartesian(Widget):
 
         self._circle_palette = displayio.Palette(2)
         self._circle_palette.make_transparent(0)
-        self._circle_palette[1] = 0xFFFFFF
+        self._circle_palette[1] = self._pointer_color
 
         self._pointer_vector_shape = vectorio.VectorShape(
             shape=self._pointer,
@@ -363,10 +390,28 @@ class Cartesian(Widget):
     def update_pointer(self, x: int, y: int):
         """updater_pointer function
         helper function to update pointer in the plane
-        :param x: x coordinate in the local plane
-        :param y: y coordinate in the local plane
+        :param int x: x coordinate in the local plane
+        :param int y: y coordinate in the local plane
         :return: None
         rtype: None
         """
-        self._pointer_vector_shape.x = self._origin_x + x + self._margin
-        self._pointer_vector_shape.y = self._origin_y + self._usable_height + y
+        local_x = self._origin_x + x
+        local_y = self._origin_y + self._usable_height - y
+        self._pointer_vector_shape.x = local_x
+        self._pointer_vector_shape.y = local_y
+
+    def set_widget_style(self, new_style: str) -> None:
+        """set_widget_style function
+        Allows to set the widget style
+        :param str new_style: style for the widget
+        :return: None
+        """
+        # import would change after library packaging
+        # pylint: disable=import-outside-toplevel
+        from adafruit_styles import get_hex
+        from adafruit_styles import styles
+
+        colorset = styles.THEME
+        self._pointer_color = get_hex(colorset[new_style]["TEXT"])
+        self._font_color = get_hex(colorset[new_style]["TEXT"])
+        self._draw_ticks()
