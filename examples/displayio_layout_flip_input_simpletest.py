@@ -11,10 +11,10 @@ This is a basic demonstration of a FlipInput widget.
 import time
 import board
 import displayio
+import adafruit_touchscreen
+from adafruit_bitmap_font import bitmap_font
 from adafruit_displayio_layout.widgets.flip_input import FlipInput
 
-from adafruit_bitmap_font import bitmap_font
-import adafruit_touchscreen
 
 display = board.DISPLAY  # create the display on the PyPortal,
 # otherwise change this to setup the display
@@ -92,16 +92,16 @@ my_flip3 = FlipInput(
     arrow_height=30,
     arrow_width=20,
     horizontal=True,
-    animation_time=0.6, # add more time since the animation covers a longer distance
+    animation_time=0.6,  # add more time since the animation covers a longer distance
 )
 
 # Pick an interesting date to start
 # You can set the value by direct integer indexes of the list or by one of the strings
 # Here are three ways to set the values
-my_flip1.value = 9 # use direct integer indexing to set the value to the 10th month
-my_flip2.value = my_flip2.value_list.index("21") # find the index yourself by
-                                                 # searching the value_list
-my_flip3.value = "2015" # or set the value based on a string that is in the value_list
+my_flip1.value = 9  # use direct integer indexing to set the value to the 10th month
+my_flip2.value = my_flip2.value_list.index("21")  # find the index yourself by
+# searching the value_list
+my_flip3.value = "2015"  # or set the value based on a string that is in the value_list
 
 # Create the group to display and append the FlipInput widgets
 my_group = displayio.Group(max_size=3)
