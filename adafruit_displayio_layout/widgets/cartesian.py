@@ -108,11 +108,7 @@ class Cartesian(Widget):
 
     def __init__(
         self,
-        x: int = 10,
-        y: int = 10,
         display_color=0x000000,
-        width: int = 100,
-        height: int = 100,
         xrange: Tuple[int, int] = (0, 100),
         yrange: Tuple[int, int] = (0, 100),
         axes_color: int = 0xFFFFFF,
@@ -140,15 +136,8 @@ class Cartesian(Widget):
         # TODO Updater to use local coordinates         [√]
 
         super().__init__(**kwargs, max_size=3)
-        self._origin_x = x
-        self._origin_y = y
-
-        self._margin = 10
 
         self._display_color = display_color
-
-        self._usable_width = width
-        self._usable_height = height
 
         self._axes_line_color = axes_color
         self._axes_line_thickness = axes_stroke
@@ -167,9 +156,9 @@ class Cartesian(Widget):
         self._font_height = self._get_font_height(self._font, 1)[1]
 
         self._normx = xrange[1] / 100
-        self._valuex = self._usable_width / 100
+        self._valuex = self.width / 100
         self._normy = yrange[1] / 100
-        self._valuey = self._usable_height / 100
+        self._valuey = self.height / 100
 
         self._tick_bitmap = displayio.Bitmap(
             self._tick_line_thickness, self._tick_line_height, 3
@@ -184,7 +173,8 @@ class Cartesian(Widget):
             + self._font_height
             + self._tick_line_height // 2
         )
-        self._axesx_bitmap = displayio.Bitmap(self._usable_width, axesx_height, 4)
+
+        self._axesx_bitmap = displayio.Bitmap(self.width, axesx_height, 4)
         self._axesx_bitmap.fill(0)
 
         self._axesy_width = (
@@ -193,12 +183,11 @@ class Cartesian(Widget):
             + self._font_width
             + self._tick_line_height // 2
         )
-        self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self._usable_height, 4)
+
+        self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self.height, 4)
         self._axesy_bitmap.fill(0)
 
-        self._screen_bitmap = displayio.Bitmap(
-            self._usable_width, self._usable_height, 3
-        )
+        self._screen_bitmap = displayio.Bitmap(self.width, self.height, 3)
         self._screen_bitmap.fill(0)
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
@@ -211,22 +200,22 @@ class Cartesian(Widget):
         self._axesx_tilegrid = displayio.TileGrid(
             self._axesx_bitmap,
             pixel_shader=self._screen_palette,
-            x=self._origin_x,
-            y=self._origin_y + self._usable_height,
+            x=0,
+            y=self.height,
         )
 
         self._axesy_tilegrid = displayio.TileGrid(
             self._axesy_bitmap,
             pixel_shader=self._screen_palette,
-            x=self._origin_x - self._axesy_width,
-            y=self._origin_y,
+            x=-self._axesy_width,
+            y=0,
         )
 
         self._screen_tilegrid = displayio.TileGrid(
             self._screen_bitmap,
             pixel_shader=self._screen_palette,
-            x=self._origin_x,
-            y=self._origin_y,
+            x=0,
+            y=0,
         )
 
         self._draw_axes()
@@ -253,16 +242,14 @@ class Cartesian(Widget):
     def _draw_axes(self):
         # Draw x axes line
         if self._axes_line_thickness == 1:
-            bitmaptools.draw_line(
-                self._axesx_bitmap, 0, 0, self._usable_width - 1, 0, 2
-            )
+            bitmaptools.draw_line(self._axesx_bitmap, 0, 0, self.width - 1, 0, 2)
             # Draw y axes line
             bitmaptools.draw_line(
                 self._axesy_bitmap,
                 self._axesy_width - 1,
                 0,
                 self._axesy_width - 1,
-                self._usable_height - 1,
+                self.height - 1,
                 2,
             )
         else:
@@ -301,9 +288,8 @@ class Cartesian(Widget):
                     self._font,
                     color=self._font_color,
                     text=text_tick,
-                    x=self._origin_x + text_dist - (shift_label_x // 2),
-                    y=self._origin_y
-                    + self._usable_height
+                    x=text_dist - (shift_label_x // 2),
+                    y=self.height
                     + self._axes_line_thickness
                     + self._tick_line_height
                     + self._font_height // 2
@@ -339,12 +325,11 @@ class Cartesian(Widget):
                     self._font,
                     color=self._font_color,
                     text=text_tick,
-                    x=self._origin_x
-                    - shift_label_x
+                    x=-shift_label_x
                     - self._axes_line_thickness
                     - self._tick_line_height
                     - 2,
-                    y=self._origin_y + self._usable_height - text_dist,
+                    y=0 + self.height - text_dist,
                 )
                 self.append(tick_text)
 
@@ -373,7 +358,6 @@ class Cartesian(Widget):
 
     def _draw_pointers(self):
         self._pointer = vectorio.Circle(3)
-
         self._circle_palette = displayio.Palette(2)
         self._circle_palette.make_transparent(0)
         self._circle_palette[1] = self._pointer_color
@@ -393,8 +377,8 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        local_x = self._origin_x + x
-        local_y = self._origin_y + self._usable_height - y
+        local_x = x
+        local_y = self.height - y
         self._pointer_vector_shape.x = local_x
         self._pointer_vector_shape.y = local_y
 
