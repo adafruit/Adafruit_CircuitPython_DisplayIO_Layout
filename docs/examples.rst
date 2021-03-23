@@ -24,3 +24,12 @@ Create multiple sliding switch with various sizes and orientations.
 .. literalinclude:: ../examples/displayio_layout_switch_multiple.py
     :caption: examples/displayio_layout_switch_multiple.py
     :linenos:
+
+FlipInput simple test
+---------------------
+
+Create three FlipInput selectors.
+
+.. literalinclude:: ../examples/displayio_layout_flip_input_simpletest.py
+    :caption: examples/displayio_layout_flip_input_simpletest.py
+    :linenos:
