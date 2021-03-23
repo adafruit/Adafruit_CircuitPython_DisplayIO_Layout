@@ -24,3 +24,12 @@ Create multiple sliding switch with various sizes and orientations.
 .. literalinclude:: ../examples/displayio_layout_switch_multiple.py
     :caption: examples/displayio_layout_switch_multiple.py
     :linenos:
+
+Annotation example
+------------------
+
+Displays a sliding switch with annotations
+
+.. literalinclude:: ../examples/displayio_layout_gridlayout_pygame_display_simpletest.py
+    :caption: examples/displayio_layout_gridlayout_pygame_display_simpletest.py
+    :linenos:
