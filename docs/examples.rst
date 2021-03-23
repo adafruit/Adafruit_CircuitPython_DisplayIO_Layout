@@ -33,3 +33,12 @@ Create a simple plot plane.
 .. literalinclude:: ../examples/displayio_layout_cartesian_simpletest.py
     :caption: examples/displayio_layout_cartesian_simpletest.py
     :linenos:
+
+Cartesian plane advanced test
+-----------------------------
+
+Create different cartesian planes in the scree
+
+.. literalinclude:: ../examples/displayio_layout_cartesian_advanced_test.py
+    :caption: examples/displayio_layout_cartesian_advanced_test.py
+    :linenos:

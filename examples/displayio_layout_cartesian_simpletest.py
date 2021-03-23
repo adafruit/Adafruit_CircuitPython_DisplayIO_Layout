@@ -31,8 +31,8 @@ my_plane = Cartesian(
     tick_color=0xFFFFFF,  # ticks color
     major_tick_stroke=1,  # ticks width in pixels
     major_tick_length=5,  # ticks length in pixels
-    tick_label_color=0xFFFFFF,  # ticks line color
     tick_label_font=tick_font,  # the font used for the tick labels
+    font_color=0xFFFFFF,  # ticks line color
 )
 
 my_group = displayio.Group(max_size=3)
@@ -40,11 +40,11 @@ my_group.append(my_plane)
 display.show(my_group)  # add high level Group to the display
 
 posx = 0
-posy = 100
+posy = 0
 
 while True:
     my_plane.update_pointer(posx, posy)
     display.show(my_group)
     time.sleep(0.5)
     posx = posx + 2
-    posy = posy - 2
+    posy = posy + 2
