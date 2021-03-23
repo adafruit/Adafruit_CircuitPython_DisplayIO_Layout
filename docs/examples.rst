@@ -28,8 +28,8 @@ Create multiple sliding switch with various sizes and orientations.
 Annotation example
 ------------------
 
-Displays a sliding switch with annotations
+Displays annotations, examples relative to SwitchRound widget or as freeform.
 
-.. literalinclude:: ../examples/displayio_layout_gridlayout_pygame_display_simpletest.py
-    :caption: examples/displayio_layout_gridlayout_pygame_display_simpletest.py
+.. literalinclude:: ../examples/displayio_layout_annotation_simpletest.py
+    :caption: examples/displayio_layout_annotation_simpletest.py
     :linenos:
