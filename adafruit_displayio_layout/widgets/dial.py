@@ -48,47 +48,56 @@ class Dial(Widget):
 
     :param int width: requested width, in pixels
     :param int height: requested height, in pixels
-    :param int padding: keepout padding amount around the border, in pixels
+    :param int padding: keepout padding amount around the border, in pixels,
+     default is 12
 
-    :param float sweep_angle: dial rotation, in degrees, maximum value is 360 degrees
-    :param float start_angle: starting angle, in degrees.  Defaults
-     to `None` for symmetry along vertical axis.  Vertical is defined as 0 degrees.
+    :param float sweep_angle: dial rotation, in degrees, maximum value is 360 degrees,
+     default is 90 degrees
+    :param float start_angle: starting angle, in degrees.  Set to `None` for symmetry along
+     vertical axis.  Vertical is defined as 0 degrees.
      Negative values are counter-clockwise degrees; positive values
-     are clockwise degrees.
+     are clockwise degrees. Defaults to `None`.
 
-    :param float min_value: the minimum value displayed on the dial
-    :param float max_value: the maximum value displayed the dial
+    :param float min_value: the minimum value displayed on the dial, default is 0.0
+    :param float max_value: the maximum value displayed the dial, default is 100.0
     :param float value: the value to display (if None, defaults to ``min_value``)
 
     :param Boolean display_value: set `True` to display a value label on the dial
-    :param Font value_font: the font for the value label
-    :param int value_color: the color for the value label
+    :param Font value_font: the font for the value label, defaults to
+     ``terminalio.FONT``
+    :param int value_color: the color for the value label, defaults to 0xFF0000
     :param str value_format_string: the format string for displaying the value label
      (defaults to ':0.0f' to show the value rounded to the nearest whole number)
-    :param (float,float) value_label_anchor_point: anchor point on the label
-    :param (float,float) value_label_anchor_point_on_widget: anchor point on the widget where the
-     label will be placed
+    :param (float,float) value_label_anchor_point: anchor point on the label, default
+     value is (0.5, -1.0) where the y-value of -1.0 signifies the text baseline
+    :param (float,float) value_label_anchor_point_on_widget: anchor point on the
+     widget where the label will be placed, default value is (0.5, 0.5)
 
-    :param int needle_width: requested pixel width of the triangular needle
+    :param int needle_width: requested pixel width of the triangular needle,
+     default = 7
     :param int needle_color: color value for the needle, defaults to red (0xFF0000)
+    :param Boolean limit_rotation: Set True to limit needle rotation to between the
+     ``min_value`` and ``max_value``, set to False for unlimited rotation, default is True
 
-    :param int tick_color: tick line color (24-bit hex value)
-    :param int major_ticks: number of major ticks
-    :param int major_tick_stroke: major tick line stroke width, in pixels
-    :param int major_tick_length: major tick length, in pixels
-    :param str major_tick_labels: array of strings for the major tick labels
+    :param int tick_color: tick line color (24-bit hex value), defaults to 0xFFFFFF
+    :param int major_ticks: number of major ticks, default = 5
+    :param int major_tick_stroke: major tick line stroke width, in pixels, default = 3
+    :param int major_tick_length: major tick length, in pixels, default = 10
+    :param str major_tick_labels: array of strings for the major tick labels,
+     default is ("0", "25", "50", "75", "100")
     :param float tick_label_scale: the scaling of the tick labels, default = 1.0
-    :param Font tick_label_font: font to be used for major tick labels
-    :param int tick_label_color: color for the major tick labels
+    :param Font tick_label_font: font to be used for major tick labels, default
+     is ``terminalio.FONT``
+    :param int tick_label_color: color for the major tick labels, default is 0xFFFFFF
     :param Boolean angle_tick_labels: set True to rotate the major tick labels to
-     match the tick angle
+     match the tick angle, default is True
 
-    :param int minor_ticks: number of minor ticks (per major tick)
-    :param int minor_tick_stroke: minor tick line stroke width, in pixels
-    :param int minor_tick_length: minor tick length, in pixels
+    :param int minor_ticks: number of minor ticks (per major tick), default = 5
+    :param int minor_tick_stroke: minor tick line stroke width, in pixels, default = 1
+    :param int minor_tick_length: minor tick length, in pixels, default = 5
 
     :param int background_color: background color (RGB tuple
-     or 24-bit hex value), set None for transparent
+     or 24-bit hex value), set `None` for transparent, default is `None`
 
 
     :param (float,float) anchor_point: (X,Y) values from 0.0 to 1.0 to define the dial's
@@ -169,6 +178,7 @@ class Dial(Widget):
         needle_width=7,
         # triangle with this base width, best if this is odd
         needle_color=0x880000,
+        limit_rotation=True,
         value=None,
         value_font=None,
         display_value=False,
@@ -245,6 +255,7 @@ class Dial(Widget):
         self._clip_needle = clip_needle
         self._needle_width_requested = needle_width
         self._needle_color = needle_color
+        self._limit_rotation = limit_rotation
         self._background_color = background_color
 
         self._major_tick_labels = major_tick_labels
@@ -552,6 +563,9 @@ class Dial(Widget):
         return angle_offset
 
     def _update_needle(self, value):
+        if self._limit_rotation:  # constrain between min_value and max_value
+            value = max(min(self._value, self._max_value), self._min_value)
+
         self._draw_position(
             value / (self._max_value - self._min_value)
         )  # convert to position (0.0 to 1.0)
