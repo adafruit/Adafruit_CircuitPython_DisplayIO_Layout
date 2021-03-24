@@ -106,33 +106,22 @@ class Cartesian(Widget):
     """
 
     def __init__(
-            self,
-            display_color=0x000000,
-            xrange: Tuple[int, int] = (0, 100),
-            yrange: Tuple[int, int] = (0, 100),
-            axes_color: int = 0xFFFFFF,
-            axes_stroke: int = 1,
-            tick_color: int = 0xFFFFFF,
-            major_tick_stroke: int = 1,
-            major_tick_length: int = 5,
-            tick_label_font=terminalio.FONT,
-            font_color: int = 0xFFFFFF,
-            pointer_radius: int = 1,
-            pointer_color: int = 0xFFFFFF,
-            subticks: bool = False,
-            **kwargs,
+        self,
+        display_color=0x000000,
+        xrange: Tuple[int, int] = (0, 100),
+        yrange: Tuple[int, int] = (0, 100),
+        axes_color: int = 0xFFFFFF,
+        axes_stroke: int = 1,
+        tick_color: int = 0xFFFFFF,
+        major_tick_stroke: int = 1,
+        major_tick_length: int = 5,
+        tick_label_font=terminalio.FONT,
+        font_color: int = 0xFFFFFF,
+        pointer_radius: int = 1,
+        pointer_color: int = 0xFFFFFF,
+        subticks: bool = False,
+        **kwargs,
     ) -> None:
-        # TODO Make axes, separate from data            [√]
-        # TODO Replace with drawline/vectorio           [√]
-        # TODO Make a rectangle function                [√]
-        # TODO Include functions to equal space ticks   [√]
-        # TODO Make labels and text                     [√]
-        # TODO Make Styles applicable                   [√]
-        # TODO Animate when overflow                    [ ]
-        # TODO Add Subticks functionality               [√]
-        # TODO ticks evenly distributed                 [√]
-        # TODO Make Ticker lines                        [√]
-        # TODO Updater to use local coordinates         [√]
 
         super().__init__(**kwargs, max_size=3)
 
@@ -172,20 +161,20 @@ class Cartesian(Widget):
         self._subticks = subticks
 
         axesx_height = (
-                2
-                + self._axes_line_thickness
-                + self._font_height
-                + self._tick_line_height // 2
+            2
+            + self._axes_line_thickness
+            + self._font_height
+            + self._tick_line_height // 2
         )
 
         self._axesx_bitmap = displayio.Bitmap(self.width, axesx_height, 4)
         self._axesx_bitmap.fill(0)
 
         self._axesy_width = (
-                2
-                + self._axes_line_thickness
-                + self._font_width
-                + self._tick_line_height // 2
+            2
+            + self._axes_line_thickness
+            + self._font_width
+            + self._tick_line_height // 2
         )
 
         self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self.height, 4)
@@ -230,6 +219,11 @@ class Cartesian(Widget):
         self.append(self._screen_tilegrid)
 
         self._update_line = True
+
+        self._pointer = None
+        self._circle_palette = None
+        self._pointer_vector_shape = None
+        self.plot_line_point = None
 
     @staticmethod
     def _get_font_height(font, scale):
@@ -295,10 +289,10 @@ class Cartesian(Widget):
                     text=text_tick,
                     x=text_dist - (shift_label_x // 2),
                     y=self.height
-                      + self._axes_line_thickness
-                      + self._tick_line_height
-                      + self._font_height // 2
-                      + 1,
+                    + self._axes_line_thickness
+                    + self._tick_line_height
+                    + self._font_height // 2
+                    + 1,
                 )
                 self.append(tick_text)
                 bitmaptools.draw_line(
@@ -331,9 +325,9 @@ class Cartesian(Widget):
                     color=self._font_color,
                     text=text_tick,
                     x=-shift_label_x
-                      - self._axes_line_thickness
-                      - self._tick_line_height
-                      - 2,
+                    - self._axes_line_thickness
+                    - self._tick_line_height
+                    - 2,
                     y=0 + self.height - text_dist,
                 )
                 self.append(tick_text)
