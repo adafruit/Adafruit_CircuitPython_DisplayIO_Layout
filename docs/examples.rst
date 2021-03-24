@@ -7,6 +7,15 @@ Ensure your device works with this simple test.
     :caption: examples/displayio_layout_simpletest.py
     :linenos:
 
+Pygame simple test
+------------------
+
+Display Hello World using Blinka_Displayio_PyGameDisplay.
+
+.. literalinclude:: ../examples/displayio_layout_gridlayout_pygame_display_simpletest.py
+    :caption: examples/displayio_layout_gridlayout_pygame_display_simpletest.py
+    :linenos:
+
 Switch simple test
 ------------------
 
@@ -41,4 +50,13 @@ Create different cartesian planes in the scree
 
 .. literalinclude:: ../examples/displayio_layout_cartesian_advanced_test.py
     :caption: examples/displayio_layout_cartesian_advanced_test.py
+    :linenos:
+
+Dial simple test
+----------------
+
+Create a single dial.
+
+.. literalinclude:: ../examples/displayio_layout_dial_simpletest.py
+    :caption: examples/displayio_layout_dial_simpletest.py
     :linenos:
