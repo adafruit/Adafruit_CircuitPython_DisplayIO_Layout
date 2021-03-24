@@ -59,7 +59,6 @@ class Cartesian(Widget):
 
     :param int major_tick_stroke: tick lines thickness in pixels dafaults to 1
     :param int major_tick_length: tick lines length in pixels defaults to 5
-    :param List[str] tick_labels: a list of strings for the tick text labels
 
     :param int tick_label_font: tick label text font
     :param int font_color: font color
@@ -107,21 +106,21 @@ class Cartesian(Widget):
     """
 
     def __init__(
-        self,
-        display_color=0x000000,
-        xrange: Tuple[int, int] = (0, 100),
-        yrange: Tuple[int, int] = (0, 100),
-        axes_color: int = 0xFFFFFF,
-        axes_stroke: int = 1,
-        tick_color: int = 0xFFFFFF,
-        major_tick_stroke: int = 1,
-        major_tick_length: int = 5,
-        tick_label_font=terminalio.FONT,
-        font_color: int = 0xFFFFFF,
-        pointer_radius: int = 1,
-        pointer_color: int = 0xFFFFFF,
-        subticks: bool = False,
-        **kwargs,
+            self,
+            display_color=0x000000,
+            xrange: Tuple[int, int] = (0, 100),
+            yrange: Tuple[int, int] = (0, 100),
+            axes_color: int = 0xFFFFFF,
+            axes_stroke: int = 1,
+            tick_color: int = 0xFFFFFF,
+            major_tick_stroke: int = 1,
+            major_tick_length: int = 5,
+            tick_label_font=terminalio.FONT,
+            font_color: int = 0xFFFFFF,
+            pointer_radius: int = 1,
+            pointer_color: int = 0xFFFFFF,
+            subticks: bool = False,
+            **kwargs,
     ) -> None:
         # TODO Make axes, separate from data            [√]
         # TODO Replace with drawline/vectorio           [√]
@@ -155,10 +154,15 @@ class Cartesian(Widget):
         self._font_width = self._get_font_height(self._font, 1)[0]
         self._font_height = self._get_font_height(self._font, 1)[1]
 
-        self._normx = xrange[1] / 100
+        self._xrange = xrange
+        self._normx = (self._xrange[1] - self._xrange[0]) / 100
         self._valuex = self.width / 100
-        self._normy = yrange[1] / 100
+        self._factorx = 100 / (self._xrange[1] - self._xrange[0])
+
+        self._yrange = yrange
+        self._normy = (self._yrange[1] - self._yrange[0]) / 100
         self._valuey = self.height / 100
+        self._factory = 100 / (self._yrange[1] - self._yrange[0])
 
         self._tick_bitmap = displayio.Bitmap(
             self._tick_line_thickness, self._tick_line_height, 3
@@ -168,27 +172,27 @@ class Cartesian(Widget):
         self._subticks = subticks
 
         axesx_height = (
-            2
-            + self._axes_line_thickness
-            + self._font_height
-            + self._tick_line_height // 2
+                2
+                + self._axes_line_thickness
+                + self._font_height
+                + self._tick_line_height // 2
         )
 
         self._axesx_bitmap = displayio.Bitmap(self.width, axesx_height, 4)
         self._axesx_bitmap.fill(0)
 
         self._axesy_width = (
-            2
-            + self._axes_line_thickness
-            + self._font_width
-            + self._tick_line_height // 2
+                2
+                + self._axes_line_thickness
+                + self._font_width
+                + self._tick_line_height // 2
         )
 
         self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self.height, 4)
         self._axesy_bitmap.fill(0)
 
-        self._screen_bitmap = displayio.Bitmap(self.width, self.height, 3)
-        self._screen_bitmap.fill(0)
+        self._screen_bitmap = displayio.Bitmap(self.width, self.height, 5)
+        self._screen_bitmap.fill(5)
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = self._tick_color
@@ -220,11 +224,12 @@ class Cartesian(Widget):
 
         self._draw_axes()
         self._draw_ticks()
-        self._draw_pointers()
-        self.append(self._pointer_vector_shape)
+
         self.append(self._axesx_tilegrid)
         self.append(self._axesy_tilegrid)
         self.append(self._screen_tilegrid)
+
+        self._update_line = True
 
     @staticmethod
     def _get_font_height(font, scale):
@@ -280,7 +285,7 @@ class Cartesian(Widget):
         subticks = [20, 40, 60, 80, 100]
         # X axes ticks
         for i in range(10, 100, 10):
-            text_tick = str(round(i * self._normx))
+            text_tick = str(round(self._xrange[0]) + round(i * self._normx))
             text_dist = int(self._valuex * i)
             if i in ticks:
                 shift_label_x = len(text_tick) * self._font_width
@@ -290,10 +295,10 @@ class Cartesian(Widget):
                     text=text_tick,
                     x=text_dist - (shift_label_x // 2),
                     y=self.height
-                    + self._axes_line_thickness
-                    + self._tick_line_height
-                    + self._font_height // 2
-                    + 1,
+                      + self._axes_line_thickness
+                      + self._tick_line_height
+                      + self._font_height // 2
+                      + 1,
                 )
                 self.append(tick_text)
                 bitmaptools.draw_line(
@@ -317,7 +322,7 @@ class Cartesian(Widget):
 
         # Y axes ticks
         for i in range(10, 100, 10):
-            text_tick = str(round(i * self._normy))
+            text_tick = str(round(self._yrange[0]) + round(i * self._normy))
             text_dist = int(self._valuey * i)
             if i in ticks:
                 shift_label_x = len(text_tick) * self._font_width
@@ -326,9 +331,9 @@ class Cartesian(Widget):
                     color=self._font_color,
                     text=text_tick,
                     x=-shift_label_x
-                    - self._axes_line_thickness
-                    - self._tick_line_height
-                    - 2,
+                      - self._axes_line_thickness
+                      - self._tick_line_height
+                      - 2,
                     y=0 + self.height - text_dist,
                 )
                 self.append(tick_text)
@@ -356,7 +361,7 @@ class Cartesian(Widget):
                         1,
                     )
 
-    def _draw_pointers(self):
+    def _draw_pointers(self, x, y):
         self._pointer = vectorio.Circle(3)
         self._circle_palette = displayio.Palette(2)
         self._circle_palette.make_transparent(0)
@@ -365,9 +370,10 @@ class Cartesian(Widget):
         self._pointer_vector_shape = vectorio.VectorShape(
             shape=self._pointer,
             pixel_shader=self._circle_palette,
-            x=0,
-            y=0,
+            x=x,
+            y=y,
         )
+        self.append(self._pointer_vector_shape)
 
     def update_pointer(self, x: int, y: int):
         """updater_pointer function
@@ -377,10 +383,45 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        local_x = x
-        local_y = self.height - y
-        self._pointer_vector_shape.x = local_x
-        self._pointer_vector_shape.y = local_y
+        local_x = int((x - self._xrange[0]) * self._factorx)
+        local_y = int((self._yrange[0] - y) * self._factory) + self.height
+
+        if local_x >= 0 or local_y <= 100:
+            if self._update_line:
+                self._draw_pointers(local_x, local_y)
+                self._update_line = False
+            else:
+                self._pointer_vector_shape.x = local_x
+                self._pointer_vector_shape.y = local_y
+
+    def _set_plotter_line(self):
+        self.plot_line_point = list()
+
+    def update_line(self, x: int, y: int):
+        """updater_line function
+        helper function to update pointer in the plane
+        :param int x: x coordinate in the local plane
+        :param int y: y coordinate in the local plane
+        :return: None
+        rtype: None
+        """
+        local_x = int((x - self._xrange[0]) * self._factorx)
+        local_y = int((self._yrange[0] - y) * self._factory) + self.height
+        if x < self._xrange[1] and y < self._yrange[1]:
+            if local_x > 0 or local_y < 100:
+                if self._update_line:
+                    self._set_plotter_line()
+                    self.plot_line_point.append((local_x, local_y))
+                    self._update_line = False
+                else:
+                    bitmaptools.draw_line(
+                        self._screen_bitmap,
+                        self.plot_line_point[-1][0],
+                        self.plot_line_point[-1][1],
+                        local_x,
+                        local_y,
+                        1,
+                    )
 
     def set_widget_style(self, new_style: str) -> None:
         """set_widget_style function
