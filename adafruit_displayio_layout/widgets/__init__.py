@@ -53,10 +53,9 @@ def rectangle_helper(
 
     """
     if bitmaptool:
-        x1 = x0 + width
-        y1 = y0 + height
-        for row_pos in range(y0, y1, 1):
-            bitmaptools.draw_line(bitmap, x0, row_pos, x1, row_pos, color_index)
+        bitmaptools.fill_region(
+            bitmap, x0, y0, x0 + width - 1, y0 + height - 1, color_index
+        )
     else:
         rect = vectorio.Rectangle(width, height)
         vectorio.VectorShape(

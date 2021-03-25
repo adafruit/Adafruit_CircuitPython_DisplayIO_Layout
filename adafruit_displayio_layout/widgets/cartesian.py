@@ -123,14 +123,14 @@ class Cartesian(Widget):
         **kwargs,
     ) -> None:
 
+        # TODO major_tick_stroke value is ignored    [√]
         # TODO Pointer: (0, 0) AXISX vs AXISY        [ ]
-        # TODO major_tick_stroke value is ignored    [ ]
         # TODO pointer_radiusvalue is ignored        [√]
         # TODO The y-axis width vs x-axis width.     [ ]
-        # TODO Use rectangle helper for all cases    [ ]
+        # TODO Use rectangle helper for all cases    [√]
         # TODO Docstrings Xrange - axis_range        [√]
         # TODO Change background_color name          [√]
-        # TODO Verify Errors Tick Lenght Selection   [ ]
+        # TODO Verify Errors Tick Lenght Selection   [√]
 
         super().__init__(**kwargs, max_size=3)
 
@@ -140,8 +140,17 @@ class Cartesian(Widget):
         self._axes_line_thickness = axes_stroke
 
         self._tick_color = tick_color
-        self._tick_line_thickness = major_tick_stroke
-        self._tick_line_height = major_tick_length
+        if major_tick_stroke not in range(1, 5):
+            print("tick thickness must be 1-4 pixels. Defaulting to 1")
+            self._tick_line_thickness = 1
+        else:
+            self._tick_line_thickness = major_tick_stroke
+
+        if major_tick_length not in range(1, 9):
+            print("tick lenght must be 1-10 pixels. Defaulting to 5")
+            self._tick_line_height = 5
+        else:
+            self._tick_line_height = major_tick_length
 
         self._pointer_radius = pointer_radius
         self._pointer_color = pointer_color
@@ -249,38 +258,28 @@ class Cartesian(Widget):
 
     def _draw_axes(self):
         # Draw x axes line
-        if self._axes_line_thickness == 1:
-            bitmaptools.draw_line(self._axesx_bitmap, 0, 0, self.width - 1, 0, 2)
-            # Draw y axes line
-            bitmaptools.draw_line(
-                self._axesy_bitmap,
-                self._axesy_width - 1,
-                0,
-                self._axesy_width - 1,
-                self.height - 1,
-                2,
-            )
-        else:
-            rectangle_helper(
-                0,
-                0,
-                self._axes_line_thickness,
-                self._axesx_bitmap.width - 1,
-                self._axesx_bitmap,
-                2,
-                self._screen_palette,
-                True,
-            )
-            rectangle_helper(
-                self._axesy_width - self._axes_line_thickness - 1,
-                0,
-                self._axesy_bitmap.height,
-                self._axes_line_thickness,
-                self._axesy_bitmap,
-                2,
-                self._screen_palette,
-                True,
-            )
+        rectangle_helper(
+            0,
+            0,
+            self._axes_line_thickness,
+            self.width,
+            self._axesx_bitmap,
+            2,
+            self._screen_palette,
+            True,
+        )
+
+        # Draw y axes line
+        rectangle_helper(
+            self._axesy_width - self._axes_line_thickness,
+            0,
+            self.height,
+            self._axes_line_thickness,
+            self._axesy_bitmap,
+            2,
+            self._screen_palette,
+            True,
+        )
 
     def _draw_ticks(self):
         # ticks definition
@@ -304,23 +303,28 @@ class Cartesian(Widget):
                     + 1,
                 )
                 self.append(tick_text)
-                bitmaptools.draw_line(
-                    self._axesx_bitmap,
-                    text_dist,
-                    self._tick_line_height + self._axes_line_thickness,
+                rectangle_helper(
                     text_dist,
                     self._axes_line_thickness,
+                    self._tick_line_height,
+                    self._tick_line_thickness,
+                    self._axesx_bitmap,
                     1,
+                    self._screen_palette,
+                    True,
                 )
+
             if self._subticks:
                 if i in subticks:
-                    bitmaptools.draw_line(
-                        self._axesx_bitmap,
-                        text_dist,
-                        self._tick_line_height // 2 + self._axes_line_thickness,
+                    rectangle_helper(
                         text_dist,
                         self._axes_line_thickness,
+                        self._tick_line_height // 2,
                         1,
+                        self._axesx_bitmap,
+                        1,
+                        self._screen_palette,
+                        True,
                     )
 
         # Y axes ticks
@@ -340,28 +344,34 @@ class Cartesian(Widget):
                     y=0 + self.height - text_dist,
                 )
                 self.append(tick_text)
-
-                bitmaptools.draw_line(
-                    self._axesy_bitmap,
+                rectangle_helper(
                     self._axesy_width
                     - self._axes_line_thickness
                     - self._tick_line_height
                     - 1,
                     text_dist,
-                    self._axesy_width - 1 - self._axes_line_thickness,
-                    text_dist,
+                    self._tick_line_thickness,
+                    self._tick_line_height,
+                    self._axesy_bitmap,
                     1,
+                    self._screen_palette,
+                    True,
                 )
 
             if self._subticks:
                 if i in subticks:
-                    bitmaptools.draw_line(
-                        self._axesy_bitmap,
-                        self._axesy_width - 1 - self._tick_line_height // 2,
-                        text_dist,
-                        self._axesy_width - 1,
+                    rectangle_helper(
+                        self._axesy_width
+                        - self._axes_line_thickness
+                        - self._tick_line_height // 2
+                        - 1,
                         text_dist,
                         1,
+                        self._tick_line_height // 2,
+                        self._axesy_bitmap,
+                        1,
+                        self._screen_palette,
+                        True,
                     )
 
     def _draw_pointers(self, x, y):
