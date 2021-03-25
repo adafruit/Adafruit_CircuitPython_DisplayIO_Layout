@@ -66,6 +66,7 @@ class Cartesian(Widget):
     :param int pointer_radius: pointer radius in pixels defaults to 1
     :param int pointer_color: pointer color defaults to white (0xFFFFFF)
 
+
     **Quickstart: Importing and using Cartesian**
 
     Here is one way of importing the `Cartesian` class so you can use it as
@@ -103,6 +104,40 @@ class Cartesian(Widget):
 
         display.show(my_group) # add the group to the display
 
+
+    .. figure:: cartesian.gif
+       :scale: 100 %
+       :figwidth: 50%
+       :align: center
+       :alt: Diagram of the cartesian widget with the pointer in motion.
+
+       This is a diagram of a cartesian widget with the pointer moving in the
+       plot area.
+
+    .. figure:: cartesian_zones.png
+       :scale: 100 %
+       :figwidth: 50%
+       :align: center
+       :alt: Diagram of the cartesian widget zones.
+
+       This is a diagram of a cartesian widget showing the different zones.
+
+    .. figure:: cartesian_zones.png
+       :scale: 100 %
+       :figwidth: 50%
+       :align: center
+       :alt: Diagram of the cartesian widget zones.
+
+       This is a diagram of a cartesian widget showing the different zones.
+
+    .. figure:: cartesian_explanation.png
+       :scale: 100 %
+       :figwidth: 50%
+       :align: center
+       :alt: Diagram of the cartesian widget localisation.
+
+       This is a diagram of a cartesian widget showing localisation scheme.
+
     """
 
     def __init__(
@@ -138,7 +173,7 @@ class Cartesian(Widget):
             self._tick_line_thickness = major_tick_stroke
 
         if major_tick_length not in range(1, 9):
-            print("tick lenght must be 1-10 pixels. Defaulting to 5")
+            print("tick length must be 1-10 pixels. Defaulting to 5")
             self._tick_line_height = 5
         else:
             self._tick_line_height = major_tick_length
@@ -235,7 +270,7 @@ class Cartesian(Widget):
         self.plot_line_point = None
 
     @staticmethod
-    def _get_font_height(font, scale):
+    def _get_font_height(font, scale: int) -> Tuple[int, int]:
         if hasattr(font, "get_bounding_box"):
             font_height = int(scale * font.get_bounding_box()[1])
             font_width = int(scale * font.get_bounding_box()[0])
@@ -247,7 +282,7 @@ class Cartesian(Widget):
             font_width = 12
         return font_width, font_height
 
-    def _draw_axes(self):
+    def _draw_axes(self) -> None:
         # Draw x axes line
         rectangle_helper(
             0,
@@ -272,7 +307,7 @@ class Cartesian(Widget):
             True,
         )
 
-    def _draw_ticks(self):
+    def _draw_ticks(self) -> None:
         # ticks definition
         ticks = [10, 30, 50, 70, 90]
         subticks = [20, 40, 60, 80, 100]
@@ -365,7 +400,7 @@ class Cartesian(Widget):
                         True,
                     )
 
-    def _draw_pointers(self, x, y):
+    def _draw_pointers(self, x: int, y: int) -> None:
         self._pointer = vectorio.Circle(self._pointer_radius)
         self._circle_palette = displayio.Palette(2)
         self._circle_palette.make_transparent(0)
@@ -379,7 +414,7 @@ class Cartesian(Widget):
         )
         self.append(self._pointer_vector_shape)
 
-    def update_pointer(self, x: int, y: int):
+    def update_pointer(self, x: int, y: int) -> None:
         """updater_pointer function
         helper function to update pointer in the plane
         :param int x: x coordinate in the local plane
@@ -398,10 +433,10 @@ class Cartesian(Widget):
                 self._pointer_vector_shape.x = local_x
                 self._pointer_vector_shape.y = local_y
 
-    def _set_plotter_line(self):
+    def _set_plotter_line(self) -> None:
         self.plot_line_point = list()
 
-    def update_line(self, x: int, y: int):
+    def update_line(self, x: int, y: int) -> None:
         """updater_line function
         helper function to update pointer in the plane
         :param int x: x coordinate in the local plane
