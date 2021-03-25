@@ -123,15 +123,6 @@ class Cartesian(Widget):
         **kwargs,
     ) -> None:
 
-        # TODO major_tick_stroke value is ignored    [√]
-        # TODO Pointer: (0, 0) AXISX vs AXISY        [ ]
-        # TODO pointer_radiusvalue is ignored        [√]
-        # TODO The y-axis width vs x-axis width.     [ ]
-        # TODO Use rectangle helper for all cases    [√]
-        # TODO Docstrings Xrange - axis_range        [√]
-        # TODO Change background_color name          [√]
-        # TODO Verify Errors Tick Lenght Selection   [√]
-
         super().__init__(**kwargs, max_size=3)
 
         self._background_color = background_color
@@ -444,9 +435,11 @@ class Cartesian(Widget):
         """
         # import would change after library packaging
         # pylint: disable=import-outside-toplevel
-        from adafruit_styles import get_hex
-        from adafruit_styles import styles
-
+        try:
+            from adafruit_styles import get_hex
+            from adafruit_styles import styles
+        except ImportError:
+            pass
         colorset = styles.THEME
         self._pointer_color = get_hex(colorset[new_style]["TEXT"])
         self._font_color = get_hex(colorset[new_style]["TEXT"])
