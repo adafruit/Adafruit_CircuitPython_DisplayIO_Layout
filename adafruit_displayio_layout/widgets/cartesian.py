@@ -48,23 +48,23 @@ class Cartesian(Widget):
     :param int y: y position of the plane origin
 
     :param int background_color: background color to use defaults to black (0x000000)
-    :param int width: requested width, in pixels defaults to 100 pixels
-    :param int height: requested height, in pixels defaults to 100 pixels
+    :param int width: requested width, in pixels.
+    :param int height: requested height, in pixels.
 
-    :param (int, int) xrange: X axes range
-    :param (int, int) yrange: Y axes range
+    :param (int, int) xrange: X axes range. Defaults to (0, 100)
+    :param (int, int) yrange: Y axes range. Defaults to (0, 100)
 
     :param int axes_color: axes lines color defaults to white (0xFFFFFF)
     :param int axes_stroke: axes lines thickness in pixels defaults to 2
 
-    :param int major_tick_stroke: tick lines thickness in pixels dafaults to 1
+    :param int major_tick_stroke: tick lines thickness in pixels defaults to 1
     :param int major_tick_length: tick lines length in pixels defaults to 5
 
     :param int tick_label_font: tick label text font
-    :param int font_color: font color
+    :param int font_color: font color. Defaults to white (0xFFFFFF)
 
     :param int pointer_radius: pointer radius in pixels defaults to 1
-    :param int pointer_color: pointer color defaults to white (0xFFFFFF)
+    :param int pointer_color: pointer color. Defaults to white (0xFFFFFF)
 
 
     **Quickstart: Importing and using Cartesian**
@@ -105,6 +105,27 @@ class Cartesian(Widget):
         display.show(my_group) # add the group to the display
 
 
+    **Summary: Cartesian Features and input variables**
+
+    The `cartesian` widget has some options for controlling its position, visible appearance,
+    and scale through a collection of input variables:
+
+        - **position**: ``x``, ``y`` or ``anchor_point`` and ``anchored_position``
+
+        - **size**: ``width`` and ``height``
+
+        - **color**: ``axes_color``, ``font_color``, ``tick_color``, ``pointer_color``
+
+        - **background color**: ``background_color``
+
+        - **linewidths**: ``axes_stroke`` and ``major_tick_stroke``
+
+        - **range**: ``xrange`` and ``yrange`` This is the range in absolute units.
+          For example, when using (20-90), the X axis will start at 20 finishing at 90.
+          However the height of the graph is given by the height parameter. The scale
+          is handled internal to provide a 1:1 experience when you update the graph.
+
+
     .. figure:: cartesian.gif
        :scale: 100 %
        :figwidth: 50%
@@ -134,7 +155,7 @@ class Cartesian(Widget):
 
     def __init__(
         self,
-        background_color=0x000000,
+        background_color: int = 0x000000,
         xrange: Tuple[int, int] = (0, 100),
         yrange: Tuple[int, int] = (0, 100),
         axes_color: int = 0xFFFFFF,
@@ -465,9 +486,10 @@ class Cartesian(Widget):
         try:
             from adafruit_styles import get_hex
             from adafruit_styles import styles
+
+            colorset = styles.THEME
+            self._pointer_color = get_hex(colorset[new_style]["TEXT"])
+            self._font_color = get_hex(colorset[new_style]["TEXT"])
+            self._draw_ticks()
         except ImportError:
-            pass
-        colorset = styles.THEME
-        self._pointer_color = get_hex(colorset[new_style]["TEXT"])
-        self._font_color = get_hex(colorset[new_style]["TEXT"])
-        self._draw_ticks()
+            print("This feature is not yet implemented")
