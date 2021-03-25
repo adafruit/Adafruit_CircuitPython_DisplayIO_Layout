@@ -60,7 +60,7 @@ class Cartesian(Widget):
     :param int major_tick_stroke: tick lines thickness in pixels defaults to 1
     :param int major_tick_length: tick lines length in pixels defaults to 5
 
-    :param int tick_label_font: tick label text font
+    :param terminalio.FONT tick_label_font: tick label text font
     :param int font_color: font color. Defaults to white (0xFFFFFF)
 
     :param int pointer_radius: pointer radius in pixels defaults to 1
