@@ -47,12 +47,12 @@ class Cartesian(Widget):
     :param int x: x position of the plane origin
     :param int y: y position of the plane origin
 
-    :param int display_color: background color to use defaults to black (0x000000)
+    :param int background_color: background color to use defaults to black (0x000000)
     :param int width: requested width, in pixels defaults to 100 pixels
     :param int height: requested height, in pixels defaults to 100 pixels
 
-    :param (int, int) axesx_range: X axes range
-    :param (int, int) axesy_range: Y axes range
+    :param (int, int) xrange: X axes range
+    :param (int, int) yrange: Y axes range
 
     :param int axes_color: axes lines color defaults to white (0xFFFFFF)
     :param int axes_stroke: axes lines thickness in pixels defaults to 2
@@ -107,7 +107,7 @@ class Cartesian(Widget):
 
     def __init__(
         self,
-        display_color=0x000000,
+        background_color=0x000000,
         xrange: Tuple[int, int] = (0, 100),
         yrange: Tuple[int, int] = (0, 100),
         axes_color: int = 0xFFFFFF,
@@ -123,9 +123,18 @@ class Cartesian(Widget):
         **kwargs,
     ) -> None:
 
+        # TODO Pointer: (0, 0) AXISX vs AXISY        [ ]
+        # TODO major_tick_stroke value is ignored    [ ]
+        # TODO pointer_radiusvalue is ignored        [√]
+        # TODO The y-axis width vs x-axis width.     [ ]
+        # TODO Use rectangle helper for all cases    [ ]
+        # TODO Docstrings Xrange - axis_range        [√]
+        # TODO Change background_color name          [√]
+        # TODO Verify Errors Tick Lenght Selection   [ ]
+
         super().__init__(**kwargs, max_size=3)
 
-        self._display_color = display_color
+        self._background_color = background_color
 
         self._axes_line_color = axes_color
         self._axes_line_thickness = axes_stroke
@@ -188,7 +197,7 @@ class Cartesian(Widget):
         self._screen_palette[2] = self._axes_line_color
         self._screen_palette[3] = 0x990099
         self._screen_palette[4] = 0xFFFFFF
-        self._screen_palette[5] = self._display_color
+        self._screen_palette[5] = self._background_color
 
         self._axesx_tilegrid = displayio.TileGrid(
             self._axesx_bitmap,
@@ -356,7 +365,7 @@ class Cartesian(Widget):
                     )
 
     def _draw_pointers(self, x, y):
-        self._pointer = vectorio.Circle(3)
+        self._pointer = vectorio.Circle(self._pointer_radius)
         self._circle_palette = displayio.Palette(2)
         self._circle_palette.make_transparent(0)
         self._circle_palette[1] = self._pointer_color
