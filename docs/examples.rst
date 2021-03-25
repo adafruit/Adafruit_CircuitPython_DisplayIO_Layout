@@ -34,6 +34,15 @@ Create multiple sliding switch with various sizes and orientations.
     :caption: examples/displayio_layout_switch_multiple.py
     :linenos:
 
+Annotation example
+------------------
+
+Displays annotations, examples relative to SwitchRound widget or as freeform.
+
+.. literalinclude:: ../examples/displayio_layout_annotation_simpletest.py
+    :caption: examples/displayio_layout_annotation_simpletest.py
+    :linenos:
+
 Cartesian plane simple test
 ---------------------------
 
