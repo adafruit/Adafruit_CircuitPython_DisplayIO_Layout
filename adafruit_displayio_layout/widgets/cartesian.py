@@ -409,8 +409,9 @@ class Cartesian(Widget):
     def update_pointer(self, x: int, y: int) -> None:
         """updater_pointer function
         helper function to update pointer in the plane
-        :param int x: x coordinate in the local plane
-        :param int y: y coordinate in the local plane
+
+        :param int x: ``x`` coordinate in the local plane
+        :param int y: ``y`` coordinate in the local plane
         :return: None
         rtype: None
         """
@@ -431,9 +432,11 @@ class Cartesian(Widget):
     def update_line(self, x: int, y: int) -> None:
         """updater_line function
         helper function to update pointer in the plane
-        :param int x: x coordinate in the local plane
-        :param int y: y coordinate in the local plane
+
+        :param int x: ``x`` coordinate in the local plane
+        :param int y: ``y`` coordinate in the local plane
         :return: None
+
         rtype: None
         """
         local_x = int((x - self._xrange[0]) * self._factorx)
