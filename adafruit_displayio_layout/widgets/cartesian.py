@@ -122,14 +122,6 @@ class Cartesian(Widget):
 
        This is a diagram of a cartesian widget showing the different zones.
 
-    .. figure:: cartesian_zones.png
-       :scale: 100 %
-       :figwidth: 50%
-       :align: center
-       :alt: Diagram of the cartesian widget zones.
-
-       This is a diagram of a cartesian widget showing the different zones.
-
     .. figure:: cartesian_explanation.png
        :scale: 100 %
        :figwidth: 50%
