@@ -247,6 +247,24 @@ class Cartesian(Widget):
         self._screen_palette[4] = 0xFFFFFF
         self._screen_palette[5] = self._background_color
 
+        self._corner_bitmap = displayio.Bitmap(10, 10, 5)
+        rectangle_helper(
+            0,
+            0,
+            self._axes_line_thickness,
+            self._axes_line_thickness,
+            self._corner_bitmap,
+            2,
+            self._screen_palette,
+        )
+
+        self._corner_tilegrid = displayio.TileGrid(
+            self._corner_bitmap,
+            pixel_shader=self._screen_palette,
+            x=-self._axes_line_thickness,
+            y=self.height,
+        )
+
         self._axesx_tilegrid = displayio.TileGrid(
             self._axesx_bitmap,
             pixel_shader=self._screen_palette,
@@ -274,6 +292,7 @@ class Cartesian(Widget):
         self.append(self._axesx_tilegrid)
         self.append(self._axesy_tilegrid)
         self.append(self._screen_tilegrid)
+        self.append(self._corner_tilegrid)
 
         self._update_line = True
 
