@@ -25,10 +25,13 @@ Implementation Notes
 # pylint: disable=too-many-locals, too-many-statements
 
 import displayio
-from adafruit_fancyled.adafruit_fancyled import CRGB
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets import rectangle_helper
 from adafruit_displayio_layout.widgets import rgb
+try:
+    from adafruit_fancyled.adafruit_fancyled import CRGB
+except NameError:
+    pass
 
 
 class Equalizer(Widget):
