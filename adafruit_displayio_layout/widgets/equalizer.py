@@ -28,6 +28,7 @@ import displayio
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets import rectangle_helper
 from adafruit_displayio_layout.widgets import rgb
+
 try:
     from adafruit_fancyled.adafruit_fancyled import CRGB
 except NameError:
