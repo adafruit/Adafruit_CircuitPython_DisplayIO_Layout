@@ -69,3 +69,12 @@ Create a single dial.
 .. literalinclude:: ../examples/displayio_layout_dial_simpletest.py
     :caption: examples/displayio_layout_dial_simpletest.py
     :linenos:
+
+Equalizer simple test
+----------------
+
+Create a 5 bar equalizer.
+
+.. literalinclude:: ../examples/displayio_layout_equalizer_simpletest.py
+    :caption: examples/displayio_layout_equalizer_simpletest.py
+    :linenos:
