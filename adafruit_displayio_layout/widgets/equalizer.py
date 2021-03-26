@@ -47,11 +47,15 @@ class Equalizer(Widget):
     :param (int, int) yrange: Y axes range. Defaults to (0, 100)
 
     :param int bar_line_color: axes lines color defaults to white (0xFFFFFF)
-    :param int bar_line_thickness: axes lines thickness in pixels defaults to 2
 
     :param int horiz_margin: horizontal margins in pixels. Defaults to 10
 
     :param int number_bars: number of bars to display. Defaults to 1
+    :param int pad_x: pixels number to move the bars to the right
+
+    :param int number_segments: number of segments in each bar
+    :param bool seg_best_fit: When True it will calculate segment height automatically
+     Default True.
 
 
     **Quickstart: Importing and using Equalizer**
@@ -97,27 +101,32 @@ class Equalizer(Widget):
         self,
         background_color: int = 0x000000,
         yrange: Tuple[int, int] = (0, 100),
-        bar_line_color: int = 0xFFFFFF,
-        bar_line_thickness: int = 2,
         horiz_margin: int = 10,
         number_bars: int = 1,
+        bar_best_fit: bool = True,
         bar_width: int = 10,
         bars_distance: int = 3,
+        pad_x: int = 0,
+        number_segments: int = 2,
+        segments_height: int = 10,
+        seg_best_fit: bool = True,
         **kwargs,
     ) -> None:
 
+        # TODO Segment display              [✓]
+        # TODO SEGMENT level logic          [ ]
+        # TODO Animation function           [ ]
+        # TODO Animated Gifs                [ ]
+        # TODO SimpleTest example           [ ]
+        # TODO Features docs                [ ]
+        # TODO PNGs                         [ ]
+        # TODO Type Annotations             [ ]
+        # TODO API example inclusion        [ ]
+        # TODO API RST inclusion            [ ]
+
         super().__init__(**kwargs, max_size=3)
 
-        self._bar_line_thickness = bar_line_thickness
         self._background_color = background_color
-
-        self._bar_line_color = bar_line_color
-
-        if bar_line_thickness not in range(1, 4):
-            print("tick length must be 1-10 pixels. Defaulting to 2")
-            self._bar_line_thickness = 2
-        else:
-            self._bar_line_thickness = bar_line_thickness
 
         if self.width < 42:
             print("Equalizer minimum width is 40. Defaulting to 40")
@@ -127,6 +136,12 @@ class Equalizer(Widget):
         self._horiz_margin = horiz_margin
         self._bar_width = bar_width
         self._bar_distance = bars_distance
+        self._pad_x = pad_x
+        self._bar_best_fit = bar_best_fit
+
+        self._number_segments = number_segments
+        self._segments_height = segments_height
+        self._seg_best_fit = seg_best_fit
 
         self._yrange = yrange
         self._normy = (self._yrange[1] - self._yrange[0]) / 100
@@ -138,11 +153,12 @@ class Equalizer(Widget):
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = 0xFFFFFF
-        self._screen_palette[2] = self._bar_line_color
+        self._screen_palette[2] = 0x990099
         self._screen_palette[3] = 0x990099
         self._screen_palette[4] = 0xFFFFFF
         self._screen_palette[5] = self._background_color
 
+        self._bar_inventory = list()
         self._hor_bar_setup()
 
         self._screen_tilegrid = displayio.TileGrid(
@@ -155,30 +171,68 @@ class Equalizer(Widget):
         self.append(self._screen_tilegrid)
 
     def _hor_bar_setup(self):
-        total_width = self._number_bars * (
-            2 * self._bar_line_thickness + self._bar_width
-        ) + ((self._number_bars + 1) * 2)
-        if total_width > self.width:
-            print("Equalizer setup could not be display. Adjusting bar widths")
+        if self._bar_best_fit:
             self._bar_width = (
-                self.width
-                - self._number_bars * (2 * self._bar_line_thickness)
-                + ((self._number_bars + 1) * 2)
+                self.width - 2 * (self._number_bars + 1)
             ) // self._number_bars
+        else:
+            total_width = self._number_bars * (self._bar_width) + (
+                (self._number_bars + 1) * 2
+            )
+
+            if total_width > self.width:
+                print("Equalizer setup could not be displayed. Adjusting bar widths")
+                self._bar_width = (
+                    self.width - ((self._number_bars + 1) * 2)
+                ) // self._number_bars
 
         widths_bars = self._number_bars * self._bar_width
         width_free = self.width - widths_bars
-        separation = width_free // (self._number_bars + 1)
-        x_local = separation
-        for _ in range(self._number_bars):
+        separationx = width_free // (self._number_bars + 1)
+        x_local = separationx + self._pad_x
+
+        if self._seg_best_fit:
+            self._segments_height = (self.height - 2) // self._number_segments
+        else:
+            total_height = self._number_segments * self._segments_height + 6
+            if total_height > self.height:
+                print(
+                    "Equalizer setup could not be displayed. Adjusting segments heights"
+                )
+                self._segments_height = (
+                    self.height - ((self._number_segments + 1) * 2)
+                ) // self._number_segments
+
+        heights_segs = self._number_segments * self._segments_height
+        height_free = self.height - heights_segs
+        self._separationy = height_free // (self._number_segments + 1)
+
+        for col in range(self._number_bars):
+            self._bar_inventory.append((col, x_local))
+            x_local = x_local + separationx + self._bar_width
+        print(self._bar_inventory)
+        self.show_bars(0, 2)
+        self.show_bars(1, 0)
+        self.show_bars(2, 3)
+        self.show_bars(3, 2)
+        self.show_bars(4, 1)
+
+    def show_bars(self, bars, height):
+        """
+        :param bars: bars to display
+        :parm height: height of the bar to display
+        """
+        bar_to_show = self._bar_inventory[bars][1]
+
+        y_local = self.height - self._separationy - self._segments_height
+        for _ in range(height):
             rectangle_helper(
-                x_local,
-                self.height - (self.height // 2),
-                self.height // 2,
+                bar_to_show,
+                y_local,
+                self._segments_height,
                 self._bar_width,
                 self._screen_bitmap,
                 2,
                 self._screen_palette,
             )
-            x_local = x_local + separation + self._bar_width
-            print(x_local)
+            y_local = y_local - self._separationy - self._segments_height
