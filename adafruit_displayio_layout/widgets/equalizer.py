@@ -25,14 +25,10 @@ Implementation Notes
 # pylint: disable=too-many-locals, too-many-statements
 
 import displayio
+import adafruit_fancyled.adafruit_fancyled as fancy
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets import rectangle_helper
 from adafruit_displayio_layout.widgets import rgb
-
-try:
-    from adafruit_fancyled import CRGB
-except NameError:
-    pass
 
 
 class Equalizer(Widget):
@@ -237,7 +233,7 @@ class Equalizer(Widget):
 
         for i, item in enumerate(self._segment_inventory):
             prgb_color = rgb(item[1], 0, 100)
-            color_buffer = CRGB(prgb_color[0], prgb_color[1], prgb_color[2])
+            color_buffer = fancy.CRGB(prgb_color[0], prgb_color[1], prgb_color[2])
             self._screen_palette[i] = color_buffer.pack()
 
     def show_bars(self, values) -> None:
