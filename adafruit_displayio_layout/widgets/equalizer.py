@@ -30,7 +30,7 @@ from adafruit_displayio_layout.widgets import rectangle_helper
 from adafruit_displayio_layout.widgets import rgb
 
 try:
-    from adafruit_fancyled.adafruit_fancyled import CRGB
+    from adafruit_fancyled import CRGB
 except NameError:
     pass
 
