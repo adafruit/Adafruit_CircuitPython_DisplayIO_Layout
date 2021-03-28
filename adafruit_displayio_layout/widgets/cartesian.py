@@ -66,6 +66,13 @@ class Cartesian(Widget):
     :param int pointer_radius: pointer radius in pixels defaults to 1
     :param int pointer_color: pointer color. Defaults to white (0xFFFFFF)
 
+    :param bool subticks: inclusion of subticks in the plot area. Default to False
+
+    :param int nudge_x: movement in pixels in the x direction to move the origin.
+     Defaults to 0
+    :param int nudge_y: movement in pixels in the y direction to move the origin.
+     Defaults to 0
+
 
     **Quickstart: Importing and using Cartesian**
 
@@ -110,7 +117,10 @@ class Cartesian(Widget):
     The `cartesian` widget has some options for controlling its position, visible appearance,
     and scale through a collection of input variables:
 
-        - **position**: ``x``, ``y`` or ``anchor_point`` and ``anchored_position``
+        - **position**: ``x``, ``y``, ``anchor_point``, ``anchored_position`` and
+          `nudge_x`, `nudge_y`. Nudge parameters are used to account for the float and int
+          conversions required to display different ranges and values. Conversion are required
+          as displays work in integers and not floats
 
         - **size**: ``width`` and ``height``
 
@@ -168,6 +178,8 @@ class Cartesian(Widget):
         pointer_radius: int = 1,
         pointer_color: int = 0xFFFFFF,
         subticks: bool = False,
+        nudge_x: int = 0,
+        nudge_y: int = 0,
         **kwargs,
     ) -> None:
 
@@ -285,6 +297,9 @@ class Cartesian(Widget):
             x=0,
             y=0,
         )
+
+        self._nudge_x = nudge_x
+        self._nudge_y = nudge_y
 
         self._draw_axes()
         self._draw_ticks()
@@ -476,8 +491,10 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        local_x = int((x - self._xrange[0]) * self._factorx)
-        local_y = int((self._yrange[0] - y) * self._factory) + self.height
+        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
+        local_y = (
+            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
+        )
         if x < self._xrange[1] and y < self._yrange[1]:
             if local_x > 0 or local_y < 100:
                 if self._update_line:
