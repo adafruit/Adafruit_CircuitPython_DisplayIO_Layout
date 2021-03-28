@@ -25,7 +25,10 @@ Implementation Notes
 # pylint: disable=too-many-locals, too-many-statements
 
 import displayio
-import adafruit_fancyled.adafruit_fancyled as fancy
+try:
+    import adafruit_fancyled.adafruit_fancyled as fancy
+except ImportError:
+    pass
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets import rectangle_helper
 from adafruit_displayio_layout.widgets import rgb

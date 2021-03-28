@@ -71,7 +71,7 @@ Create a single dial.
     :linenos:
 
 Equalizer simple test
-----------------
+---------------------
 
 Create a 5 bar equalizer.
 
