@@ -15,7 +15,6 @@ import adafruit_touchscreen
 from adafruit_bitmap_font import bitmap_font
 from adafruit_displayio_layout.widgets.flip_input import FlipInput
 
-
 display = board.DISPLAY  # create the display on the PyPortal,
 # otherwise change this to setup the display
 # for display chip driver and pinout you have (e.g. ILI9341)
@@ -37,9 +36,9 @@ my_font = bitmap_font.load_font(font_file)
 my_flip1 = FlipInput(
     display,
     anchor_point=[0.0, 0.0],
-    anchored_position=[10, 40],
-    color=0xFF2222,
-    value_list=[
+    anchored_position=[50, 40],
+    color=0xFF2222,  # reddish orange color
+    value_list=[  # list of month strings, using three characters
         "JAN",
         "FEB",
         "MAR",
@@ -53,29 +52,21 @@ my_flip1 = FlipInput(
         "NOV",
         "DEC",
     ],
-    font=my_font,
-    arrow_touch_padding=40,
-    arrow_color=0x333333,
-    arrow_outline=0x444444,
-    arrow_height=20,
-    arrow_width=30,
-    horizontal=False,
+    font_scale=5,
+    horizontal=False,  # use vertical arrows
     animation_time=0.4,
 )
 
 my_flip2 = FlipInput(
     display,
     anchor_point=[0.0, 0.0],
-    anchored_position=[180, 40],
-    color=0xFF2222,
+    anchored_position=[220, 40],
+    color=0xFF2222,  # reddish orange color
     value_list=["{0:02d}".format(x) for x in range(1, 31 + 1)],
-    font=my_font,
-    arrow_touch_padding=40,
-    arrow_color=0x333333,
-    arrow_outline=0x444444,
-    arrow_height=20,
-    arrow_width=30,
-    horizontal=False,
+    # use a list of strings from 01 through 31
+    # use the {0:02d} format string to always use two digits (e.g. '03')
+    font_scale=5,
+    horizontal=False,  # use vertical arrows
     animation_time=0.4,
 )
 
@@ -83,21 +74,18 @@ my_flip3 = FlipInput(
     display,
     anchor_point=[0.5, 1.0],
     anchored_position=[320 // 2, 240 - 10],
-    color=0xFF2222,
-    value_list=["{0:02d}".format(x) for x in range(1985, 2022, 1)],
+    color=0xFF2222,  # reddish orange color
+    value_list=["{}".format(x) for x in range(1985, 2022, 1)],
+    # use a list with values of stringsfrom 1985 to 2022
     font=my_font,
-    arrow_touch_padding=40,
-    arrow_color=0x333333,
-    arrow_outline=0x444444,
-    arrow_height=30,
-    arrow_width=20,
-    horizontal=True,
-    animation_time=0.6,  # add more time since the animation covers a longer distance
+    horizontal=True,  # use horizontal arrows
+    animation_time=0.8,  # add more time since the animation covers a longer distance
 )
 
 # Pick an interesting date to start
-# You can set the value by direct integer indexes of the list or by one of the strings
-# Here are three ways to set the values
+#
+# You can set the value by direct integer indexes of the list or by a string
+# Here are three ways to set the values:
 my_flip1.value = 9  # use direct integer indexing to set the value to the 10th month
 my_flip2.value = my_flip2.value_list.index("21")  # find the index yourself by
 # searching the value_list

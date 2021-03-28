@@ -43,7 +43,9 @@ from adafruit_displayio_layout.widgets.easing import back_easeinout as easeout
 
 
 class FlipInput(Widget, Control):
-    """A flip style input selector.
+    """A flip style input selector. The value changes based on touch inputs on the
+    two halves of the indicator with optional arrows added.
+
 
     :param int x: pixel position
     :param int y: pixel position
@@ -52,22 +54,25 @@ class FlipInput(Widget, Control):
     :param value_list: the list of strings that will be displayed
     :type value_list: List[str]
     :param Font font: the font used for the text (defaults to ``terminalio.FONT``)
+    :param int font_scale: the scaling of the font in integer values (default is 1)
     :param int color: the color used for the font (default is 0xFFFFFF)
     :param int value: the index into the value_list that is initially displayed
      (default is 0)
 
-    :param int arrow_touch_padding: additional pixel space surrounding the arrows
-     that responds to touch inputs, in pixels (default = 0)
-    :param int arrow_color: the color used for the arrow fill (default is `None`)
-    :param int arrow_outline: the color used for the arrow outline (default is `None`)
-    :param int arrow_height: the height of the arrows, in pixels (default is `None`)
-    :param int arrow_width: the width of the arrows, in pixels (default is `None`)
+    :param int arrow_color: the color used for the arrow fill (default is 0x333333)
+    :param int arrow_outline: the color used for the arrow outline (default is 0x555555)
+    :param int arrow_height: the height of the arrows, in pixels (default is 30 pixels)
+    :param int arrow_width: the width of the arrows, in pixels (default is 30 pixels)
+    :param int arrow_gap: distance from text to the arrow, in pixels (default is 5),
+     can also be a negative value
+    :param int arrow_touch_padding: additional padding on the arrow sides of the
+     widget where touch response is accepted, in pixels (default = 0)
     :param int alt_touch_padding: additional padding on the non-arrow sides of the
-     widget where touch-response is accepted, in pixels (default = 0)
+     widget where touch response is accepted, in pixels (default = 0)
     :param Boolean horizontal: set to `True` to display arrows are in the horizontal
      direction, set `False` for arrows in the vertical direction (default = `True`)
     :param float animation_time: duration for the animation during flipping between
-     values (default is `None`, no animation)
+     values, in seconds (default is 0.4 seconds), set to 0.0 or `None` for no animation.
 
     """
 
@@ -77,13 +82,15 @@ class FlipInput(Widget, Control):
         *,
         value_list=None,
         font=FONT,
+        font_scale=1,
         color=0xFFFFFF,
         value=0,  # initial value, index into the value_list
-        arrow_touch_padding=0,  # touch padding on the arrow sides of the Widget
-        arrow_color=None,
-        arrow_outline=None,
-        arrow_height=None,
-        arrow_width=None,
+        arrow_touch_padding=0,  # additional touch padding on the arrow sides of the Widget
+        arrow_color=0x333333,
+        arrow_outline=0x555555,
+        arrow_height=30,
+        arrow_width=30,
+        arrow_gap=5,
         alt_touch_padding=0,  # touch padding on the non-arrow sides of the Widget
         horizontal=True,
         animation_time=None,
@@ -107,6 +114,7 @@ class FlipInput(Widget, Control):
 
         self._color = color
         self._font = font
+        self._font_scale = font_scale
         # preload the glyphs
 
         self._arrow_touch_padding = arrow_touch_padding
@@ -162,69 +170,89 @@ class FlipInput(Widget, Control):
 
                 xposition = xposition + glyph.shift_x
 
-        self._bounding_box = [0, 0, right - left, bottom - top]
+        self._bounding_box = [
+            0,
+            0,
+            (right - left) * self._font_scale,
+            (bottom - top) * self._font_scale,
+        ]
 
         # Create the text label
         self._label = bitmap_label.Label(
             text=value_list[value],
             font=self._font,
+            scale=self._font_scale,
             color=self._color,
             base_alignment=True,
             background_tight=True,
         )
-        self._label.x = -1 * left
-        self._label.y = -1 * top
+        self._label.x = -1 * left * self._font_scale
+        self._label.y = -1 * top * self._font_scale
+
+        self._left = left
+        self._top = top
 
         self.append(self._label)  # add the label to the self Group
 
         # set the touch_boundary including the touch_padding
+        self._arrow_gap = arrow_gap  # of pixel gap above/below label before the arrow
 
         if horizontal:  # horizontal orientation, add arrow padding to x-dimension and
             # alt_padding to y-dimension
             self.touch_boundary = [
-                self._bounding_box[0] - self._arrow_touch_padding,
+                self._bounding_box[0]
+                - self._arrow_gap
+                - arrow_height
+                - self._arrow_touch_padding,
                 self._bounding_box[1] - self._alt_touch_padding,
-                self._bounding_box[2] + 2 * self._arrow_touch_padding,
+                self._bounding_box[2]
+                + 2 * (self._arrow_gap + arrow_height + self._arrow_touch_padding),
                 self._bounding_box[3] + 2 * self._alt_touch_padding,
             ]
         else:  # vertical orientation, add arrow padding to y-dimension and
             # alt_padding to x-dimension
             self.touch_boundary = [
                 self._bounding_box[0] - self._alt_touch_padding,
-                self._bounding_box[1] - self._arrow_touch_padding,
+                self._bounding_box[1]
+                - self._arrow_gap
+                - arrow_height
+                - self._arrow_touch_padding,
                 self._bounding_box[2] + 2 * self._alt_touch_padding,
-                self._bounding_box[3] + 2 * self._arrow_touch_padding,
+                self._bounding_box[3]
+                + 2 * (self._arrow_gap + arrow_height + self._arrow_touch_padding),
             ]
 
         # create the Up/Down arrows
         self._update_position()  # call Widget superclass function to reposition
 
         self._animation_group = displayio.Group(
-            max_size=1
+            max_size=1,
+            scale=self._font_scale,
         )  # holds the animation bitmap
+        # self._animation_group.x = -1 * left * (1)
+        # self._animation_group.y = -1 * top * (1)
         self._animation_group.hidden = True
         self.append(self._animation_group)
 
         # Add the two arrow triangles, if required
 
         if (arrow_color is not None) or (arrow_outline is not None):
-            gap = 5  # of pixel gap above/below label
 
             if horizontal:  # horizontal orientation, add left and right arrows
-                if arrow_height is None:
-                    arrow_height = self._bounding_box[3]
-                if arrow_width is None:
-                    arrow_width = arrow_touch_padding
 
-                if arrow_width > 0:
+                if (
+                    (arrow_width is not None)
+                    and (arrow_height is not None)
+                    and (arrow_width > 0)
+                ):
                     mid_point_y = self._bounding_box[1] + self._bounding_box[3] // 2
                     self.append(
                         Triangle(
-                            self._bounding_box[0] - gap,
+                            self._bounding_box[0] - self._arrow_gap,
                             mid_point_y - arrow_height // 2,
-                            self._bounding_box[0] - gap,
+                            self._bounding_box[0] - self._arrow_gap,
                             mid_point_y + arrow_height // 2,
-                            self._bounding_box[0] - gap - arrow_width,
+                            self._bounding_box[0] - self._arrow_gap - arrow_width,
                             mid_point_y,
                             fill=arrow_color,
                             outline=arrow_outline,
@@ -233,13 +261,17 @@ class FlipInput(Widget, Control):
 
                     self.append(
                         Triangle(
-                            self._bounding_box[0] + self._bounding_box[2] + gap,
+                            self._bounding_box[0]
+                            + self._bounding_box[2]
+                            + self._arrow_gap,
                             mid_point_y - arrow_height // 2,
-                            self._bounding_box[0] + self._bounding_box[2] + gap,
+                            self._bounding_box[0]
+                            + self._bounding_box[2]
+                            + self._arrow_gap,
                             mid_point_y + arrow_height // 2,
                             self._bounding_box[0]
                             + self._bounding_box[2]
-                            + gap
+                            + self._arrow_gap
                             + arrow_width,
                             mid_point_y,
                             fill=arrow_color,
@@ -247,21 +279,21 @@ class FlipInput(Widget, Control):
                         )
                     )
             else:  # vertical orientation, add upper and lower arrows
-                if arrow_height is None:
-                    arrow_height = arrow_touch_padding
-                if arrow_width is None:
-                    arrow_width = self._bounding_box[2]
 
-                if arrow_height > 0:
+                if (
+                    (arrow_height is not None)
+                    and (arrow_width is not None)
+                    and (arrow_height > 0)
+                ):
                     mid_point_x = self._bounding_box[0] + self._bounding_box[2] // 2
                     self.append(
                         Triangle(
                             mid_point_x - arrow_width // 2,
-                            self._bounding_box[1] - gap,
+                            self._bounding_box[1] - self._arrow_gap,
                             mid_point_x + arrow_width // 2,
-                            self._bounding_box[1] - gap,
+                            self._bounding_box[1] - self._arrow_gap,
                             mid_point_x,
-                            self._bounding_box[1] - gap - arrow_height,
+                            self._bounding_box[1] - self._arrow_gap - arrow_height,
                             fill=arrow_color,
                             outline=arrow_outline,
                         )
@@ -269,21 +301,24 @@ class FlipInput(Widget, Control):
                     self.append(
                         Triangle(
                             mid_point_x - arrow_width // 2,
-                            self._bounding_box[1] + self._bounding_box[3] + gap,
+                            self._bounding_box[1]
+                            + self._bounding_box[3]
+                            + self._arrow_gap,
                             mid_point_x + arrow_width // 2,
-                            self._bounding_box[1] + self._bounding_box[3] + gap,
+                            self._bounding_box[1]
+                            + self._bounding_box[3]
+                            + self._arrow_gap,
                             mid_point_x,
                             self._bounding_box[1]
                             + self._bounding_box[3]
-                            + gap
+                            + self._arrow_gap
                             + arrow_height,
                             fill=arrow_color,
                             outline=arrow_outline,
                         )
                     )
 
-        # Draw function of the current value
-
+    # Draw function to update the current value
     def _update_value(self, new_value, animate=True):
 
         if (
@@ -307,7 +342,9 @@ class FlipInput(Widget, Control):
 
             # create the animation bitmap
             animation_bitmap = displayio.Bitmap(
-                self._bounding_box[2], self._bounding_box[3], 2
+                self._bounding_box[2] // self._font_scale,
+                self._bounding_box[3] // self._font_scale,
+                2,
             )  # color depth 2
 
             palette = displayio.Palette(2)
@@ -325,20 +362,21 @@ class FlipInput(Widget, Control):
                 self._label.bitmap.width, self._label.bitmap.height, 2
             )  # color depth 2
             start_bitmap.blit(0, 0, self._label.bitmap)
+
             # get the bitmap1 position offsets
             bitmap1_offset = [
-                self._label.x + self._label.tilegrid.x,
-                self._label.y + self._label.tilegrid.y,
+                -1 * self._left + self._label.tilegrid.x,
+                -1 * self._top + self._label.tilegrid.y,
             ]
 
-            # hide the label group.
+            # hide the label group
             self.pop(0)
 
             # update the value label and get the bitmap offsets
             self._label.text = str(self.value_list[new_value])
             bitmap2_offset = [
-                self._label.x + self._label.tilegrid.x,
-                self._label.y + self._label.tilegrid.y,
+                -1 * self._left + self._label.tilegrid.x,
+                -1 * self._top + self._label.tilegrid.y,
             ]
 
             # animate between old and new bitmaps
@@ -450,7 +488,7 @@ class FlipInput(Widget, Control):
         return self._value
 
 
-# draw_position - Draws two bitmaps with offsets.
+# draw_position - Draws two bitmaps into the target bitmap with offsets.
 # Allows values < 0.0 and > 1.0 for "springy" easing functions
 def _draw_position(
     target_bitmap,
@@ -477,8 +515,8 @@ def _draw_position(
         return
 
     if horizontal:
-        target_bitmap.fill(0)
-        x_index = round(position * target_bitmap.width)
+        target_bitmap.fill(0)  # clear the target bitmap
+        x_index = round(position * target_bitmap.width)  # find the scroll offset
         _blit_constrained(target_bitmap, x_offset1, y_offset1, bitmap1, x1=x_index)
         _blit_constrained(
             target_bitmap,
@@ -562,8 +600,6 @@ def _animate_bitmap(
     horizontal,
 ):
 
-    max_position = max(start_position, end_position)
-    min_position = min(start_position, end_position)
     start_time = time.monotonic()
 
     if start_position > end_position:  # direction is decreasing: "out"
@@ -588,15 +624,16 @@ def _animate_bitmap(
 
     while True:
 
+        this_time = time.monotonic()
         target_position = (
             start_position
             + (end_position - start_position)
-            * (time.monotonic() - start_time)
+            * (this_time - start_time)
             / animation_time
         )
 
         display.auto_refresh = False
-        if min_position < target_position < max_position:
+        if (this_time - start_time) < animation_time:
             display.auto_refresh = False
             _draw_position(
                 target_bitmap,
