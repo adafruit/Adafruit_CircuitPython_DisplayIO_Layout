@@ -25,6 +25,7 @@ Implementation Notes
 # pylint: disable=too-many-locals, too-many-statements
 
 import displayio
+
 try:
     import adafruit_fancyled.adafruit_fancyled as fancy
 except ImportError:
