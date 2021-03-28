@@ -42,6 +42,7 @@ display.show(my_group)  # add high level Group to the display
 posx = 0
 posy = 0
 
-for i in range(0, 90, 2):
-    my_plane.update_pointer(i, i)
-    time.sleep(0.5)
+while True:
+    for i in range(0, 90, 2):
+        my_plane.update_pointer(i, i)
+        time.sleep(0.5)
