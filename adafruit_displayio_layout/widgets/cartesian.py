@@ -118,7 +118,7 @@ class Cartesian(Widget):
     and scale through a collection of input variables:
 
         - **position**: ``x``, ``y``, ``anchor_point``, ``anchored_position`` and
-          `nudge_x`, `nudge_y`. Nudge parameters are used to account for the float and int
+          ``nudge_x``, ``nudge_y``. Nudge parameters are used to account for the float and int
           conversions required to display different ranges and values. Conversion are required
           as displays work in integers and not floats
 
