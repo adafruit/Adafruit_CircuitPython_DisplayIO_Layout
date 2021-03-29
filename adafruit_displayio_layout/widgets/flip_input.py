@@ -73,6 +73,11 @@ class FlipInput(Widget, Control):
      direction, set `False` for arrows in the vertical direction (default = `True`)
     :param float animation_time: duration for the animation during flipping between
      values, in seconds (default is 0.4 seconds), set to 0.0 or `None` for no animation.
+    :param float cool_down: minimum duration between activations of the widget with a
+     continuous pressing, this can be used to reduce the chance of accidental multiple
+     activations, in seconds (default is 0.0 seconds, no delay).  Set to -1.0 to require
+     the button be released and pressed again for activation (Note: This requires calling
+     the ``released`` function prior to the next call to ``selected``.)
 
     """
 
@@ -94,6 +99,7 @@ class FlipInput(Widget, Control):
         alt_touch_padding=0,  # touch padding on the non-arrow sides of the Widget
         horizontal=True,
         animation_time=None,
+        cool_down=0.0,
         **kwargs,
     ):
 
@@ -124,6 +130,9 @@ class FlipInput(Widget, Control):
         self._display = display
 
         self._animation_time = animation_time
+        self._cool_down = cool_down
+        self._last_pressed = time.monotonic()
+        self._pressed = False  # state variable
 
         # Find the maximum bounding box of the text and determine the
         # baseline (x,y) start point (top, left)
@@ -412,6 +421,15 @@ class FlipInput(Widget, Control):
             self._display.auto_refresh = True
         self._update_position()  # call Widget superclass function to reposition
 
+    def _ok_to_change(self):  # checks state variable and timers to determine
+        # if an update is allowed
+        if self._cool_down < 0:  # if cool_down is negative, require ``released``
+            # to be called before next change
+            return not self._pressed
+        if (time.monotonic() - self._last_pressed) < self._cool_down:
+            return False  # cool_down time has not transpired
+        return True
+
     def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
         """Returns True if the touch_point is within the widget's touch_boundary."""
 
@@ -429,34 +447,50 @@ class FlipInput(Widget, Control):
         return super().contains((touch_x, touch_y, 0))
 
     def selected(self, touch_point):
-        """Response function when Control is selected.  Increases value when upper half is pressed
-        and decreases value when lower half is pressed."""
+        """Response function when the Control is selected.  Increases value when upper half
+        is pressed and decreases value when lower half is pressed."""
 
         # Adjust for local position of the widget using self.x and self.y
 
-        t_b = self.touch_boundary
+        if self._ok_to_change():
+            t_b = self.touch_boundary
 
-        if self._horizontal:
-            if (
-                t_b[0] <= (touch_point[0] - self.x) < (t_b[0] + t_b[2] // 2)
-            ):  # in left half of touch_boundary
-                self.value = self.value - 1
+            if self._horizontal:
+                if (
+                    t_b[0] <= (touch_point[0] - self.x) < (t_b[0] + t_b[2] // 2)
+                ):  # in left half of touch_boundary
+                    self.value = self.value - 1
 
-            elif (
-                (t_b[0] + t_b[2] // 2) <= (touch_point[0] - self.x) <= (t_b[0] + t_b[2])
-            ):  # in right half of touch_boundary
-                self.value = self.value + 1
+                elif (
+                    (t_b[0] + t_b[2] // 2)
+                    <= (touch_point[0] - self.x)
+                    <= (t_b[0] + t_b[2])
+                ):  # in right half of touch_boundary
+                    self.value = self.value + 1
 
-        else:
-            if (
-                t_b[1] <= (touch_point[1] - self.y) < (t_b[1] + t_b[3] // 2)
-            ):  # in upper half of touch_boundary
-                self.value = self.value + 1
+            else:
+                if (
+                    t_b[1] <= (touch_point[1] - self.y) < (t_b[1] + t_b[3] // 2)
+                ):  # in upper half of touch_boundary
+                    self.value = self.value + 1
 
-            elif (
-                (t_b[1] + t_b[3] // 2) <= (touch_point[1] - self.y) <= (t_b[1] + t_b[3])
-            ):  # in lower half of touch_boundary
-                self.value = self.value - 1
+                elif (
+                    (t_b[1] + t_b[3] // 2)
+                    <= (touch_point[1] - self.y)
+                    <= (t_b[1] + t_b[3])
+                ):  # in lower half of touch_boundary
+                    self.value = self.value - 1
+
+            self._pressed = True  # update the state variable
+            self._last_pressed = (
+                time.monotonic()
+            )  # value changed, so update cool_down timer
+
+    def released(self):
+        """Response function when the Control is released. Resets the state variables
+        for handling situation when ``cool_down`` is < 0 that requires `released()` before
+        reacting another another `selected()`."""
+        self._pressed = False
 
     @property
     def value(self):
