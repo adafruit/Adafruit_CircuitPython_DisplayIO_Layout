@@ -469,8 +469,10 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        local_x = int((x - self._xrange[0]) * self._factorx)
-        local_y = int((self._yrange[0] - y) * self._factory) + self.height
+        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
+        local_y = (
+            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
+        )
 
         if local_x >= 0 or local_y <= 100:
             if self._update_line:
