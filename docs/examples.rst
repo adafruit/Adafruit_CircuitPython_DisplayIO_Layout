@@ -34,6 +34,24 @@ Create multiple sliding switch with various sizes and orientations.
     :caption: examples/displayio_layout_switch_multiple.py
     :linenos:
 
+Dial simple test
+----------------
+
+Create a single dial.
+
+.. literalinclude:: ../examples/displayio_layout_dial_simpletest.py
+    :caption: examples/displayio_layout_dial_simpletest.py
+    :linenos:
+
+FlipInput simple test
+---------------------
+
+Create three FlipInput selectors.
+
+.. literalinclude:: ../examples/displayio_layout_flip_input_simpletest.py
+    :caption: examples/displayio_layout_flip_input_simpletest.py
+    :linenos:
+
 Annotation example
 ------------------
 
@@ -50,22 +68,4 @@ Create a simple plot plane.
 
 .. literalinclude:: ../examples/displayio_layout_cartesian_simpletest.py
     :caption: examples/displayio_layout_cartesian_simpletest.py
-    :linenos:
-
-Cartesian plane advanced test
------------------------------
-
-Create different cartesian planes in the scree
-
-.. literalinclude:: ../examples/displayio_layout_cartesian_advanced_test.py
-    :caption: examples/displayio_layout_cartesian_advanced_test.py
-    :linenos:
-
-Dial simple test
-----------------
-
-Create a single dial.
-
-.. literalinclude:: ../examples/displayio_layout_dial_simpletest.py
-    :caption: examples/displayio_layout_dial_simpletest.py
     :linenos:
