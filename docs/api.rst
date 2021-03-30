@@ -33,3 +33,15 @@
 .. automodule:: adafruit_displayio_layout.widgets.icon_widget
    :members:
    :member-order: bysource
+
+.. automodule:: adafruit_displayio_layout.widgets.icon_animated
+   :members:
+   :member-order: bysource
+
+.. automodule:: adafruit_displayio_layout.widgets.flip_input
+   :members:
+   :member-order: bysource
+
+.. automodule:: adafruit_displayio_layout.widgets.annotation
+   :members:
+   :member-order: bysource

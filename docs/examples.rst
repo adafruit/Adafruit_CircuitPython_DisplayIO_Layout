@@ -42,3 +42,21 @@ Create a single dial.
 .. literalinclude:: ../examples/displayio_layout_dial_simpletest.py
     :caption: examples/displayio_layout_dial_simpletest.py
     :linenos:
+
+FlipInput simple test
+---------------------
+
+Create three FlipInput selectors.
+
+.. literalinclude:: ../examples/displayio_layout_flip_input_simpletest.py
+    :caption: examples/displayio_layout_flip_input_simpletest.py
+    :linenos:
+
+Annotation example
+------------------
+
+Displays annotations, examples relative to SwitchRound widget or as freeform.
+
+.. literalinclude:: ../examples/displayio_layout_annotation_simpletest.py
+    :caption: examples/displayio_layout_annotation_simpletest.py
+    :linenos:
