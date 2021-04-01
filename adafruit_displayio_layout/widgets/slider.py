@@ -57,12 +57,11 @@ class Slider(Widget, Control):
     :param int touch_padding: the width of an additional border surrounding the switch
      that extends the touch response boundary, defaults to 0
 
-    :param anchor_point: starting point for the annotation line, where ``anchor_point`` is an
-     (A,B) tuple in relative units of the size of the widget,
-     for example (0.0, 0.0) is the upper left corner, and (1.0, 1.0) is the lower
-     right corner of the widget.  If ``anchor_point`` is `None`, then ``anchored_position``
-     is used to set the annotation line starting point, in widget size relative units
-     (default is (0.0, 0.0)).
+    :param anchor_point: starting point for the annotation line, where ``anchor_point`` is
+     an (A,B) tuple in relative units of the size of the widget, for example (0.0, 0.0) is
+     the upper left corner, and (1.0, 1.0) is the lower      right corner of the widget.
+     If ``anchor_point`` is `None`, then ``anchored_position`` is used to set the
+     annotation line starting point, in widget size relative units (default is (0.0, 0.0)).
     :type anchor_point: Tuple[float, float]
 
     :param anchored_position: pixel position starting point for the annotation line
@@ -70,16 +69,41 @@ class Slider(Widget, Control):
      upper left corner of the widget, in pixel units (default is None).
     :type anchored_position: Tuple[int, int]
 
-    :param fill_color: (*RGB tuple or 24-bit hex value*) slider fill color, default is
-     ``(66, 44, 66)`` gray.
+    :param fill_color: (*RGB tuple or 24-bit hex value*) slider fill color, default
+     is ``(66, 44, 66)`` gray.
     :param outline_color: (*RGB tuple or 24-bit hex value*) slider outline color,
      default is ``(30, 30, 30)`` dark gray.
     :param background_color: (*RGB tuple or 24-bit hex value*) background color,
      default is ``(255, 255, 255)`` white
 
-    :param int switch_stroke: outline stroke width for the switch and background,
-     in pixels, default is 2
+    :param int switch_stroke: outline stroke width for the switch and background, in pixels,
+     default is 2
     :param Boolean value: the initial value for the switch, default is False
+
+
+    **Summary: Slider Features and input variables**
+
+    The ``Slider`` widget has some options for controlling its position, visible appearance,
+    and value through a collection of input variables:
+
+        - **position**: ``x``, ``y`` or ``anchor_point`` and ``anchored_position``
+
+        - **size**: ``width`` and ``height`` (recommend to leave ``height`` = None to use
+          preferred aspect ratio)
+
+        - **switch color**: ``fill_color``, ``outline_color``
+
+        - **background color**: ``background_color``
+
+        - **linewidths**: ``switch_stroke``
+
+        - **value**: Set ``value`` to the initial value (True or False)
+
+        - **touch boundaries**: ``touch_padding`` defines the number of additional pixels
+          surrounding the switch that should respond to a touch.  (Note: The ``touch_padding``
+          variable updates the ``touch_boundary`` Control class variable.  The definition of
+          the ``touch_boundary`` is used to determine the region on the Widget that returns
+          `True` in the `when_inside` function.)
 
     """
 
