@@ -37,16 +37,118 @@ from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets.control import Control
 from adafruit_displayio_layout.widgets.easing import quadratic_easeinout as easing
 
-
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
 
 class Slider(Widget, Control):
-
     """
 
-    TBD
+    :param int x: pixel position, defaults to 0
+    :param int y: pixel position, defaults to 0
+    :param int width: width of the slider in pixels. It is recommended to use 100
+     the height will auto-size relative to the width, defaults to 100
+    :param int height: height of the slider in pixels, defaults to 40 pixels
+    :param int touch_padding: the width of an additional border surrounding the switch
+     that extends the touch response boundary, defaults to 0
+
+    :param anchor_point: starting point for the annotation line, where ``anchor_point`` is an
+     (A,B) tuple in relative units of the size of the widget,
+     for example (0.0, 0.0) is the upper left corner, and (1.0, 1.0) is the lower
+     right corner of the widget.  If ``anchor_point`` is `None`, then ``anchored_position``
+     is used to set the annotation line starting point, in widget size relative units
+     (default is (0.0, 0.0)).
+    :type anchor_point: Tuple[float, float]
+
+    :param anchored_position: pixel position starting point for the annotation line
+     where ``anchored_position`` is an (x,y) tuple in pixel units relative to the
+     upper left corner of the widget, in pixel units (default is None).
+    :type anchored_position: Tuple[int, int]
+
+    :param fill_color: (*RGB tuple or 24-bit hex value*) slider fill color, default is
+     ``(66, 44, 66)`` gray.
+    :param outline_color: (*RGB tuple or 24-bit hex value*) slider outline color,
+     default is ``(30, 30, 30)`` dark gray.
+    :param background_color: (*RGB tuple or 24-bit hex value*) background color,
+     default is ``(255, 255, 255)`` white
+
+    :param int switch_stroke: outline stroke width for the switch and background,
+     in pixels, default is 2
+
+    :param Boolean value: the initial value for the switch, default is False
+
+
+    **Quickstart: Importing and using SwitchRound**
+
+        Here is one way of importing the `Slider` class so you can use it as
+        the name ``Slider``:
+
+        .. code-block:: python
+
+            from adafruit_displayio_layout.widgets.slider import Slider
+
+        Now you can create a switch at pixel position x=20, y=30 using:
+
+        .. code-block:: python
+
+            my_slider=Slider(20, 30) # instance the slider at x=20, y=30
+
+        Once you setup your display, you can now add ``my_slider`` to your display using:
+
+        .. code-block:: python
+
+            display.show(my_slider) # add the group to the display
+
+        If you want to have multiple display elements, you can create a group and then
+        append the slider and the other elements to the group.  Then, you can add the full
+        group to the display as in this example:
+
+        .. code-block:: python
+
+            my_switch = Slider(20, 30) # instance the slider at x=20, y=30
+            my_group = displayio.Group(max_size=10) # make a group that can hold 10 items
+            my_group.append(my_slider) # Add my_switch to the group
+
+            #
+            # Append other display elements to the group
+            #
+
+            display.show(my_group) # add the group to the display
+
+
+    **Summary: Slider Features and input variables**
+
+    The `Slider` widget has numerous options for controlling its position, visible appearance,
+    and value through a collection of input variables:
+
+        - **position**: ``x``, ``y`` or ``anchor_point`` and ``anchored_position``
+
+        - **size**: ``width`` and ``height`` (recommend to leave ``height`` = None to use
+          preferred aspect ratio)
+
+        - **switch color**: ``fill_color``, ``outline_color``
+
+        - **background color**: ``background_color``
+
+        - **linewidths**: ``switch_stroke``
+
+        - **value**: Set ``value`` to the initial value (True or False)
+
+        - **touch boundaries**: ``touch_padding`` defines the number of additional pixels
+          surrounding the switch that should respond to a touch.  (Note: The ``touch_padding``
+          variable updates the ``touch_boundary`` Control class variable.  The definition of
+          the ``touch_boundary`` is used to determine the region on the Widget that returns
+          `True` in the `contains` function.)
+
+    **The Slider Widget*
+
+    .. figure:: slider.png
+       :scale: 100 %
+       :figwidth: 100%
+       :align: center
+       :alt: Diagram of the slider widget.
+
+       This is a diagram of a slider with component parts
 
     """
 
@@ -56,19 +158,15 @@ class Slider(Widget, Control):
         self,
         x=0,
         y=0,
-        width=None,  # recommend to default to
+        width=100,  # recommend to default to
         height=40,
         touch_padding=0,
-        horizontal=True,  # horizontal orientation
         anchor_point=None,
         anchored_position=None,
         fill_color=(66, 44, 66),
         outline_color=(30, 30, 30),
         background_color=(255, 255, 255),
-        background_outline_color=None,  # default to background_color_off
-        switch_stroke=2,
-        text_stroke=None,  # default to switch_stroke
-        value=False,  # initial value
+        value=False,
         **kwargs,
     ):
 
@@ -77,15 +175,13 @@ class Slider(Widget, Control):
         )
         Control.__init__(self)
 
-        self._horizontal = horizontal
-
-        self._knob_width = 20
-        self._knob_height = 40
+        self._knob_width = height // 2
+        self._knob_height = height
 
         self._knob_x = self._knob_width
         self._knob_y = self._knob_height
 
-        self._slider_height = 8
+        self._slider_height = height // 5
 
         self._height = self.height
 
@@ -94,19 +190,11 @@ class Slider(Widget, Control):
         else:
             self._width = self.width
 
-        if background_outline_color is None:
-            background_outline_color = background_color
-
         self._fill_color = fill_color
         self._outline_color = outline_color
         self._background_color = background_color
-        self._background_outline_color = background_outline_color
 
-        self._switch_stroke = switch_stroke
-
-        if text_stroke is None:
-            text_stroke = switch_stroke  # width of lines for the (0/1) text shapes
-        self._text_stroke = text_stroke
+        self._switch_stroke = 2
 
         self._touch_padding = touch_padding
 
@@ -151,7 +239,7 @@ class Slider(Widget, Control):
             width=self._width - 4,
             height=self._slider_height,
             fill=self._background_color,
-            outline=self._background_outline_color,
+            outline=self._background_color,
             stroke=self._switch_stroke,
         )
 
@@ -245,7 +333,7 @@ class Slider(Widget, Control):
     @width.setter
     def width(self, new_width):
         if self._width is None:
-            self._width = 50
+            self._width = 100
         else:
             self._width = new_width
         self._create_switch()
@@ -257,32 +345,5 @@ class Slider(Widget, Control):
     @height.setter
     def height(self, new_height):
         self._height = new_height
-        self._width = new_height // 2
-        self._create_switch()
-
-    def resize(self, new_width, new_height):
-        """Resize the switch to a new requested width and height.
-
-        :param int new_width: requested maximum width
-        :param int new_height: requested maximum height
-        :return: None
-
-        """
-
-        # Swap dimensions when orientation is vertical: "horizontal=False"
-        if not self._horizontal:
-            new_width, new_height = new_height, new_width
-
-        # calculate the preferred target width based on new_height and 2:1 aspect ratio
-        preferred_width = new_height * 2
-
-        if preferred_width <= new_width:  # the new_height is the constraint
-            self._height = new_height
-            self._width = preferred_width
-        else:  # the new_width is the constraint
-            self._height = new_width // 2  # keep 2:1 aspect ratio
-            self._width = new_width
-
-        self._width = self._height // 2
-
+        self._width = new_height * 2
         self._create_switch()

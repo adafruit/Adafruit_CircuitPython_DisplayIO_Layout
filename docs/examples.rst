@@ -60,3 +60,12 @@ Displays annotations, examples relative to SwitchRound widget or as freeform.
 .. literalinclude:: ../examples/displayio_layout_annotation_simpletest.py
     :caption: examples/displayio_layout_annotation_simpletest.py
     :linenos:
+
+Slider example
+--------------
+
+Demonstrate the use of the slider widget
+
+.. literalinclude:: ../examples/displayio_layout_slider_simpletest.py
+    :caption: examples/displayio_layout_slider_simpletest.py
+    :linenos:
