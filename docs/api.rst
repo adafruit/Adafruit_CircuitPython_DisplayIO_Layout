@@ -45,3 +45,7 @@
 .. automodule:: adafruit_displayio_layout.widgets.annotation
    :members:
    :member-order: bysource
+
+.. automodule:: adafruit_displayio_layout.widgets.slider
+   :members:
+   :member-order: bysource
