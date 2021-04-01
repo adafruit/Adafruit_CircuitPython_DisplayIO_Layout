@@ -36,6 +36,10 @@ from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets.control import Control
 from adafruit_displayio_layout.widgets.easing import quadratic_easeinout as easing
+try:
+    from typing import Tuple
+except ImportError:
+    pass
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
@@ -156,17 +160,17 @@ class Slider(Widget, Control):
     # pylint: disable=too-many-branches, too-many-statements
     def __init__(
         self,
-        x=0,
-        y=0,
-        width=100,  # recommend to default to
-        height=40,
-        touch_padding=0,
-        anchor_point=None,
-        anchored_position=None,
-        fill_color=(66, 44, 66),
-        outline_color=(30, 30, 30),
-        background_color=(255, 255, 255),
-        value=False,
+        x: int = 0,
+        y: int = 0,
+        width: int = 100,  # recommend to default to
+        height: int = 40,
+        touch_padding: int = 0,
+        anchor_point: Tuple[int, int] = None,
+        anchored_position: Tuple[int, int] = None,
+        fill_color: Tuple[int, int, int] = (66, 44, 66),
+        outline_color: Tuple[int, int, int] = (30, 30, 30),
+        background_color: Tuple[int, int, int] = (255, 255, 255),
+        value: bool = False,
         **kwargs,
     ):
 
@@ -203,9 +207,9 @@ class Slider(Widget, Control):
         self._anchor_point = anchor_point
         self._anchored_position = anchored_position
 
-        self._create_switch()
+        self._create_slider()
 
-    def _create_switch(self):
+    def _create_slider(self):
         # The main function that creates the switch display elements
         self._x_motion = self._width
         self._y_motion = 0
@@ -336,7 +340,7 @@ class Slider(Widget, Control):
             self._width = 100
         else:
             self._width = new_width
-        self._create_switch()
+        self._create_slider()
 
     @property
     def height(self):
@@ -346,4 +350,4 @@ class Slider(Widget, Control):
     def height(self, new_height):
         self._height = new_height
         self._width = new_height * 2
-        self._create_switch()
+        self._create_slider()
