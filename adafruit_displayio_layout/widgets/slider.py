@@ -36,6 +36,7 @@ from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets.control import Control
 from adafruit_displayio_layout.widgets.easing import quadratic_easeinout as easing
+
 try:
     from typing import Tuple
 except ImportError:
@@ -142,7 +143,7 @@ class Slider(Widget, Control):
           surrounding the switch that should respond to a touch.  (Note: The ``touch_padding``
           variable updates the ``touch_boundary`` Control class variable.  The definition of
           the ``touch_boundary`` is used to determine the region on the Widget that returns
-          `True` in the `contains` function.)
+          `True` in the `when_inside` function.)
 
     **The Slider Widget*
 
@@ -291,7 +292,10 @@ class Slider(Widget, Control):
         self._switch_handle.x = self._switch_initial_x + x_offset
         self._switch_handle.y = self._switch_initial_y + y_offset
 
-    def selected(self, touch_point):
+    def when_selected(self, touch_point):
+        """
+        Manages internal logic when widget is selected
+        """
 
         touch_x = touch_point[0] - self.x
         touch_y = touch_point[1] - self.y
@@ -301,9 +305,8 @@ class Slider(Widget, Control):
         super().selected((touch_x, touch_y, 0))
         return self._switch_handle.x
 
-    def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
-        """Checks if the Widget was touched.  Returns True if the touch_point
-        is within the Control's touch_boundary.
+    def when_inside(self, touch_point):
+        """Checks if the Widget was touched.
 
         :param touch_point: x,y location of the screen, in absolute display coordinates.
         :return: Boolean
@@ -323,31 +326,3 @@ class Slider(Widget, Control):
         :return: Boolean
         """
         return self._value
-
-    @value.setter
-    def value(self, new_value):
-        if new_value != self._value:
-            fake_touch_point = [0, 0, 0]  # send an arbitrary touch_point
-            self.selected(fake_touch_point)
-
-    @property
-    def width(self):
-        return self._width
-
-    @width.setter
-    def width(self, new_width):
-        if self._width is None:
-            self._width = 100
-        else:
-            self._width = new_width
-        self._create_slider()
-
-    @property
-    def height(self):
-        return self._height
-
-    @height.setter
-    def height(self, new_height):
-        self._height = new_height
-        self._width = new_height * 2
-        self._create_slider()

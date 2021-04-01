@@ -38,7 +38,7 @@ while True:
     p = ts.touch_point  # get any touches on the screen
 
     if p:  # Check each slider if the touch point is within the slider touch area
-        if my_slider.contains(p):
-            my_sslider.selected(p)
+        if my_slider.when_inside(p):
+            my_slider.when_selected(p)
 
     time.sleep(0.05)  # touch response on PyPortal is more accurate with a small delay
