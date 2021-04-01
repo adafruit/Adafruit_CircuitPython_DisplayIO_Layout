@@ -85,7 +85,7 @@ class Slider(Widget, Control):
 
     **Quickstart: Importing and using SwitchRound**
 
-        Here is one way of importing the `Slider` class so you can use it as
+        Here is one way of importing the ``Slider`` class so you can use it as
         the name ``Slider``:
 
         .. code-block:: python
@@ -123,7 +123,7 @@ class Slider(Widget, Control):
 
     **Summary: Slider Features and input variables**
 
-    The `Slider` widget has numerous options for controlling its position, visible appearance,
+    The ``Slider`` widget has numerous options for controlling its position, visible appearance,
     and value through a collection of input variables:
 
         - **position**: ``x``, ``y`` or ``anchor_point`` and ``anchored_position``
