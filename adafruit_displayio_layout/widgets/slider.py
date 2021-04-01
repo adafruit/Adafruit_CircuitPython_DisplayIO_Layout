@@ -85,40 +85,40 @@ class Slider(Widget, Control):
 
     **Quickstart: Importing and using SwitchRound**
 
-        Here is one way of importing the ``Slider`` class so you can use it as
-        the name ``Slider``:
+    Here is one way of importing the ``Slider`` class so you can use it as
+    the name ``Slider``:
 
-        .. code-block:: python
+    .. code-block:: python
 
-            from adafruit_displayio_layout.widgets.slider import Slider
+        from adafruit_displayio_layout.widgets.slider import Slider
 
-        Now you can create a switch at pixel position x=20, y=30 using:
+    Now you can create a switch at pixel position x=20, y=30 using:
 
-        .. code-block:: python
+    .. code-block:: python
 
-            my_slider=Slider(20, 30) # instance the slider at x=20, y=30
+        my_slider=Slider(20, 30) # instance the slider at x=20, y=30
 
-        Once you setup your display, you can now add ``my_slider`` to your display using:
+    Once you setup your display, you can now add ``my_slider`` to your display using:
 
-        .. code-block:: python
+    .. code-block:: python
 
-            display.show(my_slider) # add the group to the display
+        display.show(my_slider) # add the group to the display
 
-        If you want to have multiple display elements, you can create a group and then
-        append the slider and the other elements to the group.  Then, you can add the full
-        group to the display as in this example:
+    If you want to have multiple display elements, you can create a group and then
+    append the slider and the other elements to the group.  Then, you can add the full
+    group to the display as in this example:
 
-        .. code-block:: python
+    .. code-block:: python
 
-            my_switch = Slider(20, 30) # instance the slider at x=20, y=30
-            my_group = displayio.Group(max_size=10) # make a group that can hold 10 items
-            my_group.append(my_slider) # Add my_switch to the group
+        my_switch = Slider(20, 30) # instance the slider at x=20, y=30
+        my_group = displayio.Group(max_size=10) # make a group that can hold 10 items
+        my_group.append(my_slider) # Add my_switch to the group
 
-            #
-            # Append other display elements to the group
-            #
+        #
+        # Append other display elements to the group
+        #
 
-            display.show(my_group) # add the group to the display
+        display.show(my_group) # add the group to the display
 
 
     **Summary: Slider Features and input variables**
