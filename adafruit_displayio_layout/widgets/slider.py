@@ -143,6 +143,17 @@ class Slider(Widget, Control):
           the ``touch_boundary`` is used to determine the region on the Widget that returns
           `True` in the `when_inside` function.)
 
+    **The Slider Widget**
+
+    .. figure:: slider.png
+       :scale: 100 %
+       :figwidth: 80%
+       :align: center
+       :alt: Diagram of the slider widget.
+
+       This is a diagram of a slider with component parts
+
+
     """
 
     # pylint: disable=too-many-instance-attributes, too-many-arguments, too-many-locals
