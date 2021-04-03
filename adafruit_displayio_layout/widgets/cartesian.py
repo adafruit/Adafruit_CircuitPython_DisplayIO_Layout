@@ -26,8 +26,8 @@ Implementation Notes
 
 import displayio
 import terminalio
-import vectorio
 from adafruit_display_text import bitmap_label
+import vectorio
 from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets import rectangle_helper
 
@@ -512,22 +512,3 @@ class Cartesian(Widget):
                         local_y,
                         1,
                     )
-
-    def set_widget_style(self, new_style: str) -> None:
-        """set_widget_style function
-        Allows to set the widget style
-        :param str new_style: style for the widget
-        :return: None
-        """
-        # import would change after library packaging
-        # pylint: disable=import-outside-toplevel
-        try:
-            from adafruit_styles import get_hex
-            from adafruit_styles import styles
-
-            colorset = styles.THEME
-            self._pointer_color = get_hex(colorset[new_style]["TEXT"])
-            self._font_color = get_hex(colorset[new_style]["TEXT"])
-            self._draw_ticks()
-        except ImportError:
-            print("This feature is not yet implemented")
