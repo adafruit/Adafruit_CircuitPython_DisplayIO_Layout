@@ -140,7 +140,10 @@ class ColorPicker(Widget, Control):
 
     @staticmethod
     def _make_color(base, adj, ratio, shade):
-
+        """
+        Go through each bit of the colors adjusting blue with blue, red with red,
+        green with green, etc.
+        """
         color_wheel = [
             [0xFF, 0x00, 0xFF],
             [0xFF, 0x00, 0x00],
@@ -153,10 +156,7 @@ class ColorPicker(Widget, Control):
 
         output = 0x0
         bit = 0
-        """
-        Go through each bit of the colors adjusting blue with blue, red with red,
-        green with green, etc.
-        """
+
         for pos in range(3):
             base_chan = color_wheel[base][pos]
             adj_chan = color_wheel[adj][pos]
