@@ -37,6 +37,8 @@ autodoc_mock_imports = [
     "adafruit_imageload",
     "adafruit_display_text",
     "bitmaptools",
+    "adafruit_sdcard",
+    "storage"
 ]
 
 
