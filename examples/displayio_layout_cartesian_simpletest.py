@@ -43,8 +43,6 @@ posx = 0
 posy = 0
 
 while True:
-    my_plane.update_pointer(posx, posy)
-    display.show(my_group)
-    time.sleep(0.5)
-    posx = posx + 2
-    posy = posy + 2
+    for i in range(0, 90, 2):
+        my_plane.update_pointer(i, i)
+        time.sleep(0.5)
