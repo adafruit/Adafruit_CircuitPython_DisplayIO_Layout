@@ -46,6 +46,13 @@
    :members:
    :member-order: bysource
 
+.. automodule:: adafruit_displayio_layout.widgets.cartesian
+   :members:
+   :member-order: bysource
+   :inherited-members:
+
+.. inheritance-diagram:: adafruit_displayio_layout.widgets.cartesian
+
 .. automodule:: adafruit_displayio_layout.widgets.slider
    :members:
    :member-order: bysource
