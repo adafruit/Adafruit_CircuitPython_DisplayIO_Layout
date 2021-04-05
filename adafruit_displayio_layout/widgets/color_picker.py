@@ -5,7 +5,7 @@
 
 `color_picker`
 ================================================================================
-A colorpicker using a existing bitmap.
+A colorpicker using a existing bitmap created by the make_wheel utility.
 
 * Author(s): Jose David M.
 
@@ -44,8 +44,70 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.
 
 
 class ColorPicker(Widget, Control):
-    """
-    TBD
+    """A widget to be used to select colors from a heel.
+
+    :param str filename: name of the bitmap file to be used as a ColorPicker
+
+    :param int x: x position of the color picker origin
+    :param int y: y position of the color picker origin
+
+    :param int imagesize: size of the bitmap file. The bitmap colorwheels are squares.
+
+
+    **Quickstart: Importing and using the Color Picker**
+
+    Here is one way of importing the ``ColorPicker`` class so you can use:
+
+    .. code-block:: python
+
+        from adafruit_displayio_layout.widgets.color_picker import ColorPicker
+
+    Now you can create an Slider at pixel position x=20, y=30 using:
+
+    .. code-block:: python
+
+        my_colorpicker=ColorPicker(x=20, y=30)
+
+    Once you setup your display, you can now add ``my_colorpicker`` to your display using:
+
+    .. code-block:: python
+
+        display.show(my_colorpicker) # add the group to the display
+
+    If you want to have multiple display elements, you can create a group and then
+    append the slider and the other elements to the group.  Then, you can add the full
+    group to the display as in this example:
+
+    .. code-block:: python
+
+        my_colorpicker= ColorPicker(20, 30)
+        my_group = displayio.Group(max_size=10) # make a group that can hold 10 items
+        my_group.append(my_colorpicker) # Add my_slider to the group
+
+        #
+        # Append other display elements to the group
+        #
+
+        display.show(my_group) # add the group to the display
+
+
+    **Final Notes**
+
+    Depending on the screen results may vary. Resolution of the bitmap will no be as seen in a PC.
+    Sensitivity of the screen could also affect the behaviour of the library.
+
+
+    **The Color Picker Widget**
+
+    .. figure:: color_picker.png
+      :scale: 100 %
+      :align: center
+      :alt: Example of the color picker widget.
+
+      Example of the color picker. representation will vary according to screen used.
+
+
+
     """
 
     # pylint: disable=too-many-lines, too-many-instance-attributes, too-many-arguments
@@ -53,13 +115,10 @@ class ColorPicker(Widget, Control):
 
     def __init__(
         self,
-        x=0,
-        y=0,
-        filename=None,
-        image_size=100,
-        touch_padding=0,
-        anchor_point=None,
-        anchored_position=None,
+        filename: str = None,
+        x: int = 0,
+        y: int = 0,
+        image_size: int = 100,
         **kwargs,
     ):
 
@@ -73,7 +132,6 @@ class ColorPicker(Widget, Control):
         tile_grid = TileGrid(image, pixel_shader=ColorConverter())
 
         self._image_size = image_size
-        self._touch_padding = touch_padding
 
         self.append(tile_grid)
 
@@ -101,11 +159,12 @@ class ColorPicker(Widget, Control):
 
         return super().contains((touch_x, touch_y, 0))
 
-    def when_selected(self, touch_point):
+    def when_selected(self, touch_point, screen_height):
         """Response function when ColorPicker is selected.  When selected, the ColorPicker
         will give the color corresponding with the position
 
         :param touch_point: x,y location of the screen, in absolute display coordinates.
+        :param int screen_height: screen height
         :return: Color
 
         """
@@ -113,7 +172,7 @@ class ColorPicker(Widget, Control):
         touch_x = (
             touch_point[0] - self.x
         )  # adjust touch position for the local position
-        touch_y = touch_point[1] - self.y
+        touch_y = screen_height - touch_point[1] - self.y
 
         # Call the parent's .selected function in case there is any work up there.
         # touch_point is adjusted for group's x,y position before sending to super()
@@ -124,11 +183,14 @@ class ColorPicker(Widget, Control):
         img_half = image_size // 2
         dist = abs(math.sqrt((x - img_half) ** 2 + (y - img_half) ** 2))
         if x - img_half == 0:
-            angle = angle = -90
+            angle = -90
             if y > img_half:
                 angle = 90
         else:
             angle = math.atan2((y - img_half), (x - img_half)) * 180 / math.pi
+
+        angle = (angle + 30) % 360
+
         shade = 1 * dist / img_half
         idx = angle / 60
         base = int(round(idx))

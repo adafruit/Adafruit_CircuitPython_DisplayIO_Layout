@@ -150,23 +150,25 @@ def make_wheel(image_name, img_size, bg_color):
     _write_bmp_header(output_file, filesize)
     _write_dib_header(output_file, img_size_width, img_size_height)
 
-    for y in range(img_size):
+    for y in range(img_size, 0, -1):
         buffer_index = 0
         for x in range(img_size):
             dist = abs(math.sqrt((x - img_half) ** 2 + (y - img_half) ** 2))
             shade = 1 * dist / outer_radius
             if x - img_half == 0:
-                angle = angle = -90
+                angle = -90
                 if y > img_half:
                     angle = 90
             else:
                 angle = math.atan2((y - img_half), (x - img_half)) * 180 / math.pi
-            angle = (angle + 30) % 360
+
+            angle = (angle - 30) % 360
 
             idx = angle / 60
             if idx < 0:
                 idx = 6 + idx
             base = int(round(idx))
+
             adj = (6 + base + (-1 if base > idx else 1)) % 6
             ratio = max(idx, base) - min(idx, base)
             color = make_color(base, adj, ratio, shade)

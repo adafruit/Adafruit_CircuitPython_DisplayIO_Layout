@@ -60,3 +60,12 @@ Displays annotations, examples relative to SwitchRound widget or as freeform.
 .. literalinclude:: ../examples/displayio_layout_annotation_simpletest.py
     :caption: examples/displayio_layout_annotation_simpletest.py
     :linenos:
+
+Color Picker example
+--------------------
+
+Simple example of the use of the Color Picker using a 200x200 pixels Bitmap
+
+.. literalinclude:: ../examples/displayio_layout_color_picker_simpletest.py
+    :caption: examples/displayio_layout_color_picker_simpletest.py
+    :linenos:
