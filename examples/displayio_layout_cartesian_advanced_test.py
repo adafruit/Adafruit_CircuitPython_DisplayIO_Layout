@@ -53,7 +53,7 @@ car4 = Cartesian(
     tick_color=0xFFFFFF,
     subticks=True,
 )
-car4.set_widget_style("LightGreen6")
+
 my_group.append(car4)
 
 car5 = Cartesian(
