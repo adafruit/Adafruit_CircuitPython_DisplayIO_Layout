@@ -29,13 +29,7 @@ inheritance_graph_attrs = dict(rankdir="TB")
 # digitalio, micropython and busio. List the modules you use. Without it, the
 # autodoc module docs will fail to generate with a warning.
 autodoc_mock_imports = [
-    "displayio",
-    "adafruit_display_shapes",
     "vectorio",
-    "bitmaptools",
-    "terminalio",
-    "adafruit_imageload",
-    "adafruit_display_text",
     "bitmaptools",
 ]
 

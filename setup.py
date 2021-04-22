@@ -36,6 +36,10 @@ setup(
     author_email="circuitpython@adafruit.com",
     install_requires=[
         "Adafruit-Blinka",
+        "adafruit-blinka-displayio",
+        "adafruit-circuitpython-display-shapes",
+        "adafruit-circuitpython-imageload",
+        "adafruit-circuitpython-display-text",
     ],
     # Choose your license
     license="MIT",
