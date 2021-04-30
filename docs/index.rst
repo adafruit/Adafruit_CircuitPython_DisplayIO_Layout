@@ -10,6 +10,12 @@ Table of Contents
     self
 
 .. toctree::
+    :caption: Documentation
+
+    guide
+
+
+.. toctree::
     :caption: Examples
 
     examples
