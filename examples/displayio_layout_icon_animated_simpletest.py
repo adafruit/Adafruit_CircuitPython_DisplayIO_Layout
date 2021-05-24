@@ -4,7 +4,6 @@
 """
 Creates two animated icons with touch response: zoom and shrink animations.
 """
-import gc
 import time
 import board
 import displayio
