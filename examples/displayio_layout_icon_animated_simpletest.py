@@ -48,7 +48,7 @@ icon_shrink = IconAnimated(
 
 icons = [icon_zoom, icon_shrink]
 
-main_group = displayio.Group(max_size=2)
+main_group = displayio.Group()
 main_group.append(icon_zoom)
 main_group.append(icon_shrink)
 

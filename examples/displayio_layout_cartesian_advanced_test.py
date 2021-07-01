@@ -21,7 +21,7 @@ display = board.DISPLAY  # create the display on the PyPortal or Clue (for examp
 
 
 # Create different Cartesian widgets
-my_group = displayio.Group(max_size=10)
+my_group = displayio.Group()
 
 car = Cartesian(
     x=25,

@@ -35,7 +35,7 @@ my_plane = Cartesian(
     font_color=0xFFFFFF,  # ticks line color
 )
 
-my_group = displayio.Group(max_size=3)
+my_group = displayio.Group()
 my_group.append(my_plane)
 display.show(my_group)  # add high level Group to the display
 
