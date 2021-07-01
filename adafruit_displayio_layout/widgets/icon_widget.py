@@ -49,10 +49,6 @@ class IconWidget(Widget, Control):
     :type anchor_point: Tuple[float,float]
     :param int anchored_position: (x,y) pixel value for the location of the anchor_point
     :type anchored_position: Tuple[int, int]
-    :param int max_size: (Optional) this will get passed through to the
-     displayio.Group constructor. ``max_size`` should be set to the maximum number of
-     graphical elements that will be held within the Group of this widget.
-
     """
 
     def __init__(self, label_text, icon, on_disk=False, **kwargs):

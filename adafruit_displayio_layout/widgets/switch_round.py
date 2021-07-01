@@ -152,7 +152,7 @@ class SwitchRound(Widget, Control):
         .. code-block:: python
 
             my_switch = Switch(20, 30) # instance the switch at x=20, y=30
-            my_group = displayio.Group(max_size=10) # make a group that can hold 10 items
+            my_group = displayio.Group() # make a group
             my_group.append(my_switch) # Add my_switch to the group
 
             #
@@ -445,10 +445,7 @@ class SwitchRound(Widget, Control):
     ):
 
         # initialize the Widget superclass (x, y, scale)
-        super().__init__(x=x, y=y, height=height, width=width, **kwargs, max_size=4)
-        # Define how many graphical elements will be in this group
-        # using "max_size=XX"
-        #
+        super().__init__(x=x, y=y, height=height, width=width, **kwargs)
         # Group elements for SwitchRound:
         #  0. switch_roundrect: The switch background
         #  1. switch_circle: The switch button

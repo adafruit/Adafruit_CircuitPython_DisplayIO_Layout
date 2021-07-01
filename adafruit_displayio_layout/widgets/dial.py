@@ -208,12 +208,8 @@ class Dial(Widget):
         value_label_anchor_on_widget=(0.5, 0.5),  # default label position on widget
         **kwargs,
     ):
-
         # initialize the Widget superclass (x, y, scale)
-        super().__init__(**kwargs, max_size=3)
-        # Define how many graphical elements will be in this group
-        # using "max_size=XX"
-        #
+        super().__init__(**kwargs)
         # Group elements for SwitchRoundHorizontal:
         #  0. TileGrid holding bitmap with ticks and tick label text
         #  1. Value label (optional)

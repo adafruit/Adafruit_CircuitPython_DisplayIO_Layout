@@ -173,14 +173,10 @@ class Widget(displayio.Group):
         height=None,
         anchor_point=None,
         anchored_position=None,
-        **kwargs,
     ):
 
-        super().__init__(x=x, y=y, scale=scale, **kwargs)
+        super().__init__(x=x, y=y, scale=scale)
         # send x,y and scale to Group
-        # **kwargs should include `max_size`from the subclass implementation
-        # to define how many graphical elements will be held in the Group that
-        # makes up this widget
         #
         # If scale is set > 1, will need to update the Control `touch_boundary`
         # to accommodate the larger scale

@@ -102,8 +102,7 @@ class FlipInput(Widget, Control):
         cool_down=0.0,
         **kwargs,
     ):
-
-        super().__init__(**kwargs, max_size=4)
+        super().__init__(**kwargs)
         # Group elements for the FlipInput.
         # 0. The text
         # 1. The group holding the temporary scroll bitmap
@@ -235,8 +234,7 @@ class FlipInput(Widget, Control):
         self._update_position()  # call Widget superclass function to reposition
 
         self._animation_group = displayio.Group(
-            max_size=1,
-            scale=self._font_scale,
+            scale=self._font_scale
         )  # holds the animation bitmap
         # self._animation_group.x = -1 * left * (1)
         # self._animation_group.y = -1 * top * (1)

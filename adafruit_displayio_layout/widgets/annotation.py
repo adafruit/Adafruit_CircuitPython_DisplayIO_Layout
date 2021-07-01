@@ -181,7 +181,7 @@ class Annotation(Widget):
         self._line0 = Line(line_x0, line_y0, line_x1, line_y1, color=line_color)
         self._line1 = Line(line_x1, line_y1, line_x2, line_y2, color=line_color)
 
-        super().__init__(max_size=3)
+        super().__init__()
         # Group elements:
         # 0. Line0 - from (x,y) to (x+delta_x, y+delta_y)
         # 1. Line1 - horizontal line for text
