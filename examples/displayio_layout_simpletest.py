@@ -19,7 +19,7 @@ from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 display = board.DISPLAY
 
 # Make the display context
-main_group = displayio.Group(max_size=10)
+main_group = displayio.Group()
 display.show(main_group)
 
 layout = GridLayout(
@@ -29,7 +29,6 @@ layout = GridLayout(
     height=100,
     grid_size=(2, 2),
     cell_padding=8,
-    max_size=10,
 )
 _labels = []
 

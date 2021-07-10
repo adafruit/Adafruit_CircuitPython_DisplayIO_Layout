@@ -40,17 +40,11 @@ class GridLayout(displayio.Group):
     :param int height: Height of the layout in pixels.
     :param tuple grid_size: Size in cells as two ints in a tuple e.g. (2, 2)
     :param int cell_padding: Extra padding space inside each cell. In pixels.
-    :param int max_size: (Optional) this will get passed through to the
-     displayio.Group constructor. If omitted we default to
-     grid_size width * grid_size height to make room for all (1, 1) sized cells.
-
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, x, y, width, height, grid_size, cell_padding, max_size=None):
-        if not max_size:
-            max_size = grid_size[0] * grid_size[1]
-        super().__init__(x=x, y=y, max_size=max_size)
+    def __init__(self, x, y, width, height, grid_size, cell_padding):
+        super().__init__(x=x, y=y)
         self.x = x
         self.y = y
         self._width = width

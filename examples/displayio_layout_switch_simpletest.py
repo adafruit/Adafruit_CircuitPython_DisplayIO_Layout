@@ -26,7 +26,7 @@ ts = adafruit_touchscreen.Touchscreen(
 my_switch = Switch(20, 30)
 
 
-my_group = displayio.Group(max_size=1)
+my_group = displayio.Group()
 my_group.append(my_switch)
 
 # Add my_group to the display

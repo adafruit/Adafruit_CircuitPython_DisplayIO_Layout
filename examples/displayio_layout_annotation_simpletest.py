@@ -59,7 +59,7 @@ freeform_annotation = Annotation(
     text="Freeform annotation (display.width, height)",
 )
 
-my_group = displayio.Group(max_size=4)
+my_group = displayio.Group()
 my_group.append(my_switch)
 my_group.append(switch_annotation)
 my_group.append(switch_annotation_under)

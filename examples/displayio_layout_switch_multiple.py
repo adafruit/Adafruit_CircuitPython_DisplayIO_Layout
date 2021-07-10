@@ -91,7 +91,7 @@ my_switch8.anchored_position = (display.width - 10, display.height - 10)
 # the switch anchored_position is 10 pixels from the display
 # lower right corner
 
-my_group = displayio.Group(max_size=8)
+my_group = displayio.Group()
 my_group.append(my_switch)
 my_group.append(my_switch2)
 my_group.append(my_switch3)

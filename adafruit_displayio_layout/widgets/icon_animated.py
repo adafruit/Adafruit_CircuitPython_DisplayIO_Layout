@@ -64,9 +64,6 @@ class IconAnimated(IconWidget):
     :type anchor_point: Tuple[float,float]
     :param int anchored_position: (x,y) pixel value for the location of the anchor_point
     :type anchored_position: Tuple[int, int]
-    :param int max_size: (Optional) this will get passed through to the
-     displayio.Group constructor. ``max_size`` should be set to the maximum number of
-     graphical elements that will be held within the Group of this widget.
     """
 
     # pylint: disable=bad-super-call, too-many-instance-attributes, too-many-locals
@@ -145,7 +142,7 @@ class IconAnimated(IconWidget):
         if self.__class__.display is None:
             raise ValueError(
                 "Must initialize class using\n"
-                "`IconAnimated.init_class(display, max_scale, max_size, max_color_depth)`\n"
+                "`IconAnimated.init_class(display, max_scale, max_color_depth)`\n"
                 "prior to instancing IconAnimated widgets."
             )
 

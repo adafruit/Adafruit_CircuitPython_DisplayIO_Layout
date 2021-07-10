@@ -92,7 +92,7 @@ my_flip2.value = my_flip2.value_list.index("21")  # find the index yourself by
 my_flip3.value = "2015"  # or set the value based on a string that is in the value_list
 
 # Create the group to display and append the FlipInput widgets
-my_group = displayio.Group(max_size=3)
+my_group = displayio.Group()
 my_group.append(my_flip1)
 my_group.append(my_flip2)
 my_group.append(my_flip3)

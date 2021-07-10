@@ -102,7 +102,7 @@ class Cartesian(Widget):
     .. code-block:: python
 
         my_plane= Plane(20, 30) # instance the plane at x=20, y=30
-        my_group = displayio.Group(max_size=10) # make a group that can hold 10 items
+        my_group = displayio.Group() # make a group
         my_group.append(my_plane) # Add my_plane to the group
 
         #
@@ -183,7 +183,7 @@ class Cartesian(Widget):
         **kwargs,
     ) -> None:
 
-        super().__init__(**kwargs, max_size=3)
+        super().__init__(**kwargs)
 
         self._background_color = background_color
 

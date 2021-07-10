@@ -15,7 +15,7 @@ from blinka_displayio_pygamedisplay import PyGameDisplay
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 
 display = PyGameDisplay(width=320, height=240)
-main_group = displayio.Group(max_size=10)
+main_group = displayio.Group()
 display.show(main_group)
 
 layout = GridLayout(

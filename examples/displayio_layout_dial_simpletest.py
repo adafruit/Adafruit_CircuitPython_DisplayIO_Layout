@@ -39,7 +39,7 @@ my_dial = Dial(
     tick_label_scale=2.0,  # the scale factor for the tick label font
 )
 
-my_group = displayio.Group(max_size=1)
+my_group = displayio.Group()
 my_group.append(my_dial)
 
 display.show(my_group)  # add high level Group to the display
