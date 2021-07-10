@@ -59,7 +59,7 @@ class IconWidget(Widget, Control):
         if on_disk:
             self._file = open(self._icon, "rb")
             image = OnDiskBitmap(self._file)
-            tile_grid = TileGrid(image, pixel_shader=ColorConverter())
+            tile_grid = TileGrid(image, pixel_shader=getattr(image, 'pixel_shader', ColorConverter()))
         else:
             image, palette = adafruit_imageload.load(icon)
             tile_grid = TileGrid(image, pixel_shader=palette)
