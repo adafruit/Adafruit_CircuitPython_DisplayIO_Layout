@@ -59,7 +59,12 @@ class IconWidget(Widget, Control):
         if on_disk:
             self._file = open(self._icon, "rb")
             image = OnDiskBitmap(self._file)
-            tile_grid = TileGrid(image, pixel_shader=ColorConverter())
+            tile_grid = TileGrid(
+                image,
+                pixel_shader=getattr(image, "pixel_shader", ColorConverter())
+                # TODO: Once CP6 is no longer supported replace the above line with below.
+                # tile_grid = TileGrid(image, pixel_shader=image.pixel_shader)
+            )
         else:
             image, palette = adafruit_imageload.load(icon)
             tile_grid = TileGrid(image, pixel_shader=palette)
