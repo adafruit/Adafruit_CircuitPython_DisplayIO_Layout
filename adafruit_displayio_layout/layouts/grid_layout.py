@@ -79,15 +79,20 @@ class GridLayout(displayio.Group):
                         ),
                     )
                 else:
-                    # try width and height properties.
-                    cell["content"].width = (
-                        int(button_size_x * self._width / grid_size_x)
-                        - 2 * self.cell_padding
-                    )
-                    cell["content"].height = (
-                        int(button_size_y * self._height / grid_size_y)
-                        - 2 * self.cell_padding
-                    )
+                    try:
+                        # try width and height properties.
+                        cell["content"].width = (
+                            int(button_size_x * self._width / grid_size_x)
+                            - 2 * self.cell_padding
+                        )
+                        cell["content"].height = (
+                            int(button_size_y * self._height / grid_size_y)
+                            - 2 * self.cell_padding
+                        )
+                    except AttributeError:
+                        # This element does not allow setting width and height.
+                        # No problem, we'll use whatever size it already is.
+                        pass
 
                 cell["content"].x = (
                     int(grid_position_x * self._width / grid_size_x) + self.cell_padding
