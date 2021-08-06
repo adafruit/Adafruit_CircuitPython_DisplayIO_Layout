@@ -52,6 +52,7 @@ class GridLayout(displayio.Group):
         self.grid_size = grid_size
         self.cell_padding = cell_padding
         self._cell_content_list = []
+        self._cell_dictionary = {}
 
     def _layout_cells(self):
 
@@ -120,4 +121,24 @@ class GridLayout(displayio.Group):
             "cell_size": cell_size,
         }
         self._cell_content_list.append(sub_view_obj)
+        self._cell_dictionary[grid_position] = len(self._cell_content_list) - 1
         self._layout_cells()
+
+    def get_cell(self, cell_coordinates):
+        """
+        Return a cells content based on the cell_coordinates. Raises
+        KeyError if coordinates were not found in the GridLayout.
+
+        :param tuple cell_coordinates: the coordinates to lookup in the grid
+        :return: the displayio content object at those coordinates
+        """
+        if cell_coordinates in self._cell_dictionary:
+            return self._cell_content_list[self._cell_dictionary[cell_coordinates]][
+                "content"
+            ]
+
+        raise KeyError(
+            "GridLayout does not contain cell at coordinates {}".format(
+                cell_coordinates
+            )
+        )
