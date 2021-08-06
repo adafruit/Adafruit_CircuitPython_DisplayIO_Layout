@@ -132,9 +132,7 @@ class GridLayout(displayio.Group):
         """
         for index, cell in enumerate(self._cell_content_list):
             if cell["grid_position"] == cell_coordinates:
-                return self._cell_content_list[index][
-                    "content"
-                ]
+                return self._cell_content_list[index]["content"]
 
         raise KeyError(
             "GridLayout does not contain cell at coordinates {}".format(
