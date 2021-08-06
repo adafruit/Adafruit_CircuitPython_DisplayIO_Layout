@@ -30,7 +30,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.
 
 
 class GridLayout(displayio.Group):
-
     """
     A layout that organizes children into a grid table structure.
 
@@ -40,10 +39,11 @@ class GridLayout(displayio.Group):
     :param int height: Height of the layout in pixels.
     :param tuple grid_size: Size in cells as two ints in a tuple e.g. (2, 2)
     :param int cell_padding: Extra padding space inside each cell. In pixels.
+    :param bool divider_lines: Whether or not to draw lines between the cells.
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, x, y, width, height, grid_size, cell_padding):
+    def __init__(self, x, y, width, height, grid_size, cell_padding, divider_lines):
         super().__init__(x=x, y=y)
         self.x = x
         self.y = y
@@ -52,6 +52,8 @@ class GridLayout(displayio.Group):
         self.grid_size = grid_size
         self.cell_padding = cell_padding
         self._cell_content_list = []
+        self._divider_lines_enabled = divider_lines
+        self._divider_lines = []
 
     def _layout_cells(self):
 
@@ -66,43 +68,60 @@ class GridLayout(displayio.Group):
                 button_size_x = cell["cell_size"][0]
                 button_size_y = cell["cell_size"][1]
 
+                _measured_width = (
+                        int(button_size_x * self._width / grid_size_x)
+                        - 2 * self.cell_padding
+                )
+
+                _measured_height = (
+                        int(button_size_y * self._height / grid_size_y)
+                        - 2 * self.cell_padding
+                )
                 if hasattr(cell["content"], "resize"):
                     # if it has resize function
                     cell["content"].resize(
-                        (
-                            int(button_size_x * self._width / grid_size_x)
-                            - 2 * self.cell_padding
-                        ),
-                        (
-                            int(button_size_y * self._height / grid_size_y)
-                            - 2 * self.cell_padding
-                        ),
+                        _measured_width,
+                        _measured_height,
                     )
                 else:
                     try:
                         # try width and height properties.
-                        cell["content"].width = (
-                            int(button_size_x * self._width / grid_size_x)
-                            - 2 * self.cell_padding
-                        )
-                        cell["content"].height = (
-                            int(button_size_y * self._height / grid_size_y)
-                            - 2 * self.cell_padding
-                        )
+                        cell["content"].width = _measured_width
+                        cell["content"].height = _measured_height
                     except AttributeError:
                         # This element does not allow setting width and height.
                         # No problem, we'll use whatever size it already is.
+                        _measured_width = cell["content"].width
+                        _measured_height = cell["content"].height
+
                         pass
 
                 cell["content"].x = (
-                    int(grid_position_x * self._width / grid_size_x) + self.cell_padding
+                        int(grid_position_x * self._width / grid_size_x) + self.cell_padding
                 )
                 cell["content"].y = (
-                    int(grid_position_y * self._height / grid_size_y)
-                    + self.cell_padding
+                        int(grid_position_y * self._height / grid_size_y)
+                        + self.cell_padding
                 )
 
+                palette = displayio.Palette(2)
+                palette[0] = 0xFFFFFF
+                palette[1] = 0xFFFFFF
+
+                _bottom_divider_line = displayio.Shape(_measured_width, _measured_height, mirror_x=False,
+                                                       mirror_y=False)
+
+                _bottom_divider_tilegrid = displayio.TileGrid(
+                    _bottom_divider_line, pixel_shader=palette,
+                    y=cell["content"].y + _measured_height)
+
+                self._divider_lines.append({
+                    "shape": _bottom_divider_line,
+                    "tilegrid": _bottom_divider_tilegrid
+                })
+
                 self.append(cell["content"])
+                self.append(_bottom_divider_tilegrid)
 
     def add_content(self, cell_content, grid_position, cell_size):
         """Add a child to the grid.
