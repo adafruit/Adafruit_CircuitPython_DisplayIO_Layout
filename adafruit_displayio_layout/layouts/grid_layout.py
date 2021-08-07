@@ -91,37 +91,109 @@ class GridLayout(displayio.Group):
                     except AttributeError:
                         # This element does not allow setting width and height.
                         # No problem, we'll use whatever size it already is.
-                        _measured_width = cell["content"].width
-                        _measured_height = cell["content"].height
+                        # _measured_width = cell["content"].width
+                        # _measured_height = cell["content"].height
 
                         pass
 
-                cell["content"].x = (
-                        int(grid_position_x * self._width / grid_size_x) + self.cell_padding
-                )
-                cell["content"].y = (
-                        int(grid_position_y * self._height / grid_size_y)
-                        + self.cell_padding
-                )
+                if not hasattr(cell["content"], "anchor_point"):
 
-                palette = displayio.Palette(2)
-                palette[0] = 0xFFFFFF
-                palette[1] = 0xFFFFFF
+                    cell["content"].x = (
+                            int(grid_position_x * self._width / grid_size_x) + self.cell_padding
+                    )
+                    cell["content"].y = (
+                            int(grid_position_y * self._height / grid_size_y) + self.cell_padding
+                    )
+                else:
+                    print("int({} * {} / {}) + {}".format(grid_position_x, self._width, grid_size_x, self.cell_padding))
+                    print(
+                        "int({} * {} / {}) + {}".format(grid_position_y, self._height, grid_size_y, self.cell_padding))
 
-                _bottom_divider_line = displayio.Shape(_measured_width, _measured_height, mirror_x=False,
-                                                       mirror_y=False)
-
-                _bottom_divider_tilegrid = displayio.TileGrid(
-                    _bottom_divider_line, pixel_shader=palette,
-                    y=cell["content"].y + _measured_height)
-
-                self._divider_lines.append({
-                    "shape": _bottom_divider_line,
-                    "tilegrid": _bottom_divider_tilegrid
-                })
+                    cell["content"].anchor_point = (0, 0)
+                    cell["content"].anchored_position = (
+                        int(grid_position_x * self._width / grid_size_x) + self.cell_padding,
+                        int(grid_position_y * self._height / grid_size_y) + self.cell_padding)
+                    print(cell["content"].anchored_position)
+                    print("---")
 
                 self.append(cell["content"])
-                self.append(_bottom_divider_tilegrid)
+
+                if self._divider_lines_enabled:
+                    palette = displayio.Palette(2)
+                    palette[0] = 0xFFFFFF
+                    palette[1] = 0xFFFFFF
+
+                    if not hasattr(cell["content"], "anchor_point"):
+                        _bottom_line_loc_y = cell["content"].y + _measured_height + self.cell_padding
+                        _bottom_line_loc_x = cell["content"].x - self.cell_padding
+
+                        _top_line_loc_y = cell["content"].y - self.cell_padding
+                        _top_line_loc_x = cell["content"].x - self.cell_padding
+
+                        _right_line_loc_y = cell["content"].y - self.cell_padding
+                        _right_line_loc_x = cell["content"].x + _measured_width + self.cell_padding
+                    else:
+                        _bottom_line_loc_y = cell["content"].anchored_position[1] + _measured_height + self.cell_padding
+                        _bottom_line_loc_x = cell["content"].anchored_position[0] - self.cell_padding
+
+                        _top_line_loc_y = cell["content"].anchored_position[1] - self.cell_padding
+                        _top_line_loc_x = cell["content"].anchored_position[0] - self.cell_padding
+
+                        _right_line_loc_y = cell["content"].anchored_position[1] - self.cell_padding
+                        _right_line_loc_x = cell["content"].anchored_position[0] + _measured_width + self.cell_padding
+
+                    _horizontal_divider_line = displayio.Shape(
+                        _measured_width + (2 * self.cell_padding),
+                        1,
+                        mirror_x=False, mirror_y=False)
+
+                    _bottom_divider_tilegrid = displayio.TileGrid(
+                        _horizontal_divider_line, pixel_shader=palette,
+                        y=_bottom_line_loc_y,
+                        x=_bottom_line_loc_x)
+
+                    _top_divider_tilegrid = displayio.TileGrid(
+                        _horizontal_divider_line, pixel_shader=palette,
+                        y=_top_line_loc_y,
+                        x=_top_line_loc_x)
+
+                    _vertical_divider_line = displayio.Shape(
+                        1,
+                        _measured_height + (2 * self.cell_padding),
+                        mirror_x=False, mirror_y=False)
+
+                    _left_divider_tilegrid = displayio.TileGrid(
+                        _vertical_divider_line, pixel_shader=palette,
+                        y=_top_line_loc_y,
+                        x=_top_line_loc_x)
+
+                    _right_divider_tilegrid = displayio.TileGrid(
+                        _vertical_divider_line, pixel_shader=palette,
+                        y=_right_line_loc_y,
+                        x=_right_line_loc_x)
+
+                    for line_obj in self._divider_lines:
+                        self.remove(line_obj["tilegrid"])
+
+                    self._divider_lines.append({
+                        "shape": _horizontal_divider_line,
+                        "tilegrid": _bottom_divider_tilegrid
+                    })
+                    self._divider_lines.append({
+                        "shape": _horizontal_divider_line,
+                        "tilegrid": _top_divider_tilegrid
+                    })
+                    self._divider_lines.append({
+                        "shape": _horizontal_divider_line,
+                        "tilegrid": _left_divider_tilegrid
+                    })
+                    self._divider_lines.append({
+                        "shape": _vertical_divider_line,
+                        "tilegrid": _right_divider_tilegrid
+                    })
+
+                    for line_obj in self._divider_lines:
+                        self.append(line_obj["tilegrid"])
 
     def add_content(self, cell_content, grid_position, cell_size):
         """Add a child to the grid.
