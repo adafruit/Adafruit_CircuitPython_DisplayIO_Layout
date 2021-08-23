@@ -23,13 +23,6 @@
 
 .. inheritance-diagram:: adafruit_displayio_layout.widgets.switch_round
 
-.. automodule:: adafruit_displayio_layout.widgets.dial
-   :members:
-   :member-order: bysource
-   :inherited-members:
-
-.. inheritance-diagram:: adafruit_displayio_layout.widgets.dial
-
 .. automodule:: adafruit_displayio_layout.widgets.icon_widget
    :members:
    :member-order: bysource
@@ -39,10 +32,6 @@
    :member-order: bysource
 
 .. automodule:: adafruit_displayio_layout.widgets.flip_input
-   :members:
-   :member-order: bysource
-
-.. automodule:: adafruit_displayio_layout.widgets.annotation
    :members:
    :member-order: bysource
 
