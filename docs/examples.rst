@@ -7,6 +7,15 @@ Ensure your device works with this simple test.
     :caption: examples/displayio_layout_simpletest.py
     :linenos:
 
+GridLayout divider lines example
+--------------------------------
+
+Create GridLayouts with divider lines.
+
+.. literalinclude:: ../examples/displayio_layout_gridlayout_dividers.py
+    :caption: examples/displayio_layout_gridlayout_dividers.py
+    :linenos:
+
 Pygame simple test
 ------------------
 

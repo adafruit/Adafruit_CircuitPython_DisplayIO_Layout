@@ -39,11 +39,27 @@ class GridLayout(displayio.Group):
     :param int height: Height of the layout in pixels.
     :param tuple grid_size: Size in cells as two ints in a tuple e.g. (2, 2)
     :param int cell_padding: Extra padding space inside each cell. In pixels.
-    :param bool divider_lines: Whether or not to draw lines between the cells.
+    :param bool divider_lines: Whether or not to draw lines between the cells. Defaults to False.
+    :param tuple h_divider_line_rows: Row indexes to draw divider lines above.
+        Row indexes are 0 based.
+    :param tuple v_divider_line_cols: Column indexes to draw divider lines before.
+        Column indexes are 0 based.
+
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self, x, y, width, height, grid_size, cell_padding, divider_lines):
+    def __init__(
+        self,
+        x,
+        y,
+        width,
+        height,
+        grid_size,
+        cell_padding,
+        divider_lines=False,
+        h_divider_line_rows=None,
+        v_divider_line_cols=None,
+    ):
         super().__init__(x=x, y=y)
         self.x = x
         self.y = y
@@ -54,9 +70,11 @@ class GridLayout(displayio.Group):
         self._cell_content_list = []
         self._divider_lines_enabled = divider_lines
         self._divider_lines = []
+        self.h_divider_line_rows = h_divider_line_rows
+        self.v_divider_line_cols = v_divider_line_cols
 
     def _layout_cells(self):
-
+        # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         for cell in self._cell_content_list:
             if cell["content"] not in self:
                 grid_size_x = self.grid_size[0]
@@ -69,13 +87,13 @@ class GridLayout(displayio.Group):
                 button_size_y = cell["cell_size"][1]
 
                 _measured_width = (
-                        int(button_size_x * self._width / grid_size_x)
-                        - 2 * self.cell_padding
+                    int(button_size_x * self._width / grid_size_x)
+                    - 2 * self.cell_padding
                 )
 
                 _measured_height = (
-                        int(button_size_y * self._height / grid_size_y)
-                        - 2 * self.cell_padding
+                    int(button_size_y * self._height / grid_size_y)
+                    - 2 * self.cell_padding
                 )
                 if hasattr(cell["content"], "resize"):
                     # if it has resize function
@@ -99,20 +117,35 @@ class GridLayout(displayio.Group):
                 if not hasattr(cell["content"], "anchor_point"):
 
                     cell["content"].x = (
-                            int(grid_position_x * self._width / grid_size_x) + self.cell_padding
+                        int(grid_position_x * self._width / grid_size_x)
+                        + self.cell_padding
                     )
                     cell["content"].y = (
-                            int(grid_position_y * self._height / grid_size_y) + self.cell_padding
+                        int(grid_position_y * self._height / grid_size_y)
+                        + self.cell_padding
                     )
                 else:
-                    print("int({} * {} / {}) + {}".format(grid_position_x, self._width, grid_size_x, self.cell_padding))
                     print(
-                        "int({} * {} / {}) + {}".format(grid_position_y, self._height, grid_size_y, self.cell_padding))
+                        "int({} * {} / {}) + {}".format(
+                            grid_position_x, self._width, grid_size_x, self.cell_padding
+                        )
+                    )
+                    print(
+                        "int({} * {} / {}) + {}".format(
+                            grid_position_y,
+                            self._height,
+                            grid_size_y,
+                            self.cell_padding,
+                        )
+                    )
 
                     cell["content"].anchor_point = (0, 0)
                     cell["content"].anchored_position = (
-                        int(grid_position_x * self._width / grid_size_x) + self.cell_padding,
-                        int(grid_position_y * self._height / grid_size_y) + self.cell_padding)
+                        int(grid_position_x * self._width / grid_size_x)
+                        + self.cell_padding,
+                        int(grid_position_y * self._height / grid_size_y)
+                        + self.cell_padding,
+                    )
                     print(cell["content"].anchored_position)
                     print("---")
 
@@ -124,73 +157,131 @@ class GridLayout(displayio.Group):
                     palette[1] = 0xFFFFFF
 
                     if not hasattr(cell["content"], "anchor_point"):
-                        _bottom_line_loc_y = cell["content"].y + _measured_height + self.cell_padding
+                        _bottom_line_loc_y = (
+                            cell["content"].y + _measured_height + self.cell_padding
+                        )
                         _bottom_line_loc_x = cell["content"].x - self.cell_padding
 
                         _top_line_loc_y = cell["content"].y - self.cell_padding
                         _top_line_loc_x = cell["content"].x - self.cell_padding
 
                         _right_line_loc_y = cell["content"].y - self.cell_padding
-                        _right_line_loc_x = cell["content"].x + _measured_width + self.cell_padding
+                        _right_line_loc_x = (
+                            cell["content"].x + _measured_width + self.cell_padding
+                        )
                     else:
-                        _bottom_line_loc_y = cell["content"].anchored_position[1] + _measured_height + self.cell_padding
-                        _bottom_line_loc_x = cell["content"].anchored_position[0] - self.cell_padding
+                        _bottom_line_loc_y = (
+                            cell["content"].anchored_position[1]
+                            + _measured_height
+                            + self.cell_padding
+                        )
+                        _bottom_line_loc_x = (
+                            cell["content"].anchored_position[0] - self.cell_padding
+                        )
 
-                        _top_line_loc_y = cell["content"].anchored_position[1] - self.cell_padding
-                        _top_line_loc_x = cell["content"].anchored_position[0] - self.cell_padding
+                        _top_line_loc_y = (
+                            cell["content"].anchored_position[1] - self.cell_padding
+                        )
+                        _top_line_loc_x = (
+                            cell["content"].anchored_position[0] - self.cell_padding
+                        )
 
-                        _right_line_loc_y = cell["content"].anchored_position[1] - self.cell_padding
-                        _right_line_loc_x = cell["content"].anchored_position[0] + _measured_width + self.cell_padding
+                        _right_line_loc_y = (
+                            cell["content"].anchored_position[1] - self.cell_padding
+                        )
+                        _right_line_loc_x = (
+                            cell["content"].anchored_position[0]
+                            + _measured_width
+                            + self.cell_padding
+                        )
 
                     _horizontal_divider_line = displayio.Shape(
                         _measured_width + (2 * self.cell_padding),
                         1,
-                        mirror_x=False, mirror_y=False)
+                        mirror_x=False,
+                        mirror_y=False,
+                    )
 
                     _bottom_divider_tilegrid = displayio.TileGrid(
-                        _horizontal_divider_line, pixel_shader=palette,
+                        _horizontal_divider_line,
+                        pixel_shader=palette,
                         y=_bottom_line_loc_y,
-                        x=_bottom_line_loc_x)
+                        x=_bottom_line_loc_x,
+                    )
 
                     _top_divider_tilegrid = displayio.TileGrid(
-                        _horizontal_divider_line, pixel_shader=palette,
+                        _horizontal_divider_line,
+                        pixel_shader=palette,
                         y=_top_line_loc_y,
-                        x=_top_line_loc_x)
+                        x=_top_line_loc_x,
+                    )
 
                     _vertical_divider_line = displayio.Shape(
                         1,
                         _measured_height + (2 * self.cell_padding),
-                        mirror_x=False, mirror_y=False)
+                        mirror_x=False,
+                        mirror_y=False,
+                    )
 
                     _left_divider_tilegrid = displayio.TileGrid(
-                        _vertical_divider_line, pixel_shader=palette,
+                        _vertical_divider_line,
+                        pixel_shader=palette,
                         y=_top_line_loc_y,
-                        x=_top_line_loc_x)
+                        x=_top_line_loc_x,
+                    )
 
                     _right_divider_tilegrid = displayio.TileGrid(
-                        _vertical_divider_line, pixel_shader=palette,
+                        _vertical_divider_line,
+                        pixel_shader=palette,
                         y=_right_line_loc_y,
-                        x=_right_line_loc_x)
+                        x=_right_line_loc_x,
+                    )
 
                     for line_obj in self._divider_lines:
                         self.remove(line_obj["tilegrid"])
 
-                    self._divider_lines.append({
-                        "shape": _horizontal_divider_line,
-                        "tilegrid": _bottom_divider_tilegrid
-                    })
-                    self._divider_lines.append({
-                        "shape": _horizontal_divider_line,
-                        "tilegrid": _top_divider_tilegrid
-                    })
-                    self._divider_lines.append({
-                        "shape": _horizontal_divider_line,
-                        "tilegrid": _left_divider_tilegrid
-                    })
-                    self._divider_lines.append({
-                        "shape": _vertical_divider_line,
-                        "tilegrid": _right_divider_tilegrid
-                    })
+                    print("pos_y: {} - size_y: {}".format(grid_position_y, grid_size_y))
+                    print(grid_position_y == grid_size_y)
+                    if grid_position_y == grid_size_y - 1 and (
+                        self.h_divider_line_rows is None
+                        or grid_position_y + 1 in self.h_divider_line_rows
+                    ):
+                        self._divider_lines.append(
+                            {
+                                "shape": _horizontal_divider_line,
+                                "tilegrid": _bottom_divider_tilegrid,
+                            }
+                        )
+                    if (
+                        self.h_divider_line_rows is None
+                        or grid_position_y in self.h_divider_line_rows
+                    ):
+                        self._divider_lines.append(
+                            {
+                                "shape": _horizontal_divider_line,
+                                "tilegrid": _top_divider_tilegrid,
+                            }
+                        )
+                    if (
+                        self.v_divider_line_cols is None
+                        or grid_position_x in self.v_divider_line_cols
+                    ):
+                        self._divider_lines.append(
+                            {
+                                "shape": _horizontal_divider_line,
+                                "tilegrid": _left_divider_tilegrid,
+                            }
+                        )
+                    if grid_position_x == grid_size_x - 1 and (
+                        self.v_divider_line_cols is None
+                        or grid_position_x + 1 in self.v_divider_line_cols
+                    ):
+                        self._divider_lines.append(
+                            {
+                                "shape": _vertical_divider_line,
+                                "tilegrid": _right_divider_tilegrid,
+                            }
+                        )
 
                     for line_obj in self._divider_lines:
                         self.append(line_obj["tilegrid"])
