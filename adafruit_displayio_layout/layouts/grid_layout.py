@@ -22,7 +22,7 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
-
+import math
 import displayio
 
 __version__ = "0.0.0-auto.0"
@@ -39,11 +39,11 @@ class GridLayout(displayio.Group):
     :param int height: Height of the layout in pixels.
     :param tuple grid_size: Size in cells as two ints in a tuple e.g. (2, 2)
     :param int cell_padding: Extra padding space inside each cell. In pixels.
-    :param bool divider_lines: Whether or not to draw lines between the cells. Defaults to False.
-    :param tuple h_divider_line_rows: Row indexes to draw divider lines above.
-        Row indexes are 0 based.
-    :param tuple v_divider_line_cols: Column indexes to draw divider lines before.
-        Column indexes are 0 based.
+    :param bool divider_lines: Whether or not to draw lines between the cells.
+    :param Union[tuple, list] h_divider_line_rows: Row indexes to draw divider
+      lines above. Row indexes are 0 based.
+    :param Union[tuple, list] v_divider_line_cols: Column indexes to draw divider
+      lines before. Column indexes are 0 based.
 
     """
 
@@ -55,7 +55,7 @@ class GridLayout(displayio.Group):
         width,
         height,
         grid_size,
-        cell_padding,
+        cell_padding=0,
         divider_lines=False,
         h_divider_line_rows=None,
         v_divider_line_cols=None,
@@ -68,10 +68,37 @@ class GridLayout(displayio.Group):
         self.grid_size = grid_size
         self.cell_padding = cell_padding
         self._cell_content_list = []
-        self._divider_lines_enabled = divider_lines
+
         self._divider_lines = []
         self.h_divider_line_rows = h_divider_line_rows
         self.v_divider_line_cols = v_divider_line_cols
+
+        self._divider_lines_enabled = (
+            (divider_lines is True)
+            or (h_divider_line_rows is not None)
+            or (v_divider_line_cols is not None)
+        )
+
+        if divider_lines:
+            if self.h_divider_line_rows is None:
+                self.h_divider_line_rows = []
+                for _y in range(self.grid_size[1] + 1):
+                    self.h_divider_line_rows.append(_y)
+            if self.v_divider_line_cols is None:
+                self.v_divider_line_cols = []
+                for _x in range(self.grid_size[0] + 1):
+                    self.v_divider_line_cols.append(_x)
+        else:
+            if not h_divider_line_rows:
+                self.h_divider_line_rows = tuple()
+            if not v_divider_line_cols:
+                self.v_divider_line_cols = tuple()
+
+        # use at least 1 padding so that content is inside the divider lines
+        if cell_padding == 0 and (
+            divider_lines or h_divider_line_rows or v_divider_line_cols
+        ):
+            self.cell_padding = 1
 
     def _layout_cells(self):
         # pylint: disable=too-many-locals, too-many-branches, too-many-statements
@@ -87,12 +114,12 @@ class GridLayout(displayio.Group):
                 button_size_y = cell["cell_size"][1]
 
                 _measured_width = (
-                    int(button_size_x * self._width / grid_size_x)
+                    math.ceil(button_size_x * self._width / grid_size_x)
                     - 2 * self.cell_padding
                 )
 
                 _measured_height = (
-                    int(button_size_y * self._height / grid_size_y)
+                    math.ceil(button_size_y * self._height / grid_size_y)
                     - 2 * self.cell_padding
                 )
                 if hasattr(cell["content"], "resize"):
@@ -125,20 +152,6 @@ class GridLayout(displayio.Group):
                         + self.cell_padding
                     )
                 else:
-                    print(
-                        "int({} * {} / {}) + {}".format(
-                            grid_position_x, self._width, grid_size_x, self.cell_padding
-                        )
-                    )
-                    print(
-                        "int({} * {} / {}) + {}".format(
-                            grid_position_y,
-                            self._height,
-                            grid_size_y,
-                            self.cell_padding,
-                        )
-                    )
-
                     cell["content"].anchor_point = (0, 0)
                     cell["content"].anchored_position = (
                         int(grid_position_x * self._width / grid_size_x)
@@ -146,8 +159,6 @@ class GridLayout(displayio.Group):
                         int(grid_position_y * self._height / grid_size_y)
                         + self.cell_padding,
                     )
-                    print(cell["content"].anchored_position)
-                    print("---")
 
                 self.append(cell["content"])
 
@@ -159,7 +170,7 @@ class GridLayout(displayio.Group):
                     if not hasattr(cell["content"], "anchor_point"):
                         _bottom_line_loc_y = (
                             cell["content"].y + _measured_height + self.cell_padding
-                        )
+                        ) - 1
                         _bottom_line_loc_x = cell["content"].x - self.cell_padding
 
                         _top_line_loc_y = cell["content"].y - self.cell_padding
@@ -168,13 +179,13 @@ class GridLayout(displayio.Group):
                         _right_line_loc_y = cell["content"].y - self.cell_padding
                         _right_line_loc_x = (
                             cell["content"].x + _measured_width + self.cell_padding
-                        )
+                        ) - 1
                     else:
                         _bottom_line_loc_y = (
                             cell["content"].anchored_position[1]
                             + _measured_height
                             + self.cell_padding
-                        )
+                        ) - 1
                         _bottom_line_loc_x = (
                             cell["content"].anchored_position[0] - self.cell_padding
                         )
@@ -193,7 +204,7 @@ class GridLayout(displayio.Group):
                             cell["content"].anchored_position[0]
                             + _measured_width
                             + self.cell_padding
-                        )
+                        ) - 1
 
                     _horizontal_divider_line = displayio.Shape(
                         _measured_width + (2 * self.cell_padding),
@@ -240,11 +251,8 @@ class GridLayout(displayio.Group):
                     for line_obj in self._divider_lines:
                         self.remove(line_obj["tilegrid"])
 
-                    print("pos_y: {} - size_y: {}".format(grid_position_y, grid_size_y))
-                    print(grid_position_y == grid_size_y)
                     if grid_position_y == grid_size_y - 1 and (
-                        self.h_divider_line_rows is None
-                        or grid_position_y + 1 in self.h_divider_line_rows
+                        grid_position_y + 1 in self.h_divider_line_rows
                     ):
                         self._divider_lines.append(
                             {
@@ -252,20 +260,14 @@ class GridLayout(displayio.Group):
                                 "tilegrid": _bottom_divider_tilegrid,
                             }
                         )
-                    if (
-                        self.h_divider_line_rows is None
-                        or grid_position_y in self.h_divider_line_rows
-                    ):
+                    if grid_position_y in self.h_divider_line_rows:
                         self._divider_lines.append(
                             {
                                 "shape": _horizontal_divider_line,
                                 "tilegrid": _top_divider_tilegrid,
                             }
                         )
-                    if (
-                        self.v_divider_line_cols is None
-                        or grid_position_x in self.v_divider_line_cols
-                    ):
+                    if grid_position_x in self.v_divider_line_cols:
                         self._divider_lines.append(
                             {
                                 "shape": _horizontal_divider_line,
@@ -273,8 +275,7 @@ class GridLayout(displayio.Group):
                             }
                         )
                     if grid_position_x == grid_size_x - 1 and (
-                        self.v_divider_line_cols is None
-                        or grid_position_x + 1 in self.v_divider_line_cols
+                        grid_position_x + 1 in self.v_divider_line_cols
                     ):
                         self._divider_lines.append(
                             {

@@ -56,9 +56,7 @@ other_layout = GridLayout(
     height=80,
     grid_size=(2, 3),
     cell_padding=4,
-    divider_lines=True,
     h_divider_line_rows=(1, 2),  # Lines before rows 1 and 2
-    v_divider_line_cols=(),  # No vertical divider lines
 )
 
 other_layout.add_content(
