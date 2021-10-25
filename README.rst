@@ -60,6 +60,11 @@ Usage Example
 
 See scripts in the examples directory of this repository.
 
+Documentation
+=============
+
+API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/displayio-layout/en/latest/>`_.
+
 Contributing
 ============
 
