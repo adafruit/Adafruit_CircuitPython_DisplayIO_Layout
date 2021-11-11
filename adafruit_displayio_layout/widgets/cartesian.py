@@ -483,7 +483,7 @@ class Cartesian(Widget):
                 self._pointer_vector_shape.y = local_y
 
     def _set_plotter_line(self) -> None:
-        self.plot_line_point = list()
+        self.plot_line_point = []
 
     def update_line(self, x: int, y: int) -> None:
         """updater_line function
