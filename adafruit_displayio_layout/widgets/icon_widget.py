@@ -57,8 +57,8 @@ class IconWidget(Widget, Control):
         self._icon = icon
 
         if on_disk:
-            self._file = open(self._icon, "rb")
-            image = OnDiskBitmap(self._file)
+            with open(self._icon, "rb") as self._file:
+                image = OnDiskBitmap(self._file)
             tile_grid = TileGrid(
                 image,
                 pixel_shader=getattr(image, "pixel_shader", ColorConverter())
