@@ -59,6 +59,7 @@ class GridLayout(displayio.Group):
         divider_lines=False,
         h_divider_line_rows=None,
         v_divider_line_cols=None,
+        divider_line_color=0xFFFFFF,
     ):
         super().__init__(x=x, y=y)
         self.x = x
@@ -70,6 +71,7 @@ class GridLayout(displayio.Group):
         self._cell_content_list = []
 
         self._divider_lines = []
+        self._divider_color = divider_line_color
         self.h_divider_line_rows = h_divider_line_rows
         self.v_divider_line_cols = v_divider_line_cols
 
@@ -164,8 +166,8 @@ class GridLayout(displayio.Group):
 
                 if self._divider_lines_enabled:
                     palette = displayio.Palette(2)
-                    palette[0] = 0xFFFFFF
-                    palette[1] = 0xFFFFFF
+                    palette[0] = self._divider_color
+                    palette[1] = self._divider_color
 
                     if not hasattr(cell["content"], "anchor_point"):
                         _bottom_line_loc_y = (
