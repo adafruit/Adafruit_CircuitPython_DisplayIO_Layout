@@ -24,7 +24,7 @@ Implementation Notes
 
 
 import terminalio
-from displayio import TileGrid, OnDiskBitmap, ColorConverter
+from displayio import TileGrid, OnDiskBitmap
 import adafruit_imageload
 from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.control import Control
@@ -57,14 +57,8 @@ class IconWidget(Widget, Control):
         self._icon = icon
 
         if on_disk:
-            with open(self._icon, "rb") as self._file:
-                image = OnDiskBitmap(self._file)
-            tile_grid = TileGrid(
-                image,
-                pixel_shader=getattr(image, "pixel_shader", ColorConverter())
-                # TODO: Once CP6 is no longer supported replace the above line with below.
-                # tile_grid = TileGrid(image, pixel_shader=image.pixel_shader)
-            )
+            image = OnDiskBitmap(self._icon)
+            tile_grid = TileGrid(image, pixel_shader=image.pixel_shader)
         else:
             image, palette = adafruit_imageload.load(icon)
             tile_grid = TileGrid(image, pixel_shader=palette)
