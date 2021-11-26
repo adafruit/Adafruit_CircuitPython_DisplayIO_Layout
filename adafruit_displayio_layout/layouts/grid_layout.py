@@ -44,10 +44,12 @@ class GridLayout(displayio.Group):
       lines above. Row indexes are 0 based.
     :param Union[tuple, list] v_divider_line_cols: Column indexes to draw divider
       lines before. Column indexes are 0 based.
+    :param divider_line_color: The color of the divider lines (in hexadecimal)
 
     """
 
     # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
         x,
