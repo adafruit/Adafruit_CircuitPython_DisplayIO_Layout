@@ -11,7 +11,7 @@ import vectorio
 
 try:
     import bitmaptools
-except NameError:
+except ImportError:
     pass
 
 
