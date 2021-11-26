@@ -7,7 +7,10 @@
 =======================
 """
 
-import vectorio
+try:
+    import vectorio
+except ImportError:
+    pass
 
 try:
     import bitmaptools
