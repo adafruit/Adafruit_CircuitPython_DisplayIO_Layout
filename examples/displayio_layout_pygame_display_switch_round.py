@@ -43,7 +43,7 @@ text_stroke = switch_stroke  # width of text lines
 touch_padding = 0  # Additional boundary around widget that will accept touch input
 
 animation_time = 0.2  # time for switch to display change (in seconds).
-                      # animation_time=0.15 is a good starting point
+# animation_time=0.15 is a good starting point
 display_text = True  # show the text (0/1)
 
 # initialize state variables
