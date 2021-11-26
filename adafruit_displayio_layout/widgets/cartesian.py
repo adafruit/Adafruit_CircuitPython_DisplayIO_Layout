@@ -33,9 +33,6 @@ from adafruit_displayio_layout.widgets import rectangle_helper
 
 try:
     import bitmaptools
-except NameError:
-    pass
-try:
     from typing import Tuple
 except ImportError:
     pass
