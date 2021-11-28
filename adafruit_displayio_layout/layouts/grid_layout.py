@@ -52,7 +52,8 @@ class GridLayout(displayio.Group):
       lines before. Column indexes are 0 based.
     :param divider_line_color: The color of the divider lines (in hexadecimal)
     :param tuple cell_anchor_point: Anchor point used within every cell. Needs to
-      be a tuple containing two floats between 0.0 and 1.0
+      be a tuple containing two floats between 0.0 and 1.0. Default is (0.0, 0.0)
+      which will anchor content to the top left of the cell.
 
     """
 
