@@ -392,6 +392,10 @@ class GridLayout(displayio.Group):
          x,y coordinates in grid cells. e.g. (1,0)
         :param tuple cell_size: the size and shape that the new cell should
          occupy. Width and height in cells inside a tuple e.g. (1, 1)
+        :param tuple cell_anchor_point: a tuple of floats between 0.0 and 1.0.
+         If passed, this value will override the cell_anchor_point of the GridLayout
+         for the single cell having it's content added with this function call. If omitted
+         then the cell_anchor_point from the GridLayout will be used.
         :return: None"""
 
         if cell_anchor_point:
@@ -433,6 +437,6 @@ class GridLayout(displayio.Group):
         re-positioning content within cells.
 
         :return Tuple[int, int]: A tuple containing the (x, y) size in
-        pixels of a 1x1 cell in the GridLayout
+          pixels of a 1x1 cell in the GridLayout
         """
         return (self._width // self.grid_size[0], self._height // self.grid_size[1])
