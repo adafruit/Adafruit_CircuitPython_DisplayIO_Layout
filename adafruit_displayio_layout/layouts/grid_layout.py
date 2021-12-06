@@ -22,6 +22,12 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
+try:
+    # Used only for typing
+    from typing import Tuple
+except ImportError:
+    pass
+
 import math
 import displayio
 
@@ -45,6 +51,9 @@ class GridLayout(displayio.Group):
     :param Union[tuple, list] v_divider_line_cols: Column indexes to draw divider
       lines before. Column indexes are 0 based.
     :param divider_line_color: The color of the divider lines (in hexadecimal)
+    :param tuple cell_anchor_point: Anchor point used within every cell. Needs to
+      be a tuple containing two floats between 0.0 and 1.0. Default is (0.0, 0.0)
+      which will anchor content to the top left of the cell.
 
     """
 
@@ -62,6 +71,7 @@ class GridLayout(displayio.Group):
         h_divider_line_rows=None,
         v_divider_line_cols=None,
         divider_line_color=0xFFFFFF,
+        cell_anchor_point=(0.0, 0.0),
     ):
         super().__init__(x=x, y=y)
         self.x = x
@@ -71,6 +81,7 @@ class GridLayout(displayio.Group):
         self.grid_size = grid_size
         self.cell_padding = cell_padding
         self._cell_content_list = []
+        self._cell_anchor_point = cell_anchor_point
 
         self._divider_lines = []
         self._divider_color = divider_line_color
@@ -114,18 +125,19 @@ class GridLayout(displayio.Group):
                 grid_position_x = cell["grid_position"][0]
                 grid_position_y = cell["grid_position"][1]
 
-                button_size_x = cell["cell_size"][0]
-                button_size_y = cell["cell_size"][1]
+                content_cell_size_x = cell["cell_size"][0]
+                content_cell_size_y = cell["cell_size"][1]
 
                 _measured_width = (
-                    math.ceil(button_size_x * self._width / grid_size_x)
+                    math.ceil(content_cell_size_x * self._width / grid_size_x)
                     - 2 * self.cell_padding
                 )
 
                 _measured_height = (
-                    math.ceil(button_size_y * self._height / grid_size_y)
+                    math.ceil(content_cell_size_y * self._height / grid_size_y)
                     - 2 * self.cell_padding
                 )
+
                 if hasattr(cell["content"], "resize"):
                     # if it has resize function
                     cell["content"].resize(
@@ -150,18 +162,24 @@ class GridLayout(displayio.Group):
                     cell["content"].x = (
                         int(grid_position_x * self._width / grid_size_x)
                         + self.cell_padding
+                        + int(cell["cell_anchor_point"][0] * _measured_width)
+                        - int(cell["content"].width * cell["cell_anchor_point"][0])
                     )
                     cell["content"].y = (
                         int(grid_position_y * self._height / grid_size_y)
                         + self.cell_padding
+                        + int(cell["cell_anchor_point"][1] * _measured_height)
+                        - int(cell["content"].height * cell["cell_anchor_point"][1])
                     )
                 else:
-                    cell["content"].anchor_point = (0, 0)
+                    cell["content"].anchor_point = cell["cell_anchor_point"]
                     cell["content"].anchored_position = (
                         int(grid_position_x * self._width / grid_size_x)
-                        + self.cell_padding,
+                        + self.cell_padding
+                        + (cell["cell_anchor_point"][0] * _measured_width),
                         int(grid_position_y * self._height / grid_size_y)
-                        + self.cell_padding,
+                        + self.cell_padding
+                        + (cell["cell_anchor_point"][1] * _measured_height),
                     )
 
                 self.append(cell["content"])
@@ -173,42 +191,84 @@ class GridLayout(displayio.Group):
 
                     if not hasattr(cell["content"], "anchor_point"):
                         _bottom_line_loc_y = (
-                            cell["content"].y + _measured_height + self.cell_padding
-                        ) - 1
-                        _bottom_line_loc_x = cell["content"].x - self.cell_padding
+                            (cell["content"].y + _measured_height + self.cell_padding)
+                            - 1
+                            - int(cell["cell_anchor_point"][1] * _measured_height)
+                            + int(cell["content"].height * cell["cell_anchor_point"][1])
+                        )
 
-                        _top_line_loc_y = cell["content"].y - self.cell_padding
-                        _top_line_loc_x = cell["content"].x - self.cell_padding
+                        _bottom_line_loc_x = (
+                            cell["content"].x
+                            - self.cell_padding
+                            - int(cell["cell_anchor_point"][0] * _measured_width)
+                            + int(cell["content"].width * cell["cell_anchor_point"][0])
+                        )
 
-                        _right_line_loc_y = cell["content"].y - self.cell_padding
+                        _top_line_loc_y = (
+                            cell["content"].y
+                            - self.cell_padding
+                            - int(cell["cell_anchor_point"][1] * _measured_height)
+                            + int(cell["content"].height * cell["cell_anchor_point"][1])
+                        )
+
+                        _top_line_loc_x = (
+                            cell["content"].x
+                            - self.cell_padding
+                            - int(cell["cell_anchor_point"][0] * _measured_width)
+                            + int(cell["content"].width * cell["cell_anchor_point"][0])
+                        )
+
+                        _right_line_loc_y = (
+                            cell["content"].y
+                            - self.cell_padding
+                            - int(cell["cell_anchor_point"][1] * _measured_height)
+                            + int(cell["content"].height * cell["cell_anchor_point"][1])
+                        )
+
                         _right_line_loc_x = (
-                            cell["content"].x + _measured_width + self.cell_padding
-                        ) - 1
+                            (cell["content"].x + _measured_width + self.cell_padding)
+                            - 1
+                            - int(cell["cell_anchor_point"][0] * _measured_width)
+                            + int(cell["content"].width * cell["cell_anchor_point"][0])
+                        )
                     else:
                         _bottom_line_loc_y = (
                             cell["content"].anchored_position[1]
                             + _measured_height
                             + self.cell_padding
+                            - (cell["cell_anchor_point"][1] * _measured_height)
                         ) - 1
                         _bottom_line_loc_x = (
-                            cell["content"].anchored_position[0] - self.cell_padding
+                            cell["content"].anchored_position[0]
+                            - self.cell_padding
+                            - (cell["cell_anchor_point"][0] * _measured_width)
                         )
 
                         _top_line_loc_y = (
-                            cell["content"].anchored_position[1] - self.cell_padding
+                            cell["content"].anchored_position[1]
+                            - self.cell_padding
+                            - (cell["cell_anchor_point"][1] * _measured_height)
                         )
                         _top_line_loc_x = (
-                            cell["content"].anchored_position[0] - self.cell_padding
+                            cell["content"].anchored_position[0]
+                            - self.cell_padding
+                            - (cell["cell_anchor_point"][0] * _measured_width)
                         )
 
                         _right_line_loc_y = (
-                            cell["content"].anchored_position[1] - self.cell_padding
+                            cell["content"].anchored_position[1]
+                            - self.cell_padding
+                            - (cell["cell_anchor_point"][1] * _measured_height)
                         )
                         _right_line_loc_x = (
-                            cell["content"].anchored_position[0]
-                            + _measured_width
-                            + self.cell_padding
-                        ) - 1
+                            (
+                                cell["content"].anchored_position[0]
+                                + _measured_width
+                                + self.cell_padding
+                            )
+                            - 1
+                            - (cell["cell_anchor_point"][0] * _measured_width)
+                        )
 
                     _horizontal_divider_line = displayio.Shape(
                         _measured_width + (2 * self.cell_padding),
@@ -255,8 +315,18 @@ class GridLayout(displayio.Group):
                     for line_obj in self._divider_lines:
                         self.remove(line_obj["tilegrid"])
 
-                    if grid_position_y == grid_size_y - 1 and (
-                        grid_position_y + 1 in self.h_divider_line_rows
+                    """
+                    Only use bottom divider lines on the bottom row. All
+                    other rows rely on top divder lines of the row beneath them.
+                    Add the content_cell_size to the grid_position to account for
+                    areas larger than 1x1 cells. For 1x1 cells this will equal zero
+                    and not change anything.
+                    """
+                    if (
+                        grid_position_y + content_cell_size_y - 1
+                    ) == grid_size_y - 1 and (
+                        (grid_position_y + content_cell_size_y - 1) + 1
+                        in self.h_divider_line_rows
                     ):
                         self._divider_lines.append(
                             {
@@ -264,6 +334,11 @@ class GridLayout(displayio.Group):
                                 "tilegrid": _bottom_divider_tilegrid,
                             }
                         )
+
+                    """
+                    Every cell whose index is in h_divider_line_rows gets
+                    a top divider line.
+                    """
                     if grid_position_y in self.h_divider_line_rows:
                         self._divider_lines.append(
                             {
@@ -271,6 +346,11 @@ class GridLayout(displayio.Group):
                                 "tilegrid": _top_divider_tilegrid,
                             }
                         )
+
+                    """
+                    Every cell whose index is in v_divider_line_cols gets
+                    a left divider line.
+                    """
                     if grid_position_x in self.v_divider_line_cols:
                         self._divider_lines.append(
                             {
@@ -278,8 +358,18 @@ class GridLayout(displayio.Group):
                                 "tilegrid": _left_divider_tilegrid,
                             }
                         )
-                    if grid_position_x == grid_size_x - 1 and (
-                        grid_position_x + 1 in self.v_divider_line_cols
+                    """
+                    Only use right divider lines on the right-most column. All
+                    other columns rely on left divider lines of the column to their
+                    left. Add the content_cell_size to the grid_position to account for
+                    areas larger than 1x1 cells. For 1x1 cells this will equal zero
+                    and not change anything.
+                    """
+                    if (
+                        grid_position_x + content_cell_size_x - 1
+                    ) == grid_size_x - 1 and (
+                        (grid_position_x + content_cell_size_x - 1) + 1
+                        in self.v_divider_line_cols
                     ):
                         self._divider_lines.append(
                             {
@@ -291,7 +381,9 @@ class GridLayout(displayio.Group):
                     for line_obj in self._divider_lines:
                         self.append(line_obj["tilegrid"])
 
-    def add_content(self, cell_content, grid_position, cell_size):
+    def add_content(
+        self, cell_content, grid_position, cell_size, cell_anchor_point=None
+    ):
         """Add a child to the grid.
 
         :param cell_content: the content to add to this cell e.g. label, button, etc...
@@ -300,8 +392,19 @@ class GridLayout(displayio.Group):
          x,y coordinates in grid cells. e.g. (1,0)
         :param tuple cell_size: the size and shape that the new cell should
          occupy. Width and height in cells inside a tuple e.g. (1, 1)
+        :param tuple cell_anchor_point: a tuple of floats between 0.0 and 1.0.
+         If passed, this value will override the cell_anchor_point of the GridLayout
+         for the single cell having it's content added with this function call. If omitted
+         then the cell_anchor_point from the GridLayout will be used.
         :return: None"""
+
+        if cell_anchor_point:
+            _this_cell_anchor_point = cell_anchor_point
+        else:
+            _this_cell_anchor_point = self._cell_anchor_point
+
         sub_view_obj = {
+            "cell_anchor_point": _this_cell_anchor_point,
             "content": cell_content,
             "grid_position": grid_position,
             "cell_size": cell_size,
@@ -326,3 +429,14 @@ class GridLayout(displayio.Group):
                 cell_coordinates
             )
         )
+
+    @property
+    def cell_size_pixels(self) -> Tuple[int, int]:
+        """
+        Get the size of a 1x1 cell in pixels. Can be useful for manually
+        re-positioning content within cells.
+
+        :return Tuple[int, int]: A tuple containing the (x, y) size in
+          pixels of a 1x1 cell in the GridLayout
+        """
+        return (self._width // self.grid_size[0], self._height // self.grid_size[1])
