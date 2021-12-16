@@ -508,3 +508,4 @@ class Cartesian(Widget):
                         local_y,
                         1,
                     )
+                    self.plot_line_point.append((local_x, local_y))
