@@ -176,10 +176,10 @@ class GridLayout(displayio.Group):
                     cell["content"].anchored_position = (
                         int(grid_position_x * self._width / grid_size_x)
                         + self.cell_padding
-                        + (cell["cell_anchor_point"][0] * _measured_width),
+                        + int(cell["cell_anchor_point"][0] * _measured_width),
                         int(grid_position_y * self._height / grid_size_y)
                         + self.cell_padding
-                        + (cell["cell_anchor_point"][1] * _measured_height),
+                        + int(cell["cell_anchor_point"][1] * _measured_height),
                     )
 
                 self.append(cell["content"])
@@ -236,29 +236,29 @@ class GridLayout(displayio.Group):
                             cell["content"].anchored_position[1]
                             + _measured_height
                             + self.cell_padding
-                            - (cell["cell_anchor_point"][1] * _measured_height)
+                            - int(cell["cell_anchor_point"][1] * _measured_height)
                         ) - 1
                         _bottom_line_loc_x = (
                             cell["content"].anchored_position[0]
                             - self.cell_padding
-                            - (cell["cell_anchor_point"][0] * _measured_width)
+                            - int(cell["cell_anchor_point"][0] * _measured_width)
                         )
 
                         _top_line_loc_y = (
                             cell["content"].anchored_position[1]
                             - self.cell_padding
-                            - (cell["cell_anchor_point"][1] * _measured_height)
+                            - int(cell["cell_anchor_point"][1] * _measured_height)
                         )
                         _top_line_loc_x = (
                             cell["content"].anchored_position[0]
                             - self.cell_padding
-                            - (cell["cell_anchor_point"][0] * _measured_width)
+                            - int(cell["cell_anchor_point"][0] * _measured_width)
                         )
 
                         _right_line_loc_y = (
                             cell["content"].anchored_position[1]
                             - self.cell_padding
-                            - (cell["cell_anchor_point"][1] * _measured_height)
+                            - int(cell["cell_anchor_point"][1] * _measured_height)
                         )
                         _right_line_loc_x = (
                             (
@@ -267,7 +267,7 @@ class GridLayout(displayio.Group):
                                 + self.cell_padding
                             )
                             - 1
-                            - (cell["cell_anchor_point"][0] * _measured_width)
+                            - int(cell["cell_anchor_point"][0] * _measured_width)
                         )
 
                     _horizontal_divider_line = displayio.Shape(
