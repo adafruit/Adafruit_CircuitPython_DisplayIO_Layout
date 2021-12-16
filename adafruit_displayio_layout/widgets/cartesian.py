@@ -389,10 +389,12 @@ class Cartesian(Widget):
 
             if self._subticks:
                 if i in subticks:
+                    # calc subtick_line_height; force min lineheigt to 1.
+                    subtick_line_height = max(1, self._tick_line_height // 2)
                     rectangle_helper(
                         text_dist,
                         self._axes_line_thickness,
-                        self._tick_line_height // 2,
+                        subtick_line_height,
                         1,
                         self._axesx_bitmap,
                         1,
@@ -458,10 +460,13 @@ class Cartesian(Widget):
         self.append(self._pointer)
 
     def _calc_local_xy(self, x: int, y: int) -> (int, int):
+        # x_size = self._xrange[1], self._xrange[0]
+
         local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
         local_y = (
             int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
         )
+        print("({: >3}, {: >3}) -- ({: >3}, {: >3})".format(x, y, local_x, local_y))
         return (local_x, local_y)
 
     def update_pointer(self, x: int, y: int) -> None:
@@ -473,7 +478,6 @@ class Cartesian(Widget):
         rtype: None
         """
         local_x, local_y = self._calc_local_xy(x, y)
-
         if local_x >= 0 or local_y <= 100:
             if self._update_line:
                 self._draw_pointers(local_x, local_y)
