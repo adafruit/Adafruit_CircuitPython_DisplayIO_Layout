@@ -314,7 +314,6 @@ class Cartesian(Widget):
 
         self._pointer = None
         self._circle_palette = None
-        self._pointer_vector_shape = None
         self.plot_line_point = None
 
     @staticmethod
@@ -449,18 +448,14 @@ class Cartesian(Widget):
                     )
 
     def _draw_pointers(self, x: int, y: int) -> None:
-        self._pointer = vectorio.Circle(self._pointer_radius)
-        self._circle_palette = displayio.Palette(2)
-        self._circle_palette.make_transparent(0)
-        self._circle_palette[1] = self._pointer_color
 
-        self._pointer_vector_shape = vectorio.VectorShape(
-            shape=self._pointer,
-            pixel_shader=self._circle_palette,
-            x=x,
-            y=y,
+        self._circle_palette = displayio.Palette(1)
+        self._circle_palette[0] = self._pointer_color
+        self._pointer = vectorio.Circle(
+            radius=self._pointer_radius, x=x, y=y, pixel_shader=self._circle_palette
         )
-        self.append(self._pointer_vector_shape)
+
+        self.append(self._pointer)
 
     def update_pointer(self, x: int, y: int) -> None:
         """updater_pointer function
@@ -480,8 +475,8 @@ class Cartesian(Widget):
                 self._draw_pointers(local_x, local_y)
                 self._update_line = False
             else:
-                self._pointer_vector_shape.x = local_x
-                self._pointer_vector_shape.y = local_y
+                self._pointer.x = local_x
+                self._pointer.y = local_y
 
     def _set_plotter_line(self) -> None:
         self.plot_line_point = []
