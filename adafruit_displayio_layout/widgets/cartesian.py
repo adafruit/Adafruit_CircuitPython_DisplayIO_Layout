@@ -310,8 +310,6 @@ class Cartesian(Widget):
         self.append(self._screen_tilegrid)
         self.append(self._corner_tilegrid)
 
-        self._update_line = True
-
         self._pointer = None
         self._circle_palette = None
         self.plot_line_point = None
@@ -460,36 +458,17 @@ class Cartesian(Widget):
         self.append(self._pointer)
 
     def _calc_local_xy(self, x: int, y: int) -> (int, int):
-        # x_size = self._xrange[1], self._xrange[0]
-
-        # ok we have to calculate the local coordinates from the range:
-        # we have some things prepared allready:
-        # self._xrange = xrange
-        # self._normx = (self._xrange[1] - self._xrange[0]) / 100
-        # self._valuex = self.width / 100
-        # self._factorx = 100 / (self._xrange[1] - self._xrange[0])
-
         local_x = (
             int((x - self._xrange[0]) * self._factorx * self._valuex) + self._nudge_x
         )
-        # details on `+ (self.height - 1)`
-        # we make sure we stay in range.. ()
-        # as the bitmap is set to self.width & self.height
-        # but we are only allowed to draw 0..height-1 and 0..width-1
+        # details on `+ (self.height - 1)` :
+        # the bitmap is set to self.width & self.height
+        # but we are only allowed to draw to pixels 0..height-1 and 0..width-1
         local_y = (
             int((self._yrange[0] - y) * self._factory * self._valuey)
             + (self.height - 1)
             + self._nudge_y
         )
-
-        # print(
-        #     "({: >3}, {: >3}) --> ({: >3}, {: >3})".format(
-        #         x,
-        #         y,
-        #         local_x,
-        #         local_y,
-        #     )
-        # )
         return (local_x, local_y)
 
     def _check_local_x_in_range(self, local_x):
@@ -512,29 +491,9 @@ class Cartesian(Widget):
     def _check_xy_in_range(self, x, y):
         return self._check_x_in_range(x) and self._check_y_in_range(y)
 
-    def update_pointer(self, x: int, y: int) -> None:
-        """updater_pointer function
-        helper function to update pointer in the plane
-        :param int x: ``x`` coordinate in the local plane
-        :param int y: ``y`` coordinate in the local plane
-        :return: None
-        rtype: None
-        """
-        local_x, local_y = self._calc_local_xy(x, y)
-        if local_x >= 0 or local_y <= 100:
-            if self._update_line:
-                self._draw_pointers(local_x, local_y)
-                self._update_line = False
-            else:
-                self._pointer.x = local_x
-                self._pointer.y = local_y
-
-    def _set_plotter_line(self) -> None:
-        self.plot_line_point = []
-
-    def update_line(self, x: int, y: int) -> None:
-        """updater_line function
-        helper function to update pointer in the plane
+    def _add_point(self, x: int, y: int) -> None:
+        """_add_point function
+        helper function to add a point to the graph in the plane
         :param int x: ``x`` coordinate in the local plane
         :param int y: ``y`` coordinate in the local plane
         :return: None
@@ -570,26 +529,9 @@ class Cartesian(Widget):
         )
         if self._check_xy_in_range(x, y):
             if self._check_local_xy_in_range(local_x, local_y):
-                if self._update_line:
-                    self._set_plotter_line()
-                    self.plot_line_point.append((local_x, local_y))
-                    self._update_line = False
-                else:
-                    # print(
-                    #     "line_start ({: >3}, {: >3})".format(
-                    #         self.plot_line_point[-1][0],
-                    #         self.plot_line_point[-1][1],
-                    #     )
-                    # )
-                    bitmaptools.draw_line(
-                        self._screen_bitmap,
-                        self.plot_line_point[-1][0],
-                        self.plot_line_point[-1][1],
-                        local_x,
-                        local_y,
-                        1,
-                    )
-                    self.plot_line_point.append((local_x, local_y))
+                if self.plot_line_point is None:
+                    self.plot_line_point = []
+                self.plot_line_point.append((local_x, local_y))
             else:
                 # for better error messages we check in detail what failed...
                 # this should never happen:
@@ -637,3 +579,40 @@ class Cartesian(Widget):
                         self._yrange[1],
                     )
                 )
+
+    def update_pointer(self, x: int, y: int) -> None:
+        """updater_pointer function
+        helper function to update pointer in the plane
+        :param int x: ``x`` coordinate in the local plane
+        :param int y: ``y`` coordinate in the local plane
+        :return: None
+        rtype: None
+        """
+        self._add_point(x, y)
+        if not self._pointer:
+            self._draw_pointers(
+                self.plot_line_point[-1][0],
+                self.plot_line_point[-1][1],
+            )
+        else:
+            self._pointer.x = self.plot_line_point[-1][0]
+            self._pointer.y = self.plot_line_point[-1][1]
+
+    def update_line(self, x: int, y: int) -> None:
+        """updater_line function
+        helper function to update line in the plane
+        :param int x: ``x`` coordinate in the local plane
+        :param int y: ``y`` coordinate in the local plane
+        :return: None
+        rtype: None
+        """
+        self._add_point(x, y)
+        if len(self.plot_line_point) > 1:
+            bitmaptools.draw_line(
+                self._screen_bitmap,
+                self.plot_line_point[-2][0],
+                self.plot_line_point[-2][1],
+                self.plot_line_point[-1][0],
+                self.plot_line_point[-1][1],
+                1,
+            )

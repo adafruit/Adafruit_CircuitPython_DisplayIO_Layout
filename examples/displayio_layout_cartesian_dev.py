@@ -62,8 +62,7 @@ print("examples/displayio_layout_cartesian_lineplot.py")
 my_plane.update_line(0, 0)
 for x, y in data:
     my_plane.update_line(x, y)
-    # my_plane.update_pointer(x, y)
-    # print(my_plane.plot_line_point)
+    my_plane.update_pointer(x, y)
     time.sleep(0.5)
 
 while True:
