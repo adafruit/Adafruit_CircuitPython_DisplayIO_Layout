@@ -38,20 +38,33 @@ my_group.append(my_plane)
 display.show(my_group)  # add high level Group to the display
 
 data = [
-    (0, 0),
+    # (0, 0),
     (1, 1),
+    (1, 15),
+    (2, 1),
+    (2, 2),
     (3, 3),
+    (4, 3),
+    (4, 4),
     (5, 5),
+    (6, 5),
+    (6, 6),
     (7, 7),
+    (8, 7),
+    (8, 8),
     (9, 9),
+    (10, 9),
+    (10, 10),
 ]
 
 print("examples/displayio_layout_cartesian_lineplot.py")
+
+my_plane.update_line(0, 0)
 for x, y in data:
     my_plane.update_line(x, y)
     # my_plane.update_pointer(x, y)
     # print(my_plane.plot_line_point)
-    time.sleep(2.5)
+    time.sleep(0.5)
 
 while True:
     pass

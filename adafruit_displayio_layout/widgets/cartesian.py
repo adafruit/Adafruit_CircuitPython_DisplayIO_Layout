@@ -468,29 +468,35 @@ class Cartesian(Widget):
             + (self.height - 1)
             + self._nudge_y
         )
-        print(
-            "({: >3}, {: >3}) --> ({: >3}, {: >3})".format(
-                x,
-                y,
-                local_x,
-                local_y,
-            )
-        )
+        # print(
+        #     "({: >3}, {: >3}) --> ({: >3}, {: >3})".format(
+        #         x,
+        #         y,
+        #         local_x,
+        #         local_y,
+        #     )
+        # )
         return (local_x, local_y)
 
+    def _check_local_x_in_range(self, local_x):
+        return 0 <= local_x < self.width
+
+    def _check_local_y_in_range(self, local_y):
+        return 0 <= local_y < self.height
+
     def _check_local_xy_in_range(self, local_x, local_y):
-        in_range = False
-        if (0 <= local_x < self.width) and (0 <= local_y < self.height):
-            in_range = True
-        return in_range
+        return self._check_local_x_in_range(local_x) and self._check_local_y_in_range(
+            local_y
+        )
+
+    def _check_x_in_range(self, x):
+        return self._xrange[0] <= x <= self._xrange[1]
+
+    def _check_y_in_range(self, y):
+        return self._yrange[0] <= y <= self._yrange[1]
 
     def _check_xy_in_range(self, x, y):
-        in_range = False
-        if (self._xrange[0] <= x <= self._xrange[1]) and (
-            self._yrange[0] <= y <= self._yrange[1]
-        ):
-            in_range = True
-        return in_range
+        return self._check_x_in_range(x) and self._check_y_in_range(y)
 
     def update_pointer(self, x: int, y: int) -> None:
         """updater_pointer function
@@ -520,27 +526,30 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
+        print("")
         print(
-            "x:{: >4}; _xrange({: >4}, {: >4})\n"
-            "y:{: >4}; _yrange({: >4}, {: >4})\n"
+            "xy:      ({: >4}, {: >4})  "
+            "_xrange: ({: >4}, {: >4})  "
+            "_yrange: ({: >4}, {: >4})  "
             "".format(
                 x,
+                y,
                 self._xrange[0],
                 self._xrange[1],
-                y,
                 self._yrange[0],
                 self._yrange[1],
             )
         )
         local_x, local_y = self._calc_local_xy(x, y)
         print(
-            "local_x:{: >4}; _xrange({: >4}, {: >4})\n"
-            "local_y:{: >4}; _yrange({: >4}, {: >4})\n"
+            "local_*: ({: >4}, {: >4})  "
+            " width:  ({: >4}, {: >4})  "
+            " height: ({: >4}, {: >4})  "
             "".format(
                 local_x,
+                local_y,
                 0,
                 self.width,
-                local_y,
                 0,
                 self.height,
             )
@@ -552,12 +561,12 @@ class Cartesian(Widget):
                     self.plot_line_point.append((local_x, local_y))
                     self._update_line = False
                 else:
-                    print(
-                        "line_start ({: >3}, {: >3})".format(
-                            self.plot_line_point[-1][0],
-                            self.plot_line_point[-1][1],
-                        )
-                    )
+                    # print(
+                    #     "line_start ({: >3}, {: >3})".format(
+                    #         self.plot_line_point[-1][0],
+                    #         self.plot_line_point[-1][1],
+                    #     )
+                    # )
                     bitmaptools.draw_line(
                         self._screen_bitmap,
                         self.plot_line_point[-1][0],
@@ -568,30 +577,45 @@ class Cartesian(Widget):
                     )
                     self.plot_line_point.append((local_x, local_y))
             else:
+                # for better error messages we check in detail what failed...
+                if not self._check_local_x_in_range(local_x):
+                    raise ValueError(
+                        "local_x out of range: "
+                        "local_x:{: >4}; _xrange({: >4}, {: >4})"
+                        "".format(
+                            local_x,
+                            0,
+                            self.width,
+                        )
+                    )
+                if not self._check_local_y_in_range(local_y):
+                    raise ValueError(
+                        "local_y out of range: "
+                        "local_y:{: >4}; _yrange({: >4}, {: >4})"
+                        "".format(
+                            local_y,
+                            0,
+                            self.height,
+                        )
+                    )
+        else:
+            if not self._check_x_in_range(x):
                 raise ValueError(
-                    "local_x or local_y out of range:\n"
-                    "local_x:{: >4}; _xrange({: >4}, {: >4})\n"
-                    "local_y:{: >4}; _yrange({: >4}, {: >4})\n"
+                    "x out of range:    "
+                    "x:{: >4}; xrange({: >4}, {: >4})"
                     "".format(
-                        local_x,
-                        0,
-                        self.width,
-                        local_y,
-                        0,
-                        self.height,
+                        x,
+                        self._xrange[0],
+                        self._xrange[1],
                     )
                 )
-        else:
-            raise ValueError(
-                "local_x or local_y out of range:\n"
-                "x:{: >4}; _xrange({: >4}, {: >4})\n"
-                "y:{: >4}; _yrange({: >4}, {: >4})\n"
-                "".format(
-                    x,
-                    self._xrange[0],
-                    self._xrange[1],
-                    y,
-                    self._yrange[0],
-                    self._yrange[1],
+            if not self._check_y_in_range(y):
+                raise ValueError(
+                    "y out of range:    "
+                    "y:{: >4}; yrange({: >4}, {: >4})"
+                    "".format(
+                        y,
+                        self._yrange[0],
+                        self._yrange[1],
+                    )
                 )
-            )
