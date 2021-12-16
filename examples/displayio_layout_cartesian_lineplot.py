@@ -34,20 +34,34 @@ display.show(my_group)  # add high level Group to the display
 
 data = [
     (0, 0),
-    (1, 10),
-    (20, 50),
-    (30, 60),
+    (10, 10),
+    (20, 20),
+    (30, 30),
     (40, 40),
-    (50, 80),
-    (60, 20),
-    (70, 60),
-    (80, 30),
-    (100, 100),
+    (50, 50),
+    (60, 60),
+    (70, 70),
+    (80, 80),
+    (90, 90),
 ]
+#
+# data = [
+#     (0, 0),
+#     (10, 10),
+#     (20, 50),
+#     (30, 60),
+#     (40, 40),
+#     (50, 80),
+#     (60, 20),
+#     (70, 60),
+#     (80, 30),
+#     (100, 100),
+# ]
 
 print("examples/displayio_layout_cartesian_lineplot.py")
 for x, y in data:
-    my_plane.update_line(x, y)
+    # my_plane.update_line(x, y)
+    my_plane.update_pointer(x, y)
     time.sleep(0.5)
     print(my_plane.plot_line_point)
 

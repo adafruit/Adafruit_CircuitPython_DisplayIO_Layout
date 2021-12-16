@@ -457,6 +457,13 @@ class Cartesian(Widget):
 
         self.append(self._pointer)
 
+    def _calc_local_xy(self, x: int, y: int) -> (int, int):
+        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
+        local_y = (
+            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
+        )
+        return (local_x, local_y)
+
     def update_pointer(self, x: int, y: int) -> None:
         """updater_pointer function
         helper function to update pointer in the plane
@@ -465,10 +472,7 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
-        local_y = (
-            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
-        )
+        local_x, local_y = self._calc_local_xy(x, y)
 
         if local_x >= 0 or local_y <= 100:
             if self._update_line:
@@ -489,10 +493,7 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
-        local_y = (
-            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
-        )
+        local_x, local_y = self._calc_local_xy(x, y)
         if x < self._xrange[1] and y < self._yrange[1]:
             if local_x > 0 or local_y < 100:
                 if self._update_line:
