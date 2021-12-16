@@ -2,8 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 """
-Make green and purple rectangles and a
-"Hello World" label. Displayed with Blinka_Displayio_PyGameDisplay
+Make a GridLayout with some Labels in it's cells.
+Displayed with Blinka_Displayio_PyGameDisplay
+
+Requires: https://github.com/FoamyGuy/Blinka_Displayio_PyGameDisplay
 """
 import displayio
 import terminalio
