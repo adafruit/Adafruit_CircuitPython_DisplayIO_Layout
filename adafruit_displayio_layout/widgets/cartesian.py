@@ -462,12 +462,26 @@ class Cartesian(Widget):
     def _calc_local_xy(self, x: int, y: int) -> (int, int):
         # x_size = self._xrange[1], self._xrange[0]
 
-        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
+        # ok we have to calculate the local coordinates from the range:
+        # we have some things prepared allready:
+        # self._xrange = xrange
+        # self._normx = (self._xrange[1] - self._xrange[0]) / 100
+        # self._valuex = self.width / 100
+        # self._factorx = 100 / (self._xrange[1] - self._xrange[0])
+
+        local_x = (
+            int((x - self._xrange[0]) * self._factorx * self._valuex) + self._nudge_x
+        )
+        # details on `+ (self.height - 1)`
+        # we make sure we stay in range.. ()
+        # as the bitmap is set to self.width & self.height
+        # but we are only allowed to draw 0..height-1 and 0..width-1
         local_y = (
-            int((self._yrange[0] - y) * self._factory)
+            int((self._yrange[0] - y) * self._factory * self._valuey)
             + (self.height - 1)
             + self._nudge_y
         )
+
         # print(
         #     "({: >3}, {: >3}) --> ({: >3}, {: >3})".format(
         #         x,
@@ -578,6 +592,9 @@ class Cartesian(Widget):
                     self.plot_line_point.append((local_x, local_y))
             else:
                 # for better error messages we check in detail what failed...
+                # this should never happen:
+                # we already checked the range of the input values.
+                # but in case our calculation is wrong we handle this case to..
                 if not self._check_local_x_in_range(local_x):
                     raise ValueError(
                         "local_x out of range: "
@@ -599,6 +616,7 @@ class Cartesian(Widget):
                         )
                     )
         else:
+            # for better error messages we check in detail what failed...
             if not self._check_x_in_range(x):
                 raise ValueError(
                     "x out of range:    "

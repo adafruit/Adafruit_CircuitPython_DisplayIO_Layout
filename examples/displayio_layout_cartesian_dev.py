@@ -23,7 +23,7 @@ my_plane = Cartesian(
     x=11,  # x position for the plane
     y=0,  # y plane position
     width=140,  # display width
-    height=120,  # display height
+    height=110,  # display height
     xrange=(0, 10),  # x range
     yrange=(0, 10),  # y range
     major_tick_stroke=1,  # ticks width in pixels
@@ -40,7 +40,7 @@ display.show(my_group)  # add high level Group to the display
 data = [
     # (0, 0),
     (1, 1),
-    (1, 15),
+    # (1, 15),  # create out of range error
     (2, 1),
     (2, 2),
     (3, 3),
