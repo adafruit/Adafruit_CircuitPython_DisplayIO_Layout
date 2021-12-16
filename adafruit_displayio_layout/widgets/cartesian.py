@@ -464,10 +464,33 @@ class Cartesian(Widget):
 
         local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
         local_y = (
-            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
+            int((self._yrange[0] - y) * self._factory)
+            + (self.height - 1)
+            + self._nudge_y
         )
-        print("({: >3}, {: >3}) -- ({: >3}, {: >3})".format(x, y, local_x, local_y))
+        print(
+            "({: >3}, {: >3}) --> ({: >3}, {: >3})".format(
+                x,
+                y,
+                local_x,
+                local_y,
+            )
+        )
         return (local_x, local_y)
+
+    def _check_local_xy_in_range(self, local_x, local_y):
+        in_range = False
+        if (0 <= local_x < self.width) and (0 <= local_y < self.height):
+            in_range = True
+        return in_range
+
+    def _check_xy_in_range(self, x, y):
+        in_range = False
+        if (self._xrange[0] <= x <= self._xrange[1]) and (
+            self._yrange[0] <= y <= self._yrange[1]
+        ):
+            in_range = True
+        return in_range
 
     def update_pointer(self, x: int, y: int) -> None:
         """updater_pointer function
@@ -497,14 +520,44 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
+        print(
+            "x:{: >4}; _xrange({: >4}, {: >4})\n"
+            "y:{: >4}; _yrange({: >4}, {: >4})\n"
+            "".format(
+                x,
+                self._xrange[0],
+                self._xrange[1],
+                y,
+                self._yrange[0],
+                self._yrange[1],
+            )
+        )
         local_x, local_y = self._calc_local_xy(x, y)
-        if x < self._xrange[1] and y < self._yrange[1]:
-            if local_x > 0 or local_y < 100:
+        print(
+            "local_x:{: >4}; _xrange({: >4}, {: >4})\n"
+            "local_y:{: >4}; _yrange({: >4}, {: >4})\n"
+            "".format(
+                local_x,
+                0,
+                self.width,
+                local_y,
+                0,
+                self.height,
+            )
+        )
+        if self._check_xy_in_range(x, y):
+            if self._check_local_xy_in_range(local_x, local_y):
                 if self._update_line:
                     self._set_plotter_line()
                     self.plot_line_point.append((local_x, local_y))
                     self._update_line = False
                 else:
+                    print(
+                        "line_start ({: >3}, {: >3})".format(
+                            self.plot_line_point[-1][0],
+                            self.plot_line_point[-1][1],
+                        )
+                    )
                     bitmaptools.draw_line(
                         self._screen_bitmap,
                         self.plot_line_point[-1][0],
@@ -514,3 +567,31 @@ class Cartesian(Widget):
                         1,
                     )
                     self.plot_line_point.append((local_x, local_y))
+            else:
+                raise ValueError(
+                    "local_x or local_y out of range:\n"
+                    "local_x:{: >4}; _xrange({: >4}, {: >4})\n"
+                    "local_y:{: >4}; _yrange({: >4}, {: >4})\n"
+                    "".format(
+                        local_x,
+                        0,
+                        self.width,
+                        local_y,
+                        0,
+                        self.height,
+                    )
+                )
+        else:
+            raise ValueError(
+                "local_x or local_y out of range:\n"
+                "x:{: >4}; _xrange({: >4}, {: >4})\n"
+                "y:{: >4}; _yrange({: >4}, {: >4})\n"
+                "".format(
+                    x,
+                    self._xrange[0],
+                    self._xrange[1],
+                    y,
+                    self._yrange[0],
+                    self._yrange[1],
+                )
+            )
