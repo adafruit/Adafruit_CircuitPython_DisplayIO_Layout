@@ -228,12 +228,12 @@ class Widget(displayio.Group):
         """
 
         if (self._anchor_point is not None) and (self._anchored_position is not None):
-            self.x = (
+            self.x = int(
                 self._anchored_position[0]
                 - int(self._anchor_point[0] * self._bounding_box[2])
                 - self._bounding_box[0]
             )
-            self.y = (
+            self.y = int(
                 self._anchored_position[1]
                 - int(self._anchor_point[1] * self._bounding_box[3])
                 - self._bounding_box[1]
