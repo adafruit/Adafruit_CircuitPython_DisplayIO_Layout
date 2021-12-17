@@ -74,6 +74,7 @@ class Cartesian(Widget):
     :param int nudge_y: movement in pixels in the y direction to move the origin.
      Defaults to 0
 
+    :param bool verbose: print debugging information in some internal functions. Default to False
 
     **Quickstart: Importing and using Cartesian**
 
@@ -181,10 +182,13 @@ class Cartesian(Widget):
         subticks: bool = False,
         nudge_x: int = 0,
         nudge_y: int = 0,
+        verbose: bool = False,
         **kwargs,
     ) -> None:
 
         super().__init__(**kwargs)
+
+        self._verbose = verbose
 
         self._background_color = background_color
 
@@ -499,34 +503,35 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        print("")
-        print(
-            "xy:      ({: >4}, {: >4})  "
-            "_xrange: ({: >4}, {: >4})  "
-            "_yrange: ({: >4}, {: >4})  "
-            "".format(
-                x,
-                y,
-                self._xrange[0],
-                self._xrange[1],
-                self._yrange[0],
-                self._yrange[1],
-            )
-        )
         local_x, local_y = self._calc_local_xy(x, y)
-        print(
-            "local_*: ({: >4}, {: >4})  "
-            " width:  ({: >4}, {: >4})  "
-            " height: ({: >4}, {: >4})  "
-            "".format(
-                local_x,
-                local_y,
-                0,
-                self.width,
-                0,
-                self.height,
+        if self._verbose:
+            print("")
+            print(
+                "xy:      ({: >4}, {: >4})  "
+                "_xrange: ({: >4}, {: >4})  "
+                "_yrange: ({: >4}, {: >4})  "
+                "".format(
+                    x,
+                    y,
+                    self._xrange[0],
+                    self._xrange[1],
+                    self._yrange[0],
+                    self._yrange[1],
+                )
             )
-        )
+            print(
+                "local_*: ({: >4}, {: >4})  "
+                " width:  ({: >4}, {: >4})  "
+                " height: ({: >4}, {: >4})  "
+                "".format(
+                    local_x,
+                    local_y,
+                    0,
+                    self.width,
+                    0,
+                    self.height,
+                )
+            )
         if self._check_xy_in_range(x, y):
             if self._check_local_xy_in_range(local_x, local_y):
                 if self.plot_line_point is None:
