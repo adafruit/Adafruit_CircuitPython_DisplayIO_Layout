@@ -625,8 +625,8 @@ class Cartesian(Widget):
                 1,
             )
 
-    def clear_plot(self, palette_index=5):
-        """clear_plot function.
+    def clear_lines(self, palette_index=5):
+        """clear_lines function.
 
         clear all added lines
         (clear line-plot graph)
