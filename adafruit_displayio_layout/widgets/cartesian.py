@@ -612,6 +612,7 @@ class Cartesian(Widget):
         :param int x: ``x`` coordinate in the local plane
         :param int y: ``y`` coordinate in the local plane
         :return: None
+
         rtype: None
         """
         self._add_point(x, y)
@@ -633,6 +634,7 @@ class Cartesian(Widget):
 
         :param int palette_index: color palett index. Defaults to 5
         :return: None
+
         rtype: None
         """
         self.plot_line_point = None
