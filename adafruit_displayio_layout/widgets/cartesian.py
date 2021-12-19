@@ -603,9 +603,12 @@ class Cartesian(Widget):
             self._pointer.x = self.plot_line_point[-1][0]
             self._pointer.y = self.plot_line_point[-1][1]
 
-    def update_line(self, x: int, y: int) -> None:
-        """updater_line function
-        helper function to update line in the plane
+    def add_line(self, x: int, y: int) -> None:
+        """add_line function.
+
+        add line to the plane.
+        multiple calls create a line-plot graph.
+
         :param int x: ``x`` coordinate in the local plane
         :param int y: ``y`` coordinate in the local plane
         :return: None
@@ -625,7 +628,9 @@ class Cartesian(Widget):
     def clear_plot(self, palette_index=5):
         """clear_plot function.
 
-        clear plotted lines
+        clear all added lines
+        (clear line-plot graph)
+
         :param int palette_index: color palett index. Defaults to 5
         :return: None
         rtype: None
