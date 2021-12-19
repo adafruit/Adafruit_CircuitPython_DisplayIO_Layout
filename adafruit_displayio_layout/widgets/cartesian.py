@@ -254,8 +254,8 @@ class Cartesian(Widget):
         self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self.height, 4)
         self._axesy_bitmap.fill(0)
 
-        self._screen_bitmap = displayio.Bitmap(self.width, self.height, 5)
-        self._screen_bitmap.fill(5)
+        self._plot_bitmap = displayio.Bitmap(self.width, self.height, 5)
+        self.clear_plot()
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = self._tick_color
@@ -297,7 +297,7 @@ class Cartesian(Widget):
         )
 
         self._screen_tilegrid = displayio.TileGrid(
-            self._screen_bitmap,
+            self._plot_bitmap,
             pixel_shader=self._screen_palette,
             x=0,
             y=0,
@@ -614,10 +614,21 @@ class Cartesian(Widget):
         self._add_point(x, y)
         if len(self.plot_line_point) > 1:
             bitmaptools.draw_line(
-                self._screen_bitmap,
+                self._plot_bitmap,
                 self.plot_line_point[-2][0],
                 self.plot_line_point[-2][1],
                 self.plot_line_point[-1][0],
                 self.plot_line_point[-1][1],
                 1,
             )
+
+    def clear_plot(self, palette_index=5):
+        """clear_plot function.
+
+        clear plotted lines
+        :param int palette_index: color palett index. Defaults to 5
+        :return: None
+        rtype: None
+        """
+        self.plot_line_point = None
+        self._plot_bitmap.fill(palette_index)
