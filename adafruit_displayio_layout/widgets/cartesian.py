@@ -255,7 +255,7 @@ class Cartesian(Widget):
         self._axesy_bitmap.fill(0)
 
         self._plot_bitmap = displayio.Bitmap(self.width, self.height, 5)
-        self.clear_plot()
+        self.clear_lines()
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = self._tick_color
