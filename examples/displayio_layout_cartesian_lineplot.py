@@ -54,9 +54,9 @@ data = [
 print("examples/displayio_layout_cartesian_lineplot.py")
 
 # first point without a wait.
-my_plane.add_line(0, 0)
+my_plane.add_plot_line(0, 0)
 for x, y in data:
-    my_plane.add_line(x, y)
+    my_plane.add_plot_line(x, y)
     time.sleep(0.5)
 
 while True:

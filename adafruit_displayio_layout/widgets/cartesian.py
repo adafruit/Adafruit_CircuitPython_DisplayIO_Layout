@@ -255,7 +255,7 @@ class Cartesian(Widget):
         self._axesy_bitmap.fill(0)
 
         self._plot_bitmap = displayio.Bitmap(self.width, self.height, 5)
-        self.clear_lines()
+        self.clear_plot_lines()
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = self._tick_color
@@ -603,8 +603,8 @@ class Cartesian(Widget):
             self._pointer.x = self.plot_line_point[-1][0]
             self._pointer.y = self.plot_line_point[-1][1]
 
-    def add_line(self, x: int, y: int) -> None:
-        """add_line function.
+    def add_plot_line(self, x: int, y: int) -> None:
+        """add_plot_line function.
 
         add line to the plane.
         multiple calls create a line-plot graph.
@@ -626,8 +626,8 @@ class Cartesian(Widget):
                 1,
             )
 
-    def clear_lines(self, palette_index=5):
-        """clear_lines function.
+    def clear_plot_lines(self, palette_index=5):
+        """clear_plot_lines function.
 
         clear all added lines
         (clear line-plot graph)
