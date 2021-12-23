@@ -74,6 +74,7 @@ class Cartesian(Widget):
     :param int nudge_y: movement in pixels in the y direction to move the origin.
      Defaults to 0
 
+    :param bool verbose: print debugging information in some internal functions. Default to False
 
     **Quickstart: Importing and using Cartesian**
 
@@ -181,10 +182,13 @@ class Cartesian(Widget):
         subticks: bool = False,
         nudge_x: int = 0,
         nudge_y: int = 0,
+        verbose: bool = False,
         **kwargs,
     ) -> None:
 
         super().__init__(**kwargs)
+
+        self._verbose = verbose
 
         self._background_color = background_color
 
@@ -250,8 +254,8 @@ class Cartesian(Widget):
         self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self.height, 4)
         self._axesy_bitmap.fill(0)
 
-        self._screen_bitmap = displayio.Bitmap(self.width, self.height, 5)
-        self._screen_bitmap.fill(5)
+        self._plot_bitmap = displayio.Bitmap(self.width, self.height, 5)
+        self.clear_plot_lines()
         self._screen_palette = displayio.Palette(6)
         self._screen_palette.make_transparent(0)
         self._screen_palette[1] = self._tick_color
@@ -293,7 +297,7 @@ class Cartesian(Widget):
         )
 
         self._screen_tilegrid = displayio.TileGrid(
-            self._screen_bitmap,
+            self._plot_bitmap,
             pixel_shader=self._screen_palette,
             x=0,
             y=0,
@@ -309,8 +313,6 @@ class Cartesian(Widget):
         self.append(self._axesy_tilegrid)
         self.append(self._screen_tilegrid)
         self.append(self._corner_tilegrid)
-
-        self._update_line = True
 
         self._pointer = None
         self._circle_palette = None
@@ -389,10 +391,12 @@ class Cartesian(Widget):
 
             if self._subticks:
                 if i in subticks:
+                    # calc subtick_line_height; force min lineheigt to 1.
+                    subtick_line_height = max(1, self._tick_line_height // 2)
                     rectangle_helper(
                         text_dist,
                         self._axes_line_thickness,
-                        self._tick_line_height // 2,
+                        subtick_line_height,
                         1,
                         self._axesx_bitmap,
                         1,
@@ -457,6 +461,130 @@ class Cartesian(Widget):
 
         self.append(self._pointer)
 
+    def _calc_local_xy(self, x: int, y: int) -> (int, int):
+        local_x = (
+            int((x - self._xrange[0]) * self._factorx * self._valuex) + self._nudge_x
+        )
+        # details on `+ (self.height - 1)` :
+        # the bitmap is set to self.width & self.height
+        # but we are only allowed to draw to pixels 0..height-1 and 0..width-1
+        local_y = (
+            int((self._yrange[0] - y) * self._factory * self._valuey)
+            + (self.height - 1)
+            + self._nudge_y
+        )
+        return (local_x, local_y)
+
+    def _check_local_x_in_range(self, local_x):
+        return 0 <= local_x < self.width
+
+    def _check_local_y_in_range(self, local_y):
+        return 0 <= local_y < self.height
+
+    def _check_local_xy_in_range(self, local_x, local_y):
+        return self._check_local_x_in_range(local_x) and self._check_local_y_in_range(
+            local_y
+        )
+
+    def _check_x_in_range(self, x):
+        return self._xrange[0] <= x <= self._xrange[1]
+
+    def _check_y_in_range(self, y):
+        return self._yrange[0] <= y <= self._yrange[1]
+
+    def _check_xy_in_range(self, x, y):
+        return self._check_x_in_range(x) and self._check_y_in_range(y)
+
+    def _add_point(self, x: int, y: int) -> None:
+        """_add_point function
+        helper function to add a point to the graph in the plane
+        :param int x: ``x`` coordinate in the local plane
+        :param int y: ``y`` coordinate in the local plane
+        :return: None
+        rtype: None
+        """
+        local_x, local_y = self._calc_local_xy(x, y)
+        if self._verbose:
+            print("")
+            print(
+                "xy:      ({: >4}, {: >4})  "
+                "_xrange: ({: >4}, {: >4})  "
+                "_yrange: ({: >4}, {: >4})  "
+                "".format(
+                    x,
+                    y,
+                    self._xrange[0],
+                    self._xrange[1],
+                    self._yrange[0],
+                    self._yrange[1],
+                )
+            )
+            print(
+                "local_*: ({: >4}, {: >4})  "
+                " width:  ({: >4}, {: >4})  "
+                " height: ({: >4}, {: >4})  "
+                "".format(
+                    local_x,
+                    local_y,
+                    0,
+                    self.width,
+                    0,
+                    self.height,
+                )
+            )
+        if self._check_xy_in_range(x, y):
+            if self._check_local_xy_in_range(local_x, local_y):
+                if self.plot_line_point is None:
+                    self.plot_line_point = []
+                self.plot_line_point.append((local_x, local_y))
+            else:
+                # for better error messages we check in detail what failed...
+                # this should never happen:
+                # we already checked the range of the input values.
+                # but in case our calculation is wrong we handle this case to..
+                if not self._check_local_x_in_range(local_x):
+                    raise ValueError(
+                        "local_x out of range: "
+                        "local_x:{: >4}; _xrange({: >4}, {: >4})"
+                        "".format(
+                            local_x,
+                            0,
+                            self.width,
+                        )
+                    )
+                if not self._check_local_y_in_range(local_y):
+                    raise ValueError(
+                        "local_y out of range: "
+                        "local_y:{: >4}; _yrange({: >4}, {: >4})"
+                        "".format(
+                            local_y,
+                            0,
+                            self.height,
+                        )
+                    )
+        else:
+            # for better error messages we check in detail what failed...
+            if not self._check_x_in_range(x):
+                raise ValueError(
+                    "x out of range:    "
+                    "x:{: >4}; xrange({: >4}, {: >4})"
+                    "".format(
+                        x,
+                        self._xrange[0],
+                        self._xrange[1],
+                    )
+                )
+            if not self._check_y_in_range(y):
+                raise ValueError(
+                    "y out of range:    "
+                    "y:{: >4}; yrange({: >4}, {: >4})"
+                    "".format(
+                        y,
+                        self._yrange[0],
+                        self._yrange[1],
+                    )
+                )
+
     def update_pointer(self, x: int, y: int) -> None:
         """updater_pointer function
         helper function to update pointer in the plane
@@ -465,46 +593,49 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
-        local_y = (
-            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
-        )
+        self._add_point(x, y)
+        if not self._pointer:
+            self._draw_pointers(
+                self.plot_line_point[-1][0],
+                self.plot_line_point[-1][1],
+            )
+        else:
+            self._pointer.x = self.plot_line_point[-1][0]
+            self._pointer.y = self.plot_line_point[-1][1]
 
-        if local_x >= 0 or local_y <= 100:
-            if self._update_line:
-                self._draw_pointers(local_x, local_y)
-                self._update_line = False
-            else:
-                self._pointer.x = local_x
-                self._pointer.y = local_y
+    def add_plot_line(self, x: int, y: int) -> None:
+        """add_plot_line function.
 
-    def _set_plotter_line(self) -> None:
-        self.plot_line_point = []
+        add line to the plane.
+        multiple calls create a line-plot graph.
 
-    def update_line(self, x: int, y: int) -> None:
-        """updater_line function
-        helper function to update pointer in the plane
         :param int x: ``x`` coordinate in the local plane
         :param int y: ``y`` coordinate in the local plane
         :return: None
+
         rtype: None
         """
-        local_x = int((x - self._xrange[0]) * self._factorx) + self._nudge_x
-        local_y = (
-            int((self._yrange[0] - y) * self._factory) + self.height + self._nudge_y
-        )
-        if x < self._xrange[1] and y < self._yrange[1]:
-            if local_x > 0 or local_y < 100:
-                if self._update_line:
-                    self._set_plotter_line()
-                    self.plot_line_point.append((local_x, local_y))
-                    self._update_line = False
-                else:
-                    bitmaptools.draw_line(
-                        self._screen_bitmap,
-                        self.plot_line_point[-1][0],
-                        self.plot_line_point[-1][1],
-                        local_x,
-                        local_y,
-                        1,
-                    )
+        self._add_point(x, y)
+        if len(self.plot_line_point) > 1:
+            bitmaptools.draw_line(
+                self._plot_bitmap,
+                self.plot_line_point[-2][0],
+                self.plot_line_point[-2][1],
+                self.plot_line_point[-1][0],
+                self.plot_line_point[-1][1],
+                1,
+            )
+
+    def clear_plot_lines(self, palette_index=5):
+        """clear_plot_lines function.
+
+        clear all added lines
+        (clear line-plot graph)
+
+        :param int palette_index: color palett index. Defaults to 5
+        :return: None
+
+        rtype: None
+        """
+        self.plot_line_point = None
+        self._plot_bitmap.fill(palette_index)
