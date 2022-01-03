@@ -41,7 +41,10 @@ class IconWidget(Widget, Control):
     :param string icon: the filepath of the bmp image to be used as the icon.
     :param boolean on_disk: if True use OnDiskBitmap instead of imageload.
      This can be helpful to save memory. Defaults to False
-
+    :param Optional[int] transparent_index: if not None this color index will get set to
+     transparent on the palette of the icon.
+    :param Optional[int] label_background: if not None this color will be used as a background
+     for the icon label.
     :param int x: x location the icon widget should be placed. Pixel coordinates.
     :param int y: y location the icon widget should be placed. Pixel coordinates.
     :param anchor_point: (X,Y) values from 0.0 to 1.0 to define the anchor point relative to the
@@ -51,16 +54,30 @@ class IconWidget(Widget, Control):
     :type anchored_position: Tuple[int, int]
     """
 
-    def __init__(self, label_text, icon, on_disk=False, **kwargs):
+    # pylint: disable=too-many-arguments
+
+    def __init__(
+        self,
+        label_text,
+        icon,
+        on_disk=False,
+        transparent_index=None,
+        label_background=None,
+        **kwargs
+    ):
         super().__init__(**kwargs)
 
         self._icon = icon
 
         if on_disk:
             image = OnDiskBitmap(self._icon)
+            if transparent_index is not None:
+                image.pixel_shader.make_transparent(transparent_index)
             tile_grid = TileGrid(image, pixel_shader=image.pixel_shader)
         else:
             image, palette = adafruit_imageload.load(icon)
+            if transparent_index is not None:
+                palette.make_transparent(transparent_index)
             tile_grid = TileGrid(image, pixel_shader=palette)
         self.append(tile_grid)
         _label = bitmap_label.Label(
@@ -70,6 +87,10 @@ class IconWidget(Widget, Control):
             anchor_point=(0.5, 0),
             anchored_position=(image.width // 2, image.height),
         )
+
+        if label_background is not None:
+            _label.background_color = label_background
+
         self.append(_label)
         self.touch_boundary = (
             0,
