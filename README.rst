@@ -2,7 +2,7 @@ Introduction
 ============
 
 .. image:: https://readthedocs.org/projects/adafruit-circuitpython-displayio-layout/badge/?version=latest
-    :target: https://circuitpython.readthedocs.io/projects/displayio-layout/en/latest/
+    :target: https://docs.circuitpython.org/projects/displayio-layout/en/latest/
     :alt: Documentation Status
 
 .. image:: https://img.shields.io/discord/327254708534116352.svg
@@ -63,7 +63,7 @@ See scripts in the examples directory of this repository.
 Documentation
 =============
 
-API documentation for this library can be found on `Read the Docs <https://circuitpython.readthedocs.io/projects/displayio-layout/en/latest/>`_.
+API documentation for this library can be found on `Read the Docs <https://docs.circuitpython.org/projects/displayio-layout/en/latest/>`_.
 
 Contributing
 ============
