@@ -95,6 +95,16 @@ test_page_layout.showing_page_index = 1
 print("showing page name: {}".format(test_page_layout.showing_page_name))
 time.sleep(5)
 
+another_text = Label(
+    terminalio.FONT,
+    text="And another thing!",
+    scale=2,
+    color=0x00FF00,
+    anchor_point=(0, 0),
+    anchored_position=(100, 100),
+)
+test_page_layout.showing_page_content.append(another_text)
+
 print("starting loop")
 while True:
     time.sleep(1)

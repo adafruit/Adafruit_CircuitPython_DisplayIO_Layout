@@ -188,6 +188,14 @@ class PageLayout(displayio.Group):
     def showing_page_name(self, new_name):
         self.show_page(page_name=new_name)
 
+    @property
+    def showing_page_content(self):
+        """
+        The content object for the currently showing page
+        :return Displayable: showing_page_content
+        """
+        return self._page_content_list[self._cur_showing_index]["content"][0]
+
     def next_page(self, loop=True):
         """
         Hide the current page and show the next one in the list by index
