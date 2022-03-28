@@ -124,10 +124,10 @@ class PageLayout(displayio.Group):
 
         self._check_args(page_name, page_index)
 
-        if page_index:
+        if page_index is not None:
             return self._page_content_list[page_index]
 
-        if page_name:
+        if page_name is not None:
             for cell in self._page_content_list:
                 if cell["page_name"] == page_name:
                     return cell
