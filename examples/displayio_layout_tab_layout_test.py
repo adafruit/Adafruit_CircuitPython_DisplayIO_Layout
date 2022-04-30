@@ -17,7 +17,7 @@
 # page_1_lbl = Label(font=terminalio.FONT, text="Page One!", anchor_point=(0, 0), anchored_position=(10, 10), scale=3)
 # page_2_lbl = Label(font=terminalio.FONT, text="Page Two!", anchor_point=(0, 0), anchored_position=(10, 10), scale=3)
 # other_lbl = Label(font=terminalio.FONT, text="Something Different!", anchor_point=(0, 0), anchored_position=(10, 50), scale=3)
-#
+
 # test_page_layout.add_content(page_1_lbl, "page_1")
 # test_page_layout.add_content(page_2_lbl, "page_2")
 # test_page_layout.add_content(other_lbl, "page_3")
@@ -83,17 +83,18 @@ display.rotation = 0
 main_group = displayio.Group()
 display.show(main_group)
 
-font = bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
+#font = bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
+font = terminalio.FONT
 
 # create the page layout
 test_page_layout = TabLayout(x=0, y=0,
                              display=board.DISPLAY,
-                             tab_height=28, tab_text_scale=1,
+                             tab_text_scale=2,
                              custom_font=font,
                              inactive_tab_spritesheet="bmps/test_bmp_6.bmp",
                              active_tab_spritesheet="bmps/test_bmp_7.bmp",
-                             showing_tab_text_color=0x00aa59,
-                             tab_text_color=0xeeeeee,
+                             active_tab_text_color=0x00aa59,
+                             inactive_tab_text_color=0xeeeeee,
                              inactive_tab_transparent_indexes=(0, 1),
                              active_tab_transparent_indexes=(0, 1),
                              tab_count=4)
@@ -167,9 +168,9 @@ main_group.append(test_page_layout)
 #test_page_layout.tab_tilegrids_group[3].x += 50
 
 # change page with function by name
-# test_page_layout.show_page(page_name="page_3")
-# print("showing page index:{}".format(test_page_layout.showing_page_index))
-# time.sleep(1)
+test_page_layout.show_page(page_name="Thr")
+print("showing page index:{}".format(test_page_layout.showing_page_index))
+time.sleep(1)
 
 # change page with function by index
 test_page_layout.show_page(page_index=0)
@@ -177,9 +178,9 @@ print("showing page name: {}".format(test_page_layout.showing_page_name))
 time.sleep(1)
 
 # change page by updating the page name property
-# test_page_layout.showing_page_name = "page_3"
-# print("showing page index: {}".format(test_page_layout.showing_page_index))
-# time.sleep(1)
+test_page_layout.showing_page_name = "Thr"
+print("showing page index: {}".format(test_page_layout.showing_page_index))
+time.sleep(1)
 
 # change page by updating the page index property
 test_page_layout.showing_page_index = 1
@@ -197,3 +198,4 @@ while True:
     time.sleep(1)
     # change page by next page function. It will loop by default
     test_page_layout.next_page()
+    pass
