@@ -50,14 +50,14 @@ class TabLayout(displayio.Group):
     :param Optional[Union[BuiltinFont, BDF, PCF]] custom_font: A pre-loaded font object to use
       for the tab labels
     :param str inactive_tab_spritesheet: Filepath of the spritesheet to show for inactive tabs.
-    :param str active_tab_spritesheet: Filepath of the spritesheet to show for the active tab.
-    :param Optional[int, tuple[int, int, int]] active_tab_text_color: Hex or tuple color to use
+    :param str showing_tab_spritesheet: Filepath of the spritesheet to show for the active tab.
+    :param Optional[int, tuple[int, int, int]] showing_tab_text_color: Hex or tuple color to use
       for the active tab label
     :param Optional[int, tuple[int, int, int]] inactive_tab_text_color: Hex or tuple color to
       use for inactive tab labels
     :param Optional[Union[int, tuple[int, int]]] inactive_tab_transparent_indexes: single index
       or tuple of multiple indexes to be made transparent in the inactive tab sprite palette.
-    :param Optional[Union[int, tuple[int, int]]] active_tab_transparent_indexes: single index
+    :param Optional[Union[int, tuple[int, int]]] showing_tab_transparent_indexes: single index
       or tuple of multiple indexes to be made transparent in the active tab sprite palette.
     :param int tab_count: How many tabs to draw in the layout. Positive whole numbers are valid.
     """
@@ -72,11 +72,11 @@ class TabLayout(displayio.Group):
         tab_text_scale: int = 1,
         custom_font: Optional[Union[BuiltinFont, BDF, PCF]] = terminalio.FONT,
         inactive_tab_spritesheet: Optional[str] = None,
-        active_tab_spritesheet: Optional[str] = None,
-        active_tab_text_color: Optional[Union[int, Tuple[int, int, int]]] = 0x999999,
+        showing_tab_spritesheet: Optional[str] = None,
+        showing_tab_text_color: Optional[Union[int, Tuple[int, int, int]]] = 0x999999,
         inactive_tab_text_color: Optional[Union[int, Tuple[int, int, int]]] = 0xFFFFF,
         inactive_tab_transparent_indexes: Optional[Union[int, Tuple[int, int]]] = None,
-        active_tab_transparent_indexes: Optional[Union[int, Tuple[int, int]]] = None,
+        showing_tab_transparent_indexes: Optional[Union[int, Tuple[int, int]]] = None,
         tab_count: int = None,
     ):
 
@@ -88,7 +88,7 @@ class TabLayout(displayio.Group):
                 display = board.DISPLAY
         if inactive_tab_spritesheet is None:
             raise AttributeError("Must pass active_tab_spritesheet")
-        if active_tab_spritesheet is None:
+        if showing_tab_spritesheet is None:
             raise AttributeError("Must pass inactive_tab_spritesheet")
         if tab_count is None:
             raise AttributeError("Must pass tab_count")
@@ -96,16 +96,16 @@ class TabLayout(displayio.Group):
         super().__init__(x=x, y=y)
         self.tab_count = tab_count
         self._active_bmp, self._active_palette = adafruit_imageload.load(
-            active_tab_spritesheet
+            showing_tab_spritesheet
         )
         self._inactive_bmp, self._inactive_palette = adafruit_imageload.load(
             inactive_tab_spritesheet
         )
 
-        if isinstance(active_tab_transparent_indexes, int):
-            self._active_palette.make_transparent(active_tab_transparent_indexes)
-        elif isinstance(active_tab_transparent_indexes, tuple):
-            for index in active_tab_transparent_indexes:
+        if isinstance(showing_tab_transparent_indexes, int):
+            self._active_palette.make_transparent(showing_tab_transparent_indexes)
+        elif isinstance(showing_tab_transparent_indexes, tuple):
+            for index in showing_tab_transparent_indexes:
                 self._active_palette.make_transparent(index)
         else:
             raise AttributeError("active_tab_transparent_indexes must be int or tuple")
@@ -122,7 +122,7 @@ class TabLayout(displayio.Group):
 
         self.tab_height = self._active_bmp.height
         self.display = display
-        self.active_tab_text_color = active_tab_text_color
+        self.active_tab_text_color = showing_tab_text_color
         self.inactive_tab_text_color = inactive_tab_text_color
         self.custom_font = custom_font
         self.tab_text_scale = tab_text_scale
