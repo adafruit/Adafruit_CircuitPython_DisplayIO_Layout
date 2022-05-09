@@ -42,6 +42,9 @@ class TabLayout(displayio.Group):
     """
     A layout that organizes children into a grid table structure.
 
+    .. warning::
+        Requires CircuitPython version 7.3.0-beta.2 or newer
+
     :param int x: x location the layout should be placed. Pixel coordinates.
     :param int y: y location the layout should be placed. Pixel coordinates.
     :param displayio.Display display: The Display object to show the tab layout on.
@@ -167,7 +170,15 @@ class TabLayout(displayio.Group):
                 _new_tab_group.append(_tab_label)
 
                 if i == self.page_layout.showing_page_index:
-                    _tab_tilegrid.bitmap = self._active_bmp
+                    try:
+                        _tab_tilegrid.bitmap = self._active_bmp
+                    except AttributeError as e:
+                        print(e)
+                        raise (
+                            AttributeError(
+                                "TabLayout requires CircuitPython version 7.3.0-beta.2 or newer."
+                            )
+                        ) from e
                     _tab_tilegrid.pixel_shader = self._active_palette
                     _tab_label.color = self.active_tab_text_color
                 self.tab_dict[i] = _new_tab_group
