@@ -20,7 +20,7 @@ from adafruit_display_shapes.triangle import Triangle
 from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
 # Adjust here the date and time that you want the RTC to be set at start:
-default_dt = time.struct_time((2022, 5, 2, 2, 48, 0, 0, -1, -1))
+default_dt = time.struct_time((2022, 5, 12, 18, 34, 0, 3, -1, -1))
 
 my_debug = True
 
