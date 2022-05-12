@@ -330,8 +330,9 @@ temp_in_REPL = False
 """
    Function gets a value from the external temperature sensor
    It only updates if the value has changed compared to the previous value
-   If no value obtained (for instance if the sensor is disconnected)
-   the function sets the page_4 label to a default text
+   A fixed text is set in pge4_lbl2.text. The variable temperature value is set in pge4_lbl3.text
+   If no value obtained (for instance if the sensor is disconnected),
+   the function sets the pge4_lbl to a default text and makes empty pge4_lbl2.text and pge4_lbl3.text
 """
 
 
@@ -449,8 +450,8 @@ def handle_dt(dt):
    a) if an rtc is present from the rtc;
    b) if using online NTP pool server then get the date and time from the function time.localtime
    This time.localtime has before been set with data from the NTP server.
-   In both cases the date and time will be set to the page3_lbl, lbl12 and lbl3
-   If no (valid) date and time has been received then a default text will be shown on the page3_lbl
+   In both cases the date and time will be set to the pge3_lbl, pge3_lbl12 and pge3_lbl3
+   If no (valid) date and time has been received then a default text will be shown on the pge3_lbl
 """
 
 
