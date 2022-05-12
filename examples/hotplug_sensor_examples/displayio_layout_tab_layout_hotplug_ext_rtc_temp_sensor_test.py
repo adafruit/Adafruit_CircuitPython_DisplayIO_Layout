@@ -218,10 +218,10 @@ else:
     pages = {0: "Dum", 1: "One", 2: "Two", 3: "Thr", 3: "For"}
 
 # add the pages to the layout, supply your own page names
-test_page_layout.add_content(pge1_group, pages[0])
-test_page_layout.add_content(pge2_group, pages[1])
-test_page_layout.add_content(pge3_group, pages[2])
-test_page_layout.add_content(pge4_group, pages[3])
+test_page_layout.add_content(pge1_group, pages[1])
+test_page_layout.add_content(pge2_group, pages[2])
+test_page_layout.add_content(pge3_group, pages[3])
+test_page_layout.add_content(pge4_group, pages[4])
 
 # test_page_layout.add_content(displayio.Group(), "page_5")
 
