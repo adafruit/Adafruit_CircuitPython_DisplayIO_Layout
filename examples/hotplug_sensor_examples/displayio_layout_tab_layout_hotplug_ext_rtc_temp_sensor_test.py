@@ -212,7 +212,10 @@ pge4_group.append(pge4_lbl2)
 pge4_group.append(pge4_lbl3)
 pge4_group.append(rectangle)
 
-pages = {0: "One", 1: "Two", 2: "Thr", 3: "For"}
+if board.board_id == "pyportal_titano":
+    pages = {0: "Dum", 1: "One", 2: "Two", 3: "Three", 4: "Four"}
+else:
+    pages = {0: "Dum", 1: "One", 2: "Two", 3: "Thr", 3: "For"}
 
 # add the pages to the layout, supply your own page names
 test_page_layout.add_content(pge1_group, pages[0])
