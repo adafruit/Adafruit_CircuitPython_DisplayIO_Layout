@@ -109,12 +109,12 @@ test_page_layout = TabLayout(
     display=board.DISPLAY,
     tab_text_scale=2,
     custom_font=font,
-    inactive_tab_spritesheet="lib/adafruit_displayio_layout/examples/bmps/inactive_tab_sprite.bmp",
-    showing_tab_spritesheet="lib/adafruit_displayio_layout/examples/bmps/active_tab_sprite.bmp",
-    active_tab_text_color=0x00AA59,
+    inactive_tab_spritesheet="bmps/inactive_tab_sprite.bmp",
+    showing_tab_spritesheet="bmps/active_tab_sprite.bmp",
+    showing_tab_text_color=0x00AA59,
     inactive_tab_text_color=0xEEEEEE,
     inactive_tab_transparent_indexes=(0, 1),
-    active_tab_transparent_indexes=(0, 1),
+    showing_tab_transparent_indexes=(0, 1),
     tab_count=4,
 )
 
