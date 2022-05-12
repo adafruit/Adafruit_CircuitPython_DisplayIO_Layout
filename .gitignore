@@ -45,3 +45,4 @@ _build
 .idea
 .vscode
 *~
+examples/hotplug_sensor_examples/images/BGimage4.bmp
