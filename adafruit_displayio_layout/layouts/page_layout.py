@@ -53,11 +53,11 @@ class PageLayout(displayio.Group):
         self.x = x
         self.y = y
 
-        self._page_content_list = []
+        self.page_content_list = []
         self._cur_showing_index = 0
 
     def add_content(self, page_content, page_name=None):
-        """Add a child to the grid.
+        """Add a child to the page layout.
 
         :param page_content: the content for the page typically a Group
         :param page_name: the name of this page
@@ -72,10 +72,10 @@ class PageLayout(displayio.Group):
             "page_name": page_name,
         }
 
-        if len(self._page_content_list) > 0:
+        if len(self.page_content_list) > 0:
             _page_group.hidden = True
 
-        self._page_content_list.append(sub_view_obj)
+        self.page_content_list.append(sub_view_obj)
         self.append(_page_group)
 
     def _check_args(self, page_name, page_index):
@@ -95,16 +95,16 @@ class PageLayout(displayio.Group):
             )
 
         if page_index is not None:
-            if page_index >= len(self._page_content_list):
+            if page_index >= len(self.page_content_list):
                 raise KeyError(
                     "KeyError at index {} in list length {}".format(
-                        page_index, len(self._page_content_list)
+                        page_index, len(self.page_content_list)
                     ),
                 )
 
         if page_name is not None:
             _found = False
-            for page in self._page_content_list:
+            for page in self.page_content_list:
                 if not _found:
                     if page_name == page["page_name"]:
                         _found = True
@@ -125,10 +125,10 @@ class PageLayout(displayio.Group):
         self._check_args(page_name, page_index)
 
         if page_index is not None:
-            return self._page_content_list[page_index]
+            return self.page_content_list[page_index]
 
         if page_name is not None:
-            for cell in self._page_content_list:
+            for cell in self.page_content_list:
                 if cell["page_name"] == page_name:
                     return cell
 
@@ -149,7 +149,7 @@ class PageLayout(displayio.Group):
 
         self._check_args(page_name, page_index)
 
-        for cur_index, page in enumerate(self._page_content_list):
+        for cur_index, page in enumerate(self.page_content_list):
             if page_name is not None:
                 if page["page_name"] == page_name:
                     self._cur_showing_index = cur_index
@@ -182,7 +182,7 @@ class PageLayout(displayio.Group):
         Name of the currently showing page
         :return string: showing_page_name
         """
-        return self._page_content_list[self._cur_showing_index]["page_name"]
+        return self.page_content_list[self._cur_showing_index]["page_name"]
 
     @showing_page_name.setter
     def showing_page_name(self, new_name):
@@ -194,7 +194,7 @@ class PageLayout(displayio.Group):
         The content object for the currently showing page
         :return Displayable: showing_page_content
         """
-        return self._page_content_list[self._cur_showing_index]["content"][0]
+        return self.page_content_list[self._cur_showing_index]["content"][0]
 
     def next_page(self, loop=True):
         """
@@ -203,7 +203,7 @@ class PageLayout(displayio.Group):
         :return: None
         """
 
-        if self._cur_showing_index + 1 < len(self._page_content_list):
+        if self._cur_showing_index + 1 < len(self.page_content_list):
             self.show_page(page_index=self._cur_showing_index + 1)
         else:
             if not loop:
@@ -223,4 +223,4 @@ class PageLayout(displayio.Group):
             if not loop:
                 print("No more pages")
             else:
-                self.show_page(page_index=len(self._page_content_list) - 1)
+                self.show_page(page_index=len(self.page_content_list) - 1)
