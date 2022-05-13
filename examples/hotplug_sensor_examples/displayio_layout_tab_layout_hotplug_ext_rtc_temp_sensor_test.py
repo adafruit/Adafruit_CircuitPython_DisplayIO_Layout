@@ -4,7 +4,7 @@
 """
 Make a PageLayout and illustrate all of it's features
 """
-# pylint: disable-all
+# pylint: disable=global-statement
 import time
 import displayio
 import board
@@ -64,7 +64,6 @@ if my_debug:
 
 
 lStart = True
-rtc_present = None
 rtc = None
 o_secs = 0  # old seconds
 c_secs = 0  # current seconds
@@ -74,7 +73,6 @@ dt_refresh = True
 
 sDT_old = ""
 
-t_sensor_present = None
 tmp117 = None
 t0 = None
 t1 = None
@@ -215,7 +213,7 @@ pge4_group.append(rectangle)
 if board.board_id == "pyportal_titano":
     pages = {0: "Dum", 1: "One", 2: "Two", 3: "Three", 4: "Four"}
 else:
-    pages = {0: "Dum", 1: "One", 2: "Two", 3: "Thr", 3: "For"}
+    pages = {0: "Dum", 1: "One", 2: "Two", 3: "Thr", 4: "For"}
 
 # add the pages to the layout, supply your own page names
 test_page_layout.add_content(pge1_group, pages[1])
@@ -269,9 +267,9 @@ old_temp = 0.00
 
 
 def connect_temp_sensor():
-    global t_sensor_present, tmp117, t0, t1, t2
+    global tmp117, t0, t1, t2
     t = "temperature sensor found"
-    t_sensor_present = False
+
     tmp117 = None
 
     try:
@@ -280,9 +278,6 @@ def connect_temp_sensor():
         pass
 
     if tmp117 is not None:
-        t_sensor_present = True
-
-    if t_sensor_present:
         print(t)
         print("temperature sensor connected")
         t0 = "Temperature"
@@ -299,15 +294,13 @@ def connect_temp_sensor():
 """
   If the external rtc has been disconnected,
   this function will try to reconnect (test if the external rtc is present by now)
-  If reconnected this function sets the global variable rtc_present
-  If failed to reconnect the function clears rtc_present
 """
 
 
 def connect_rtc():
-    global rtc_present, rtc, lStart
+    global rtc, lStart
     t = "RTC found"
-    rtc_present = False
+
     rtc = None
     try:
         rtc = DS3231(i2c)  # i2c addres 0x68
@@ -315,7 +308,6 @@ def connect_rtc():
         pass
 
     if rtc is not None:
-        rtc_present = True
         print(t)
         print("RTC connected")
         if lStart:
@@ -332,15 +324,17 @@ temp_in_REPL = False
    It only updates if the value has changed compared to the previous value
    A fixed text is set in pge4_lbl2.text. The variable temperature value is set in pge4_lbl3.text
    If no value obtained (for instance if the sensor is disconnected),
-   the function sets the pge4_lbl to a default text and makes empty pge4_lbl2.text and pge4_lbl3.text
+   the function sets the pge4_lbl to a default text and makes empty
+   pge4_lbl2.text and pge4_lbl3.text
 """
 
 
 def get_temp():
-    global t_sensor_present, old_temp, tmp117, pge4_lbl, pge4_lbl2, pge4_lbl3, temp_in_REPL
+    global old_temp, tmp117, temp_in_REPL
+
     showing_page_idx = test_page_layout.showing_page_index
     RetVal = False
-    if t_sensor_present:
+    if tmp117 is not None:
         try:
             temp = tmp117.temperature
             t = "{:5.2f} ".format(temp) + t1
@@ -367,7 +361,6 @@ def get_temp():
         except OSError:
             print("Temperature sensor has disconnected")
             t = ""
-            t_sensor_present = False
             tmp117 = None
             pge4_lbl.text = pge4_lbl_dflt  # clean the line  (eventually: t2)
             pge4_lbl2.text = ""
@@ -391,7 +384,7 @@ ss = 5
 
 
 def handle_dt(dt):
-    global pge3_lbl, pge3_lbl2, pge3_lbl3, o_secs, c_secs, dt_refresh, sDT_old
+    global o_secs, c_secs, dt_refresh, sDT_old
     RetVal = False
     s = "Date/time: "
     sYY = str(dt[yy])
@@ -456,18 +449,17 @@ def handle_dt(dt):
 
 
 def get_dt():
-    global rtc_present, pge3_lbl, pge3_lbl2, pge3_lbl3
+
     dt = None
     RetVal = False
 
-    if rtc_present:
+    if rtc is not None:
         try:
             dt = rtc.datetime
         except OSError as exc:
             if my_debug:
                 print("Error number: ", exc.args[0])
             if exc.args[0] == 5:  # Input/output error
-                rtc_present = False
                 print("get_dt(): OSError occurred. RTC probably is disconnected")
                 pge3_lbl.text = pge3_lbl_dflt
                 return RetVal
@@ -491,12 +483,12 @@ def main():
         try:
             print("Loop nr: {:03d}".format(cnt))
 
-            if rtc_present:
+            if rtc is not None:
                 get_dt()
             else:
                 connect_rtc()
 
-            if t_sensor_present:
+            if tmp117 is not None:
                 get_temp()
             else:
                 connect_temp_sensor()
