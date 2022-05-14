@@ -4,7 +4,7 @@
 """
 Make a PageLayout and illustrate all of it's features
 """
-# pylint: disable=global-statement
+
 import time
 import displayio
 import board
@@ -15,14 +15,138 @@ from adafruit_display_text.bitmap_label import Label
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.triangle import Triangle
-
-# from adafruit_bitmap_font import bitmap_font
 from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
-# Adjust here the date and time that you want the RTC to be set at start:
-default_dt = time.struct_time((2022, 5, 12, 18, 34, 0, 3, -1, -1))
+# +-------------------------------------------------------+
+# | Definition for variables in the past defined as global|
+# +-------------------------------------------------------+
+# The gVars class is created
+# to elminate the need for global variables.
 
-my_debug = True
+
+class gVars:
+    def __init__(self):
+
+        self.gVarsDict = {
+            0: "my_debug",
+            1: "rtc",
+            2: "temp_sensor",
+            3: "lStart",
+            4: "o_secs",
+            5: "c_secs",
+            6: "dt_refresh",
+            7: "sDT_old",
+            8: "t0",
+            9: "t1",
+            10: "t2",
+            11: "default_dt",
+            12: "pge3_lbl_dflt",
+            13: "pge4_lbl_dflt",
+            14: "online_time_present",
+            15: "temp_in_REPL",
+            16: "old_temp",
+            17: "use_ntp",
+            18: "use_txt_in_month",
+            19: "use_usa_notation",
+            20: "content_sensor_idx",
+        }
+
+        self.gVars_rDict = {
+            "my_debug": 0,
+            "rtc": 1,
+            "temp_sensor": 2,
+            "lStart": 3,
+            "o_secs": 4,
+            "c_secs": 5,
+            "dt_refresh": 6,
+            "sDT_old": 7,
+            "t0": 8,
+            "t1": 9,
+            "t2": 10,
+            "default_dt": 11,
+            "pge3_lbl_dflt": 12,
+            "pge4_lbl_dflt": 13,
+            "online_time_present": 14,
+            "temp_in_REPL": 15,
+            "old_temp": 16,
+            "use_ntp": 17,
+            "use_txt_in_month": 18,
+            "use_usa_notation": 19,
+            "content_sensor_idx": 20,
+        }
+
+        self.g_vars = {}
+
+        # self.clean()
+
+    def write(self, s, value):
+        if isinstance(s, str):
+            if s in self.gVars_rDict:
+                n = self.gVars_rDict[s]
+                # print("myVars.write() \'{:" ">20s}\'found in self.gVars_rDict,
+                # key: {}".format(s, n))
+                self.g_vars[n] = value
+            else:
+                raise KeyError(
+                    "variable '{:" ">20s}' not found in self.gVars_rDict".format(s)
+                )
+        else:
+            raise TypeError(
+                "myVars.write(): param s expected str, {} received".format(type(s))
+            )
+
+    def read(self, s):
+        RetVal = None
+        if isinstance(s, str):
+            if s in self.gVars_rDict:
+                n = self.gVars_rDict[s]
+                if n in self.g_vars:
+                    RetVal = self.g_vars[n]
+        return RetVal
+
+    def clean(self):
+        self.g_vars = {
+            0: None,
+            1: None,
+            2: None,
+            3: None,
+            4: None,
+            5: None,
+            6: None,
+            7: None,
+            8: None,
+            9: None,
+            10: None,
+            11: None,
+            12: None,
+            13: None,
+            14: None,
+            15: None,
+            16: None,
+            17: None,
+            18: None,
+            19: None,
+            20: None,
+        }
+
+    def list(self):
+        for i in range(0, len(self.g_vars) - 1):
+            print(
+                "self.g_vars['{:"
+                ">20s}'] = {}".format(
+                    self.gVarsDict[i], self.g_vars[i] if i in self.g_vars else "None"
+                )
+            )
+
+
+# ---------- End of class gVars ------------------------
+
+myVars = gVars()  # create an instance of the gVars class
+
+myVars.write("my_debug", False)
+
+# Adjust here the date and time that you want the RTC to be set at start:
+myVars.write("default_dt", time.struct_time((2022, 5, 14, 19, 42, 0, 5, -1, -1)))
 
 months = {
     0: "Dum",
@@ -40,16 +164,11 @@ months = {
     12: "Dec",
 }
 
-use_txt_in_month = True
-use_usa_notation = True
-use_ntp = False
-
 i2c = board.I2C()
 
-if my_debug:
+if myVars.read("my_debug"):
     while not i2c.try_lock():
         pass
-
     try:
         while True:
             print(
@@ -58,34 +177,38 @@ if my_debug:
             )
             time.sleep(2)
             break
-
     finally:  # unlock the i2c bus when ctrl-c'ing out of the loop
         i2c.unlock()
 
-
-lStart = True
-rtc = None
-o_secs = 0  # old seconds
-c_secs = 0  # current seconds
-
-# used to flag when more or less static elements in datetime stamp have to be refreshed
-dt_refresh = True
-
-sDT_old = ""
-
-tmp117 = None
-t0 = None
-t1 = None
-t2 = None
+# -------------- Setting myVars elements ----------------------------------
+myVars.write("rtc", None)
+myVars.write("temp_sensor", None)
+myVars.write("lStart", True)
+myVars.write("o_secs", 0)  # old seconds
+myVars.write("c_secs", 0)  # current seconds
+# dt_refresh is used to flag when more or less static elements
+# in datetime stamp have to be refreshed
+myVars.write("dt_refresh", True)
+myVars.write("sDT_old", "")
+myVars.write("t0", None)
+myVars.write("t1", None)
+myVars.write("t2", None)
+# default_dt already set above
+myVars.write("pge3_lbl_dflt", "The third page is fun!")
+myVars.write("pge4_lbl_dflt", "The fourth page is where it's at")
+myVars.write("online_time_present", False)
+myVars.write("temp_in_REPL", False)
+myVars.write("old_temp", 0.00)
+myVars.write("use_txt_in_month", True)
+myVars.write("use_usa_notation", True)
+myVars.write("use_ntp", False)
+myVars.write("content_sensor_idx", None)
+# -------------------------------------------------------------------------
+if myVars.read("my_debug"):
+    # print list of all variables in myVars
+    myVars.list()
 
 # degs_sign = chr(186)  # I preferred the real degrees sign which is: chr(176)
-
-content_sensor_idx = None
-pge3_lbl_dflt = "The third page is fun!"
-pge4_lbl_dflt = "The fourth page is where it's at"
-
-online_time_present = None
-
 # -----------------------------------
 
 # built-in display
@@ -97,7 +220,7 @@ display.rotation = 0
 main_group = displayio.Group()
 display.show(main_group)
 
-# font = bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
+# fon.gvars bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
 font = terminalio.FONT
 
 # create the page layout
@@ -147,7 +270,7 @@ pge2_lbl = Label(
 pge3_lbl = Label(
     font=terminalio.FONT,
     scale=2,
-    text=pge3_lbl_dflt,  # Will be "Date/time:"
+    text=myVars.read("pge3_lbl_dflt"),  # Will be "Date/time:"
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
@@ -168,7 +291,7 @@ pge3_lbl3 = Label(
 pge4_lbl = Label(
     font=terminalio.FONT,
     scale=2,
-    text=pge4_lbl_dflt,
+    text=myVars.read("pge4_lbl_dflt"),
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
@@ -254,9 +377,7 @@ another_text = Label(terminalio.FONT, text="And another thing!", \
     anchored_position=(100, 100))
 test_page_layout.showing_page_content.append(another_text)
 """
-print("starting loop")
 
-old_temp = 0.00
 
 """
   If the temperature sensor has been disconnected,
@@ -267,28 +388,31 @@ old_temp = 0.00
 
 
 def connect_temp_sensor():
-    global tmp117, t0, t1, t2
     t = "temperature sensor found"
 
-    tmp117 = None
+    # myVars.write("temp_sensor",None)
 
     try:
-        tmp117 = adafruit_tmp117.TMP117(i2c)
+        myVars.write("temp_sensor", adafruit_tmp117.TMP117(i2c))
     except ValueError:  # ValueError occurs if the temperature sensor is not connected
         pass
 
-    if tmp117 is not None:
+    print(
+        "connect_temp_sensor(): type(temp_sensor) object = ",
+        type(myVars.read("temp_sensor")),
+    )
+    if myVars.read("temp_sensor") is not None:
         print(t)
         print("temperature sensor connected")
-        t0 = "Temperature"
-        t1 = " C"
-        t2 = 27 * "_"
+        myVars.write("t0", "Temperature")
+        myVars.write("t1", " C")
+        myVars.write("t2", 27 * "_")
     else:
         print("no " + t)
         print("failed to connect temperature sensor")
-        t0 = None
-        t1 = None
-        t2 = None
+        myVars.write("t0", None)
+        myVars.write("t1", None)
+        myVars.write("t2", None)
 
 
 """
@@ -298,27 +422,28 @@ def connect_temp_sensor():
 
 
 def connect_rtc():
-    global rtc, lStart
     t = "RTC found"
 
-    rtc = None
+    # myVars.write("rtc",None)
+
     try:
-        rtc = DS3231(i2c)  # i2c addres 0x68
+        myVars.write("rtc", DS3231(i2c))  # i2c addres 0x68
+        # myVars.write("rtc",rtc)
     except ValueError:
         pass
 
-    if rtc is not None:
+    print("connect_rtc() type rtc object = ", type(myVars.read("rtc")))
+    if myVars.read("rtc") is not None:
         print(t)
         print("RTC connected")
-        if lStart:
-            lStart = False
-            rtc.datetime = default_dt
+        if myVars.read("lStart"):
+            myVars.write("lStart", False)
+            myVars.read("rtc").datetime = myVars.read("default_dt")
     else:
         print("no " + t)
         print("Failed to connect RTC")
 
 
-temp_in_REPL = False
 """
    Function gets a value from the external temperature sensor
    It only updates if the value has changed compared to the previous value
@@ -330,44 +455,53 @@ temp_in_REPL = False
 
 
 def get_temp():
-    global old_temp, tmp117, temp_in_REPL
-
     showing_page_idx = test_page_layout.showing_page_index
     RetVal = False
-    if tmp117 is not None:
+    if myVars.read("temp_sensor") is not None:
         try:
-            temp = tmp117.temperature
-            t = "{:5.2f} ".format(temp) + t1
-            if my_debug and temp is not None and not temp_in_REPL:
-                temp_in_REPL = True
-                print("get_temp(): {} {}".format(t0, t))
+            temp = myVars.read("temp_sensor").temperature
+            t = "{:5.2f} ".format(temp) + myVars.read("t1")
+            if (
+                myVars.read("my_debug")
+                and temp is not None
+                and not myVars.read("temp_in_REPL")
+            ):
+                myVars.write("temp_in_REPL", True)
+                print("get_temp(): {} {}".format(myVars.read("t0"), t))
             if showing_page_idx == 3:  # show temperature on most right Tab page
                 if temp is not None:
-                    if (
-                        temp != old_temp
+                    if temp != myVars.read(
+                        "old_temp"
                     ):  # Only update if there is a change in temperature
-                        old_temp = temp
-                        t = "{:5.2f} ".format(temp) + t1
+                        myVars.write("old_temp", temp)
+                        t = "{:5.2f} ".format(temp) + myVars.read("t1")
                         pge4_lbl.text = ""
-                        pge4_lbl2.text = t0
+                        pge4_lbl2.text = myVars.read("t0")
                         pge4_lbl3.text = t
                         # if not my_debug:
-                        # print("pge4_lbl.text = {}".format(pge4_lbl.text))
+                        # print("pge4_lbl.tex.gvars {}".format(pge4_lbl.text))
                         # time.sleep(2)
                         RetVal = True
                 else:
                     t = ""
-                    pge4_lbl.text = pge4_lbl_dflt
+                    pge4_lbl.text = myVars.read("pge4_lbl_dflt")
         except OSError:
             print("Temperature sensor has disconnected")
             t = ""
-            tmp117 = None
-            pge4_lbl.text = pge4_lbl_dflt  # clean the line  (eventually: t2)
+            myVars.write("temp_sensor", None)
+            pge4_lbl.text = myVars.read(
+                "pge4_lbl_dflt"
+            )  # clean the line  (eventually: t2)
             pge4_lbl2.text = ""
             pge4_lbl3.text = ""
 
     return RetVal
 
+
+"""
+    Function called by get_dt()
+    Created to repair pylint error R0912: Too many branches (13/12)
+"""
 
 yy = 0
 mo = 1
@@ -377,20 +511,14 @@ mm = 4
 ss = 5
 
 
-"""
-    Function called by get_dt()
-    Created to repair pylint error R0912: Too many branches (13/12)
-"""
-
-
 def handle_dt(dt):
-    global o_secs, c_secs, dt_refresh, sDT_old
+
     RetVal = False
     s = "Date/time: "
     sYY = str(dt[yy])
     sMO = (
         months[dt[mo]]
-        if use_txt_in_month
+        if myVars.read("use_txt_in_month")
         else "0" + str(dt[mo])
         if dt[mo] < 10
         else str(dt[mo])
@@ -401,33 +529,34 @@ def handle_dt(dt):
     for _ in range(dd, ss + 1):
         dt_dict[_] = "0" + str(dt[_]) if dt[_] < 10 else str(dt[_])
 
-    if my_debug:
+    if myVars.read("my_debug"):
         print("dt_dict = ", dt_dict)
 
-    c_secs = dt_dict[ss]
+    myVars.write("c_secs", dt_dict[ss])
     sDT = (
         sMO + "-" + dt_dict[dd] + "-" + sYY
-        if use_usa_notation
+        if myVars.read("use_usa_notation")
         else sYY + "-" + sMO + "-" + dt_dict[dd]
     )
-
-    if sDT_old != sDT:
-        sDT_old = sDT
-        dt_refresh = True  # The date has changed, set the refresh flag
+    if myVars.read("my_debug"):
+        print("handle_dt(): sDT_old = {}, sDT = {}".format(myVars.read("sDT_old"), sDT))
+    if myVars.read("sDT_old") != sDT:
+        myVars.write("sDT_old", sDT)
+        myVars.write("dt_refresh", True)  # The date has changed, set the refresh flag
     sDT2 = dt_dict[hh] + ":" + dt_dict[mm] + ":" + dt_dict[ss]
 
-    if dt_refresh:  # only refresh when needed
-        dt_refresh = False
+    if myVars.read("dt_refresh"):  # only refresh when needed
+        myVars.write("dt_refresh", False)
         pge3_lbl.text = s
         pge3_lbl2.text = sDT
 
-    if c_secs != o_secs:
-        o_secs = c_secs
+    if myVars.read("c_secs") != myVars.read("o_secs"):
+        myVars.write("o_secs", myVars.read("c_secs"))
         sDT3 = s + "{} {}".format(sDT, sDT2)
         print(sDT3)
 
         pge3_lbl3.text = sDT2
-        if my_debug:
+        if myVars.read("my_debug"):
             print("pge3_lbl.text = {}".format(pge3_lbl.text))
             print("pge3_lbl2.text = {}".format(pge3_lbl2.text))
             print("pge3_lbl3.text = {}".format(pge3_lbl3.text))
@@ -449,32 +578,39 @@ def handle_dt(dt):
 
 
 def get_dt():
-
     dt = None
     RetVal = False
 
-    if rtc is not None:
+    if myVars.read("rtc") is not None:
         try:
-            dt = rtc.datetime
+            dt = myVars.read("rtc").datetime
         except OSError as exc:
-            if my_debug:
+            if myVars.read("my_debug"):
                 print("Error number: ", exc.args[0])
             if exc.args[0] == 5:  # Input/output error
                 print("get_dt(): OSError occurred. RTC probably is disconnected")
-                pge3_lbl.text = pge3_lbl_dflt
+                pge3_lbl.text = myVars.read("pge3_lbl_dflt")
+                myVars.write("sDT_old", "")
+                pge3_lbl2.text = ""
+                pge3_lbl3.text = ""
                 return RetVal
             raise  # Handle other errors
 
-    elif online_time_present or use_ntp:
+    elif myVars.read("online_time_present") or myVars.read("use_ntp"):
         dt = time.localtime()
 
+    if myVars.read("my_debug"):
+        print("get_dt(): dt = ", dt)
     if dt is not None:
         RetVal = handle_dt(dt)
     else:
-        pge3_lbl.text = pge3_lbl_dflt
+        pge3_lbl.text = myVars.read("pge3_lbl_dflt")
         pge3_lbl2.text = ""
         pge3_lbl3.text = ""
     return RetVal
+
+
+print("starting loop")
 
 
 def main():
@@ -482,17 +618,16 @@ def main():
     while True:
         try:
             print("Loop nr: {:03d}".format(cnt))
-
-            if rtc is not None:
+            # print("main(): type(rtc) object = ", type(myVars.read("rtc")))
+            if myVars.read("rtc") is not None:
                 get_dt()
             else:
                 connect_rtc()
-
-            if tmp117 is not None:
+            # print("main(): type(temp_sensor) object = ", type(myVars.read("temp_sensor")))
+            if myVars.read("temp_sensor") is not None:
                 get_temp()
             else:
                 connect_temp_sensor()
-
             cnt += 1
             if cnt > 999:
                 cnt = 0
