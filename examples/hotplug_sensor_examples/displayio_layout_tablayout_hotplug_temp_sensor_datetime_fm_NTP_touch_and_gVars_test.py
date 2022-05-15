@@ -791,7 +791,7 @@ def handle_dt(dt):
     ss = dt_ridxs["ss"]
     if "mo" in dt_ridxs:
         sMO = (
-            months[dt_ridxs["mo"]]  # was: months[dt[mo]]
+            months[dt[dt_ridxs["mo"]]]  # was: months[dt[mo]]
             if myVars.read("use_txt_in_month")
             else "0" + str(dt[dt_ridxs["mo"]])
             if dt[dt_ridxs["mo"]] < 10
