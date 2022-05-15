@@ -2,16 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 """
-Notes by @PaulskPt: tested on an Adafruit PyPortal Titano
+Notes by @PaulskPt
+Script tested on an Adafruit PyPortal Titano
 (Product ID 4444. See: https://www.adafruit.com/product/4444)
 This script can make use of an I2C Realtime Clock type DS3231
-When the flag 'use_ntp' is set, the DS3231 will not be used,
+However, when the flag 'use_ntp' is set, the DS3231 will not be used
 instead the NTP class from adafruit_ntp.py will be used.
 """
-
 import time
-
-# import gc
 import board
 import busio
 import displayio
@@ -30,6 +28,7 @@ from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.triangle import Triangle
 from adafruit_bitmap_font import bitmap_font
 from adafruit_displayio_layout.layouts.tab_layout import TabLayout
+
 
 # +-------------------------------------------------------+
 # | Definition for variables in the past defined as global|
@@ -233,18 +232,6 @@ esp32_reset = DigitalInOut(board.ESP_RESET)
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 esp = adafruit_esp32spi.ESP_SPIcontrol(spi, esp32_cs, esp32_ready, esp32_reset)
 
-# ---------- Text Boxes ------------- #
-# Set the font and preload letters
-font_arial = bitmap_font.load_font(
-    "/fonts/Arial-16.bdf"
-)  # was: Helvetica-Bold-16.bdf")
-# font.load_glyphs(b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()")
-glyphs = b' "(),-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-font_arial.load_glyphs(glyphs)
-font_arial.load_glyphs(("°",))  # a non-ascii character we need
-# gc.collect()  # ADDED by @PaulskPt -- to prevent MemoryError - memory allocation failed,
-#               allocating 6444 bytes
-
 # ------------- Screen Setup ------------- #
 pyportal = None
 timeout_cnt = 0
@@ -367,8 +354,10 @@ def refresh_from_NTP():
         if timeout_cnt2 > 10:
             print("Timeout while trying to get ntp datetime to set the internal rtc")
             break
+
     if myVars.read("my_debug"):
         print("Value ntp.valid_time = ", ntp.valid_time)
+
     if ntp.valid_time:
         myVars.write("online_time_present", True)
         myVars.write("ntp_refresh", False)
@@ -377,6 +366,7 @@ def refresh_from_NTP():
         ntp_current_time = time.time()
         if myVars.read("my_debug"):
             print("Seconds since Jan 1, 1970: {} seconds".format(ntp_current_time))
+
         # Convert the current time in seconds since Jan 1, 1970 to a struct_time
         myVars.write("default_dt", time.localtime(ntp_current_time))
         if not myVars.read("my_debug"):
@@ -463,8 +453,8 @@ main_group = displayio.Group()  # The Main Display Group
 display.show(main_group)
 
 # font = bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
-# font = bitmap_font.load_font("/fonts/Arial-16.bdf")
-font = terminalio.FONT
+font_arial = bitmap_font.load_font("/fonts/Arial-16.bdf")
+font_term = terminalio.FONT
 
 # create the page layout
 test_page_layout = TabLayout(
@@ -472,7 +462,7 @@ test_page_layout = TabLayout(
     y=0,
     display=board.DISPLAY,
     tab_text_scale=2,
-    custom_font=font,
+    custom_font=font_term,
     inactive_tab_spritesheet="lib/adafruit_displayio_layout/examples/bmps/inactive_tab_sprite.bmp",
     showing_tab_spritesheet="lib/adafruit_displayio_layout/examples/bmps/active_tab_sprite.bmp",
     showing_tab_text_color=0x00AA59,
@@ -501,34 +491,29 @@ def set_image(group, filename):
         :param filename: The filename of the chosen image
     """
     print("Set image to ", filename)
+    image = None
+    image_sprite = None
     if group:
         group.pop()
     if not filename:
         return  # we're done, no icon desired
     # CircuitPython 6 & 7 compatible
-    image_file = None
     try:
-        # image_file = open(filename, "rb")
-        with open(filename, "rb") as image_file:
-            image = displayio.OnDiskBitmap(image_file)
+        image = displayio.OnDiskBitmap(filename)
     except OSError as exc:
         if exc.args[0] == 2:  # No such file/directory
             return
-    finally:
-        if image_file is not None:
-            image_file.close()
-
-    image_sprite = displayio.TileGrid(
-        image, pixel_shader=getattr(image, "pixel_shader", displayio.ColorConverter())
-    )
-
-    # # CircuitPython 7+ compatible
-    # image = displayio.OnDiskBitmap(filename)
-    # image_sprite = displayio.TileGrid(image, pixel_shader=image.pixel_shader)
-    main_group.append(image_sprite)
+    if image is not None:
+        image_sprite = displayio.TileGrid(
+            image,
+            pixel_shader=getattr(image, "pixel_shader", displayio.ColorConverter()),
+        )
+        if image_sprite is not None:
+            main_group.append(image_sprite)
 
 
 # ------------- Setup for Images ------------- #
+
 bg_group = displayio.Group()
 set_image(bg_group, "/images/BGimage4.bmp")
 print(
@@ -544,71 +529,70 @@ pge2_group.append(icon_group)
 
 # labels
 pge1_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="This is the first page!",
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge1_lbl2 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="Please wait...",
     anchor_point=(0, 0),
     anchored_position=(10, 150),
 )
 pge2_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="This page is the second page!",
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge3_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text=myVars.read("pge3_lbl_dflt"),  # Will be "Date/time:"
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge3_lbl2 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="",  # pge3_lbl2_dflt,   # Will be DD-MO-YYYY or Month-DD-YYYY
     anchor_point=(0, 0),
     anchored_position=(10, 40),
 )
 pge3_lbl3 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="",  # pge3_lbl3_dflt,  # Will be HH:MM:SS
     anchor_point=(0, 0),
     anchored_position=(10, 70),
 )
 pge3_lbl4 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="",  # pge3_lbl3_dflt,  # Will be time until next NTP sync in MM:SS
     anchor_point=(0, 0),
     anchored_position=(10, 200),
 )
 pge4_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text=myVars.read("pge4_lbl_dflt"),
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge4_lbl2 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="",  # Will be "Temperature"
     anchor_point=(0, 0),
     anchored_position=(10, 130),
 )
-
 pge4_lbl3 = Label(
-    font=font_arial,
+    font=font_arial,  # bitmap_font.load_font("/fonts/Arial-16.bdf"),
     scale=2,
     text="",  # Will be  "xx.yy ºC"
     anchor_point=(0, 0),
@@ -620,6 +604,7 @@ square = Rect(x=20, y=70, width=40, height=40, fill=0x00DD00)
 circle = Circle(50, 100, r=30, fill=0xDD00DD)
 triangle = Triangle(50, 0, 100, 50, 0, 50, fill=0xDDDD00)
 rectangle = Rect(x=80, y=60, width=100, height=50, fill=0x0000DD)
+
 triangle.x = 80
 triangle.y = 70
 
@@ -653,12 +638,24 @@ test_page_layout.add_content(pge4_group, pages[4])
 # add it to the group that is showing on the display
 main_group.append(test_page_layout)
 # test_page_layout.tab_tilegrids_group[3].x += 50
+# ---------- Text Boxes ------------- #
+# Set the font and preload letters
+# font = bitmap_font.load_font("/fonts/Arial-16.bdf")  # was: Helvetica-Bold-16.bdf")
+# font.load_glyphs(b"abcdefghjiklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890- ()")
+glyphs = b' "(),-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+font_arial.load_glyphs(glyphs)
+font_arial.load_glyphs(("°",))  # a non-ascii character we need
+# gc.collect()  # ADDED by @PaulskPt -- to prevent MemoryError - memory allocation failed,
+#               allocating 6444 bytes
+
 pge2_group = 1
 
 
-"""If the temperature sensor has been disconnected,
+"""
+  If the temperature sensor has been disconnected,
   this function will try to reconnect (test if the sensor is present by now)
-  If reconnected this function creates the temp_sensor object"""
+  If reconnected this function creates the temp_sensor object
+"""
 
 
 def connect_temp_sensor():
@@ -689,8 +686,10 @@ def connect_temp_sensor():
         myVars.write("t2", None)
 
 
-"""If the external rtc has been disconnected,
-  this function will try to reconnect (test if the external rtc is present by now)"""
+"""
+  If the external rtc has been disconnected,
+  this function will try to reconnect (test if the external rtc is present by now)
+"""
 
 
 def connect_rtc():
@@ -716,12 +715,14 @@ def connect_rtc():
         print("Failed to connect RTC")
 
 
-"""Function gets a value from the external temperature sensor
+"""
+   Function gets a value from the external temperature sensor
    It only updates if the value has changed compared to the previous value
    A fixed text is set in pge4_lbl2.text. The variable temperature value is set in pge4_lbl3.text
    If no value obtained (for instance if the sensor is disconnected),
    the function sets the pge4_lbl to a default text and makes empty
-   pge4_lbl2.text and pge4_lbl3.text"""
+   pge4_lbl2.text and pge4_lbl3.text
+"""
 
 
 def get_temp():
@@ -761,7 +762,6 @@ def get_temp():
             )  # clean the line  (eventually: t2)
             pge4_lbl2.text = "Sensor disconnected."
             pge4_lbl3.text = "Check wiring."
-
     return RetVal
 
 
@@ -843,11 +843,14 @@ def handle_dt(dt):
     return RetVal
 
 
-"""  Function gets the date and time:  a) if an rtc is present from the rtc;
+"""
+   Function gets the date and time:
+   a) if an rtc is present from the rtc;
    b) if using online NTP pool server then get the date and time from the function time.localtime
    This time.localtime has before been set with data from the NTP server.
    In both cases the date and time will be set to the pge3_lbl, pge3_lbl12 and pge3_lbl3
-   If no (valid) datetime a default text will be shown on the pge3_lbl"""
+   If no (valid) date and time has been received then a default text will be shown on the pge3_lbl
+"""
 
 
 def get_dt():
@@ -905,16 +908,13 @@ def ck_next_NTP_sync():
     c_elapsed = c_cnt - s_cnt
     if c_elapsed < 10:  # continue only when c_elapsed >= 10
         return
-
     TAG = "ck_next_NTP_sync(): "
     my_debug = myVars.read("my_debug")
     t1 = myVars.read("next_NTP_sync_t1")
     t3 = myVars.read("next_NTP_sync_t3")
     five_min = myVars.read("five_min_cnt")
     myVars.write("s_cnt", hms_to_cnt())
-
     # --- five minutes count down calculations #1 ---
-
     if my_debug:
         print(
             TAG + "five_min = {}, s_cnt = {}, c_cnt = {}".format(five_min, s_cnt, c_cnt)
@@ -958,7 +958,6 @@ def main():
     while True:
         touch = ts.touch_point
         try:
-
             if use_ntp:
                 ck_next_NTP_sync()
             ntp_refresh = myVars.read("ntp_refresh")
@@ -986,7 +985,6 @@ def main():
                 #    the touch data has lost
             if myVars.read("temp_in_REPL"):
                 myVars.write("temp_in_REPL", False)
-
             cnt = inc_cnt(cnt)
         except KeyboardInterrupt as exc:
             print("Keyboard interrupt...exiting...")
