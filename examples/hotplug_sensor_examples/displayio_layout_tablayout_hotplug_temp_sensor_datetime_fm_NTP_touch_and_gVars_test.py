@@ -69,6 +69,7 @@ class gVars:
             25: "five_min_cnt",
             26: "next_NTP_sync_t1",
             27: "next_NTP_sync_t3",
+            28: "temp_in_fahrenheit",
         }
 
         self.gVars_rDict = {
@@ -100,6 +101,7 @@ class gVars:
             "five_min_cnt": 25,
             "next_NTP_sync_t1": 26,
             "next_NTP_sync_t3": 27,
+            "temp_in_fahrenheit": 28,
         }
 
         self.g_vars = {}
@@ -161,6 +163,7 @@ class gVars:
             25: None,
             26: None,
             27: None,
+            28: None,
         }
 
     def list(self):
@@ -213,6 +216,7 @@ myVars.write("s_cnt", 0)
 myVars.write("five_min_cnt", 0)
 myVars.write("next_NTP_sync_t1", "Next NTP sync in ")
 myVars.write("next_NTP_sync_t3", " (mm:ss)")
+myVars.write("temp_in_fahrenheit", True)
 # nHH_old is used to check if the hour has changed.
 # If so we have to re-sync from NTP server
 # (if not using an external RTC)
@@ -645,17 +649,16 @@ main_group.append(test_page_layout)
 glyphs = b' "(),-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 font_arial.load_glyphs(glyphs)
 font_arial.load_glyphs(("°",))  # a non-ascii character we need
-# gc.collect()  # ADDED by @PaulskPt -- to prevent MemoryError - memory allocation failed,
+# font=font_term.collect()  # ADDED by @PaulskPt --
+# to prevent MemoryError - memory allocation failed,
 #               allocating 6444 bytes
 
 pge2_group = 1
 
 
-"""
-  If the temperature sensor has been disconnected,
+"""If the temperature sensor has been disconnected,
   this function will try to reconnect (test if the sensor is present by now)
-  If reconnected this function creates the temp_sensor object
-"""
+  If reconnected this function creates the temp_sensor object"""
 
 
 def connect_temp_sensor():
@@ -676,7 +679,10 @@ def connect_temp_sensor():
         print(t)
         print("temperature sensor connected")
         myVars.write("t0", "Temperature")
-        myVars.write("t1", chr(186) + "C")
+        if myVars.read("temp_in_fahrenheit"):
+            myVars.write("t1", chr(186) + "F")
+        else:
+            myVars.write("t1", chr(186) + "C")
         myVars.write("t2", 27 * "_")
     else:
         print("no " + t)
@@ -686,10 +692,8 @@ def connect_temp_sensor():
         myVars.write("t2", None)
 
 
-"""
-  If the external rtc has been disconnected,
-  this function will try to reconnect (test if the external rtc is present by now)
-"""
+"""  If the external rtc has been disconnected,
+  this function will try to reconnect (test if the external rtc is present by now)"""
 
 
 def connect_rtc():
@@ -715,14 +719,12 @@ def connect_rtc():
         print("Failed to connect RTC")
 
 
-"""
-   Function gets a value from the external temperature sensor
+"""Function gets a value from the external temperature sensor
    It only updates if the value has changed compared to the previous value
    A fixed text is set in pge4_lbl2.text. The variable temperature value is set in pge4_lbl3.text
    If no value obtained (for instance if the sensor is disconnected),
    the function sets the pge4_lbl to a default text and makes empty
-   pge4_lbl2.text and pge4_lbl3.text
-"""
+   pge4_lbl2.text and pge4_lbl3.text"""
 
 
 def get_temp():
@@ -732,6 +734,8 @@ def get_temp():
     if myVars.read("temp_sensor") is not None:
         try:
             temp = myVars.read("temp_sensor").temperature
+            if myVars.read("temp_in_fahrenheit"):
+                temp = (temp * 1.8) + 32
             t = "{:5.2f}{} ".format(temp, myVars.read("t1"))
             if my_debug and temp is not None and not myVars.read("temp_in_REPL"):
                 myVars.write("temp_in_REPL", True)
@@ -767,7 +771,6 @@ def get_temp():
 
 # Moved these six definitions outside handle_dt()
 # to correct pylint error 'too many variables'
-# dt_idxs = {0: "yy", 1:"mo", 2:"dd", 3:"hh", 4:"mm", 5:"ss"}
 dt_ridxs = {"yy": 0, "mo": 1, "dd": 2, "hh": 3, "mm": 4, "ss": 5}
 
 # print("dict dt_ridxs =", dt_ridxs.keys())
@@ -843,14 +846,12 @@ def handle_dt(dt):
     return RetVal
 
 
-"""
-   Function gets the date and time:
+"""Function gets the date and time:
    a) if an rtc is present from the rtc;
    b) if using online NTP pool server then get the date and time from the function time.localtime
    This time.localtime has before been set with data from the NTP server.
    In both cases the date and time will be set to the pge3_lbl, pge3_lbl12 and pge3_lbl3
-   If no (valid) date and time has been received then a default text will be shown on the pge3_lbl
-"""
+   If no (valid) date and time received then a default text will be shown on the pge3_lbl"""
 
 
 def get_dt():
