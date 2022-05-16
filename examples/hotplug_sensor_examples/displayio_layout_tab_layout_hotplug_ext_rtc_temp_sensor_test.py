@@ -15,6 +15,7 @@ from adafruit_display_text.bitmap_label import Label
 from adafruit_display_shapes.rect import Rect
 from adafruit_display_shapes.circle import Circle
 from adafruit_display_shapes.triangle import Triangle
+from adafruit_bitmap_font import bitmap_font
 from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
 # +-------------------------------------------------------+
@@ -49,6 +50,7 @@ class gVars:
             18: "use_txt_in_month",
             19: "use_usa_notation",
             20: "content_sensor_idx",
+            21: "temp_in_fahrenheit",
         }
 
         self.gVars_rDict = {
@@ -73,6 +75,7 @@ class gVars:
             "use_txt_in_month": 18,
             "use_usa_notation": 19,
             "content_sensor_idx": 20,
+            "temp_in_fahrenheit": 21,
         }
 
         self.g_vars = {}
@@ -127,6 +130,7 @@ class gVars:
             18: None,
             19: None,
             20: None,
+            21: None,
         }
 
     def list(self):
@@ -203,6 +207,7 @@ myVars.write("use_txt_in_month", True)
 myVars.write("use_usa_notation", True)
 myVars.write("use_ntp", False)
 myVars.write("content_sensor_idx", None)
+myVars.write("temp_in_fahrenheit", True)
 # -------------------------------------------------------------------------
 if myVars.read("my_debug"):
     # print list of all variables in myVars
@@ -221,7 +226,8 @@ main_group = displayio.Group()
 display.show(main_group)
 
 # fon.gvars bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
-font = terminalio.FONT
+font_arial = bitmap_font.load_font("/fonts/Arial-16.bdf")
+font_term = terminalio.FONT
 
 # create the page layout
 test_page_layout = TabLayout(
@@ -229,7 +235,7 @@ test_page_layout = TabLayout(
     y=0,
     display=board.DISPLAY,
     tab_text_scale=2,
-    custom_font=font,
+    custom_font=font_term,
     inactive_tab_spritesheet="bmps/inactive_tab_sprite.bmp",
     showing_tab_spritesheet="bmps/active_tab_sprite.bmp",
     showing_tab_text_color=0x00AA59,
@@ -247,63 +253,63 @@ pge4_group = displayio.Group()
 
 # labels
 pge1_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="This is the first page!",
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge1_lbl2 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="Please wait...",
     anchor_point=(0, 0),
     anchored_position=(10, 150),
 )
 pge2_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="This page is the second page!",
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge3_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text=myVars.read("pge3_lbl_dflt"),  # Will be "Date/time:"
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge3_lbl2 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="",  # pge3_lbl2_dflt,   # Will be DD-MO-YYYY or Month-DD-YYYY
     anchor_point=(0, 0),
     anchored_position=(10, 40),
 )
 pge3_lbl3 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="",  # pge3_lbl3_dflt,  # Will be HH:MM:SS
     anchor_point=(0, 0),
     anchored_position=(10, 70),
 )
 pge4_lbl = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text=myVars.read("pge4_lbl_dflt"),
     anchor_point=(0, 0),
     anchored_position=(10, 10),
 )
 pge4_lbl2 = Label(
-    font=terminalio.FONT,
+    font=font_term,
     scale=2,
     text="",  # Will be "Temperature"
     anchor_point=(0, 0),
     anchored_position=(10, 130),
 )
 pge4_lbl3 = Label(
-    font=terminalio.FONT,
+    font=font_arial,
     scale=2,
     text="",  # Will be  "xx.yy C"
     anchor_point=(0, 0),
@@ -405,7 +411,11 @@ def connect_temp_sensor():
         print(t)
         print("temperature sensor connected")
         myVars.write("t0", "Temperature")
-        myVars.write("t1", " C")
+        if myVars.read("temp_in_fahrenheit"):
+            myVars.write("t1", chr(186) + "F")
+        else:
+            myVars.write("t1", chr(186) + "C")
+
         myVars.write("t2", 27 * "_")
     else:
         print("no " + t)
@@ -460,6 +470,8 @@ def get_temp():
     if myVars.read("temp_sensor") is not None:
         try:
             temp = myVars.read("temp_sensor").temperature
+            if myVars.read("temp_in_fahrenheit"):
+                temp = (temp * 1.8) + 32
             t = "{:5.2f} ".format(temp) + myVars.read("t1")
             if (
                 myVars.read("my_debug")
