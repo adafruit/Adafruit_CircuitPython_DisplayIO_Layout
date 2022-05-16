@@ -207,7 +207,7 @@ myVars.write("use_txt_in_month", True)
 myVars.write("use_usa_notation", True)
 myVars.write("use_ntp", False)
 myVars.write("content_sensor_idx", None)
-myVars.write("temp_in_fahrenheit", True)
+myVars.write("temp_in_fahrenheit", False)
 # -------------------------------------------------------------------------
 if myVars.read("my_debug"):
     # print list of all variables in myVars
