@@ -754,6 +754,9 @@ class SwitchRound(Widget, Control):
             # Determines the direction of movement, depending upon if the
             # switch is going from on->off or off->on
 
+            if self._animation_time == 0:
+                self._draw_position(0)
+                break
             # constrain the elapsed time
             elapsed_time = time.monotonic() - start_time
             if elapsed_time > self._animation_time:
