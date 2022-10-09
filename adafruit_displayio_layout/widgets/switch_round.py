@@ -772,10 +772,11 @@ class SwitchRound(Widget, Control):
                         1 - (elapsed_time) / self._animation_time
                     )  # fraction from 0 to 1
                 else:
-                    position = (elapsed_time) / self._animation_time  # fraction from 0 to 1
+                    # fraction from 0 to 1
+                    position = (elapsed_time) / self._animation_time  
 
-                # Update the moving elements based on the current position
-                # apply the "easing" function to the requested position to adjust motion
+            # Update the moving elements based on the current position
+            # apply the "easing" function to the requested position to adjust motion
                 self._draw_position(easing(position))  # update the switch position
 
             # update the switch value once the motion is complete
