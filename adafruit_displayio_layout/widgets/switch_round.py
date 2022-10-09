@@ -761,7 +761,7 @@ class SwitchRound(Widget, Control):
                 else:
                     position = 0
                     self._draw_position(0)
-            else: #animate over time
+            else:  # animate over time
                 # constrain the elapsed time
                 elapsed_time = time.monotonic() - start_time
                 if elapsed_time > self._animation_time:
@@ -773,10 +773,10 @@ class SwitchRound(Widget, Control):
                     )  # fraction from 0 to 1
                 else:
                     # fraction from 0 to 1
-                    position = (elapsed_time) / self._animation_time  
+                    position = (elapsed_time) / self._animation_time
 
-            # Update the moving elements based on the current position
-            # apply the "easing" function to the requested position to adjust motion
+                # Update the moving elements based on the current position
+                # apply the "easing" function to the requested position to adjust motion
                 self._draw_position(easing(position))  # update the switch position
 
             # update the switch value once the motion is complete
