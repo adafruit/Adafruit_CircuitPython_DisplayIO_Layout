@@ -754,21 +754,30 @@ class SwitchRound(Widget, Control):
             # Determines the direction of movement, depending upon if the
             # switch is going from on->off or off->on
 
-            # constrain the elapsed time
-            elapsed_time = time.monotonic() - start_time
-            if elapsed_time > self._animation_time:
-                elapsed_time = self._animation_time
+            if self._animation_time == 0:
+                if not self._value:
+                    position = 1
+                    self._draw_position(1)
+                else:
+                    position = 0
+                    self._draw_position(0)
+            else:  # animate over time
+                # constrain the elapsed time
+                elapsed_time = time.monotonic() - start_time
+                if elapsed_time > self._animation_time:
+                    elapsed_time = self._animation_time
 
-            if self._value:
-                position = (
-                    1 - (elapsed_time) / self._animation_time
-                )  # fraction from 0 to 1
-            else:
-                position = (elapsed_time) / self._animation_time  # fraction from 0 to 1
+                if self._value:
+                    position = (
+                        1 - (elapsed_time) / self._animation_time
+                    )  # fraction from 0 to 1
+                else:
+                    # fraction from 0 to 1
+                    position = (elapsed_time) / self._animation_time
 
-            # Update the moving elements based on the current position
-            # apply the "easing" function to the requested position to adjust motion
-            self._draw_position(easing(position))  # update the switch position
+                # Update the moving elements based on the current position
+                # apply the "easing" function to the requested position to adjust motion
+                self._draw_position(easing(position))  # update the switch position
 
             # update the switch value once the motion is complete
             if (position >= 1) and not self._value:
