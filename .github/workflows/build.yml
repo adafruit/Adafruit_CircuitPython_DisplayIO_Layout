@@ -10,5 +10,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    - name: Load graphviz
+      run: |
+        sudo apt install graphviz
     - name: Run Build CI workflow
       uses: adafruit/workflows-circuitpython-libs/build@main
