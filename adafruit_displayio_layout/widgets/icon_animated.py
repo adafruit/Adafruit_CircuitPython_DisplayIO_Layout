@@ -32,6 +32,10 @@ from adafruit_displayio_layout.widgets.easing import quadratic_easeout as easein
 from adafruit_displayio_layout.widgets.easing import quadratic_easein as easeout
 
 
+__version__ = "0.0.0+auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
+
+
 class IconAnimated(IconWidget):
 
     """

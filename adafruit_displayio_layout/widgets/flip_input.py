@@ -38,6 +38,11 @@ from adafruit_displayio_layout.widgets.control import Control
 from adafruit_displayio_layout.widgets.easing import back_easeinout as easein
 from adafruit_displayio_layout.widgets.easing import back_easeinout as easeout
 
+
+__version__ = "0.0.0+auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
+
+
 # pylint: disable=too-many-arguments, too-many-branches, too-many-statements
 # pylint: disable=too-many-locals, too-many-instance-attributes
 
