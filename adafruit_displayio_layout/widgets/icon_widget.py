@@ -30,6 +30,9 @@ from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.control import Control
 from adafruit_displayio_layout.widgets.widget import Widget
 
+__version__ = "0.0.0+auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
+
 
 class IconWidget(Widget, Control):
 

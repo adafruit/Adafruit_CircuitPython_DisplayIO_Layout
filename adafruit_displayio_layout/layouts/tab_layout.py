@@ -37,6 +37,9 @@ from adafruit_display_text.bitmap_label import Label
 from adafruit_imageload.tilegrid_inflator import inflate_tilegrid
 from adafruit_displayio_layout.layouts.page_layout import PageLayout
 
+__version__ = "0.0.0+auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
+
 
 class TabLayout(displayio.Group):
     """
