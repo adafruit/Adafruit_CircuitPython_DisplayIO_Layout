@@ -58,10 +58,10 @@ def rectangle_helper(
     if bitmaptool:
         bitmaptools.fill_region(bitmap, x0, y0, x0 + width, y0 + height, color_index)
     else:
-        rect = vectorio.Rectangle(width, height)
-        vectorio.VectorShape(
-            shape=rect,
+        vectorio.Rectangle(
             pixel_shader=palette,
+            width=width,
+            height=height,
             x=x0,
             y=y0,
         )
