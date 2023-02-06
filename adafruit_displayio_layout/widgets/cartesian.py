@@ -30,8 +30,6 @@ from adafruit_display_text import bitmap_label
 import vectorio
 from adafruit_displayio_layout.widgets.widget import Widget
 
-# from adafruit_displayio_layout.widgets import rectangle_helper
-
 try:
     import bitmaptools
 except ImportError:
