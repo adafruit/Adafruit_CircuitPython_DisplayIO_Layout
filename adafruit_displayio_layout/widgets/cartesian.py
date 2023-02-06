@@ -29,7 +29,8 @@ import terminalio
 from adafruit_display_text import bitmap_label
 import vectorio
 from adafruit_displayio_layout.widgets.widget import Widget
-from adafruit_displayio_layout.widgets import rectangle_helper
+
+# from adafruit_displayio_layout.widgets import rectangle_helper
 
 try:
     import bitmaptools
@@ -138,7 +139,7 @@ class Cartesian(Widget):
 
         - **range**: ``xrange`` and ``yrange`` This is the range in absolute units.
           For example, when using (20-90), the X axis will start at 20 finishing at 90.
-          However the height of the graph is given by the height parameter. The scale
+          However, the height of the graph is given by the height parameter. The scale
           is handled internal to provide a 1:1 experience when you update the graph.
 
 
@@ -269,14 +270,14 @@ class Cartesian(Widget):
         self._screen_palette[5] = self._background_color
 
         self._corner_bitmap = displayio.Bitmap(10, 10, 5)
-        rectangle_helper(
-            0,
-            0,
-            self._axes_line_thickness,
-            self._axes_line_thickness,
+
+        bitmaptools.fill_region(
             self._corner_bitmap,
+            0,
+            0,
+            self._axes_line_thickness,
+            self._axes_line_thickness,
             2,
-            self._screen_palette,
         )
 
         self._corner_tilegrid = displayio.TileGrid(
@@ -336,28 +337,23 @@ class Cartesian(Widget):
         return font_width, font_height
 
     def _draw_axes(self) -> None:
-        # Draw x axes line
-        rectangle_helper(
-            0,
-            0,
-            self._axes_line_thickness,
-            self.width,
+
+        bitmaptools.fill_region(
             self._axesx_bitmap,
+            0,
+            0,
+            self.width,
+            self._axes_line_thickness,
             2,
-            self._screen_palette,
-            True,
         )
 
-        # Draw y axes line
-        rectangle_helper(
+        bitmaptools.fill_region(
+            self._axesy_bitmap,
             self._axesy_width - self._axes_line_thickness,
             0,
+            self._axesy_width,
             self.height,
-            self._axes_line_thickness,
-            self._axesy_bitmap,
             2,
-            self._screen_palette,
-            True,
         )
 
     def _draw_ticks(self) -> None:
@@ -382,30 +378,28 @@ class Cartesian(Widget):
                     + 1,
                 )
                 self.append(tick_text)
-                rectangle_helper(
+
+                bitmaptools.fill_region(
+                    self._axesx_bitmap,
                     text_dist,
                     self._axes_line_thickness,
-                    self._tick_line_height,
-                    self._tick_line_thickness,
-                    self._axesx_bitmap,
+                    text_dist + self._tick_line_thickness,
+                    self._axes_line_thickness + self._tick_line_height,
                     1,
-                    self._screen_palette,
-                    True,
                 )
 
             if self._subticks:
                 if i in subticks:
                     # calc subtick_line_height; force min lineheigt to 1.
                     subtick_line_height = max(1, self._tick_line_height // 2)
-                    rectangle_helper(
+
+                    bitmaptools.fill_region(
+                        self._axesx_bitmap,
                         text_dist,
                         self._axes_line_thickness,
-                        subtick_line_height,
+                        text_dist + 1,
+                        self._axes_line_thickness + subtick_line_height,
                         1,
-                        self._axesx_bitmap,
-                        1,
-                        self._screen_palette,
-                        True,
                     )
 
         # Y axes ticks
@@ -425,34 +419,32 @@ class Cartesian(Widget):
                     y=0 + self.height - text_dist,
                 )
                 self.append(tick_text)
-                rectangle_helper(
+
+                bitmaptools.fill_region(
+                    self._axesy_bitmap,
                     self._axesy_width
                     - self._axes_line_thickness
                     - self._tick_line_height
                     - 1,
                     text_dist,
-                    self._tick_line_thickness,
-                    self._tick_line_height,
-                    self._axesy_bitmap,
+                    self._axesy_width - self._axes_line_thickness - 1,
+                    text_dist + self._tick_line_thickness,
                     1,
-                    self._screen_palette,
-                    True,
                 )
 
             if self._subticks:
                 if i in subticks:
-                    rectangle_helper(
+
+                    bitmaptools.fill_region(
+                        self._axesy_bitmap,
                         self._axesy_width
                         - self._axes_line_thickness
                         - self._tick_line_height // 2
                         - 1,
                         text_dist,
+                        self._axesy_width - self._axes_line_thickness - 1,
+                        text_dist + 1,
                         1,
-                        self._tick_line_height // 2,
-                        self._axesy_bitmap,
-                        1,
-                        self._screen_palette,
-                        True,
                     )
 
     def _draw_pointers(self, x: int, y: int) -> None:
