@@ -24,6 +24,12 @@ Implementation Notes
 
 import displayio
 
+try:
+    from typing import Optional, Tuple
+except ImportError:
+    pass
+
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
@@ -166,14 +172,14 @@ class Widget(displayio.Group):
 
     def __init__(
         self,
-        x=0,
-        y=0,
-        scale=1,
-        width=None,
-        height=None,
-        anchor_point=None,
-        anchored_position=None,
-    ):
+        x: int = 0,
+        y: int = 0,
+        scale: float = 1,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        anchor_point: Optional[Tuple[float, float]] = None,
+        anchored_position: Optional[Tuple[int, int]] = None,
+    ) -> None:
 
         super().__init__(x=x, y=y, scale=scale)
         # send x,y and scale to Group
@@ -195,7 +201,7 @@ class Widget(displayio.Group):
 
         self._update_position()
 
-    def resize(self, new_width, new_height):
+    def resize(self, new_width: int, new_height: int) -> None:
         """Resizes the widget dimensions (for use with automated layout functions).
 
         **IMPORTANT:** The `resize` function should be overridden by the subclass definition.
@@ -218,7 +224,7 @@ class Widget(displayio.Group):
         self._bounding_box[2] = new_width
         self._bounding_box[3] = new_height
 
-    def _update_position(self):
+    def _update_position(self) -> None:
         """
         Widget class function for updating the widget's *x* and *y* position based
         upon the `anchor_point` and `anchored_position` values. The subclass should
@@ -240,31 +246,31 @@ class Widget(displayio.Group):
             )
 
     @property
-    def width(self):
+    def width(self) -> int:
         """The widget width, in pixels. (getter only)
 
         :return: int
         """
-        return self._width
+        return self._width or 0
 
     @property
-    def height(self):
+    def height(self) -> int:
         """The widget height, in pixels. (getter only)
 
         :return: int
         """
-        return self._height
+        return self._height or 0
 
     @property
-    def bounding_box(self):
+    def bounding_box(self) -> Tuple[int, ...]:
         """The boundary of the widget. [x, y, width, height] in Widget's local
         coordinates (in pixels). (getter only)
 
         :return: Tuple[int, int, int, int]"""
-        return self._bounding_box
+        return tuple(self._bounding_box)
 
     @property
-    def anchor_point(self):
+    def anchor_point(self) -> Optional[Tuple[float, float]]:
         """The anchor point for positioning the widget, works in concert
         with `anchored_position`  The relative (X,Y) position of the widget where the
         anchored_position is placed.  For example (0.0, 0.0) is the Widget's upper left corner,
@@ -275,12 +281,12 @@ class Widget(displayio.Group):
         return self._anchor_point
 
     @anchor_point.setter
-    def anchor_point(self, new_anchor_point):
+    def anchor_point(self, new_anchor_point: Tuple[float, float]) -> None:
         self._anchor_point = new_anchor_point
         self._update_position()
 
     @property
-    def anchored_position(self):
+    def anchored_position(self) -> Optional[Tuple[int, int]]:
         """The anchored position (in pixels) for positioning the widget, works in concert
         with `anchor_point`.  The `anchored_position` is the x,y pixel position
         for the placement of the Widget's `anchor_point`.
@@ -292,6 +298,6 @@ class Widget(displayio.Group):
         return self._anchored_position
 
     @anchored_position.setter
-    def anchored_position(self, new_anchored_position):
+    def anchored_position(self, new_anchored_position: Tuple[int, int]) -> None:
         self._anchored_position = new_anchored_position
         self._update_position()

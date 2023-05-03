@@ -25,11 +25,16 @@ import gc
 import time
 from math import pi
 import bitmaptools
-from displayio import TileGrid, Bitmap, Palette
+from displayio import TileGrid, Bitmap, Display, Palette
 import adafruit_imageload
 from adafruit_displayio_layout.widgets.icon_widget import IconWidget
 from adafruit_displayio_layout.widgets.easing import quadratic_easeout as easein
 from adafruit_displayio_layout.widgets.easing import quadratic_easein as easeout
+
+try:
+    from typing import Any, Optional, Tuple
+except ImportError:
+    pass
 
 
 __version__ = "0.0.0+auto.0"
@@ -79,8 +84,12 @@ class IconAnimated(IconWidget):
 
     @classmethod
     def init_class(
-        cls, display=None, max_scale=1.5, max_icon_size=(80, 80), max_color_depth=256
-    ):
+        cls,
+        display: Optional[Display],
+        max_scale: float = 1.5,
+        max_icon_size: Tuple[int, int] = (80, 80),
+        max_color_depth: int = 256,
+    ) -> None:
         """
         Initializes the IconAnimated Class variables, including preallocating memory
         buffers for the icon zoom bitmap and icon zoom palette.
@@ -134,14 +143,14 @@ class IconAnimated(IconWidget):
 
     def __init__(
         self,
-        label_text,
-        icon,
-        on_disk=False,
-        scale=None,
-        angle=4,
-        animation_time=0.15,
-        **kwargs,
-    ):
+        label_text: str,
+        icon: str,
+        on_disk: bool = False,
+        scale: Optional[float] = None,
+        angle: float = 4,
+        animation_time: float = 0.15,
+        **kwargs: Any,
+    ) -> None:
 
         if self.__class__.display is None:
             raise ValueError(
@@ -169,11 +178,11 @@ class IconAnimated(IconWidget):
         self._angle = (angle / 360) * 2 * pi  # in degrees, convert to radians
         self._zoomed = False  # state variable for zoom status
 
-    def zoom_animation(self, touch_point):
+    def zoom_animation(self, touch_point: Tuple[int, int, Optional[int]]) -> None:
         """Performs zoom animation when icon is pressed.
 
         :param touch_point: x,y location of the screen.
-        :type touch_point: Tuple[x,y]
+        :type touch_point: Tuple[int, int, Optional[int]]
         :return: None
         """
 
@@ -199,6 +208,9 @@ class IconAnimated(IconWidget):
 
             animation_bitmap = self.__class__.bitmap_buffer
             animation_palette = self.__class__.palette_buffer
+
+            # For mypy, if class is configured correctly this must be true
+            assert isinstance(self.__class__.display, Display)
 
             # store the current display refresh setting
             refresh_status = self.__class__.display.auto_refresh
@@ -264,11 +276,11 @@ class IconAnimated(IconWidget):
 
             self._zoomed = True
 
-    def zoom_out_animation(self, touch_point):
+    def zoom_out_animation(self, touch_point: Tuple[int, int, Optional[int]]) -> None:
         """Performs un-zoom animation when icon is released.
 
         :param touch_point: x,y location of the screen.
-        :type touch_point: Tuple[x,y]
+        :type touch_point: Tuple[int, int, Optional[int]]
         :return: None
         """
 
@@ -277,6 +289,9 @@ class IconAnimated(IconWidget):
             animation_bitmap = self.__class__.bitmap_buffer
             animation_palette = self.__class__.palette_buffer
 
+            # For mypy, if class is configured correctly this must be true
+            assert isinstance(self.__class__.display, Display)
+
             # store the current display refresh setting
             refresh_status = self.__class__.display.auto_refresh
 
@@ -284,6 +299,7 @@ class IconAnimated(IconWidget):
 
             # Animation: shrink down to the original size
             start_time = time.monotonic()
+
             while True:
                 elapsed_time = time.monotonic() - start_time
                 position = max(0.0, easeout(1 - (elapsed_time / self._animation_time)))

@@ -44,6 +44,11 @@ from adafruit_displayio_layout.widgets.control import Control
 # modify the "easing" function that is imported to change the switch animation behaviour
 from adafruit_displayio_layout.widgets.easing import back_easeinout as easing
 
+try:
+    from typing import Any, Optional, Tuple, Union
+except ImportError:
+    pass
+
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
@@ -419,32 +424,43 @@ class SwitchRound(Widget, Control):
 
     def __init__(
         self,
-        x=0,
-        y=0,
-        width=None,  # recommend to default to
-        height=40,
-        touch_padding=0,
-        horizontal=True,  # horizontal orientation
-        flip=False,  # flip the direction of the switch movement
-        anchor_point=None,
-        anchored_position=None,
-        fill_color_off=(66, 44, 66),
-        fill_color_on=(0, 100, 0),
-        outline_color_off=(30, 30, 30),
-        outline_color_on=(0, 60, 0),
-        background_color_off=(255, 255, 255),
-        background_color_on=(0, 60, 0),
-        background_outline_color_off=None,  # default to background_color_off
-        background_outline_color_on=None,  # default to background_color_on
-        switch_stroke=2,
-        text_stroke=None,  # default to switch_stroke
-        display_button_text=True,
-        animation_time=0.2,  # animation duration (in seconds)
-        value=False,  # initial value
-        **kwargs,
-    ):
+        x: int = 0,
+        y: int = 0,
+        width: Optional[int] = None,  # recommend to default to
+        height: int = 40,
+        touch_padding: int = 0,
+        horizontal: bool = True,  # horizontal orientation
+        flip: bool = False,  # flip the direction of the switch movement
+        anchor_point: Optional[Tuple[float, float]] = None,
+        anchored_position: Optional[Tuple[int, int]] = None,
+        fill_color_off: Union[Tuple[int, int, int], int] = (66, 44, 66),
+        fill_color_on: Union[Tuple[int, int, int], int] = (0, 100, 0),
+        outline_color_off: Union[Tuple[int, int, int], int] = (30, 30, 30),
+        outline_color_on: Union[Tuple[int, int, int], int] = (0, 60, 0),
+        background_color_off: Union[Tuple[int, int, int], int] = (255, 255, 255),
+        background_color_on: Union[Tuple[int, int, int], int] = (0, 60, 0),
+        background_outline_color_off: Union[
+            Tuple[int, int, int], int, None
+        ] = None,  # default to background_color_off
+        background_outline_color_on: Union[
+            Tuple[int, int, int], int, None
+        ] = None,  # default to background_color_on
+        switch_stroke: int = 2,
+        text_stroke: Optional[int] = None,  # default to switch_stroke
+        display_button_text: bool = True,
+        animation_time: float = 0.2,  # animation duration (in seconds)
+        value: bool = False,  # initial value
+        **kwargs: Any,
+    ) -> None:
+
+        self._radius = height // 2
+
+        # If width is not provided, then use the preferred aspect ratio
+        if width is None:
+            width = 4 * self._radius
 
         # initialize the Widget superclass (x, y, scale)
+        # self._height and self._width are set in the super call
         super().__init__(x=x, y=y, height=height, width=width, **kwargs)
         # Group elements for SwitchRound:
         #  0. switch_roundrect: The switch background
@@ -459,17 +475,6 @@ class SwitchRound(Widget, Control):
 
         self._horizontal = horizontal
         self._flip = flip
-
-        # height and width internal variables are treated before considering rotation
-        self._height = self.height
-        self._radius = self.height // 2
-
-        # If width is not provided, then use the preferred aspect ratio
-        if self._width is None:
-            self._width = 4 * self._radius
-        else:
-            self._width = self.width
-            print("width set!")
 
         if background_outline_color_off is None:
             background_outline_color_off = background_color_off
@@ -505,11 +510,14 @@ class SwitchRound(Widget, Control):
 
         self._create_switch()
 
-    def _create_switch(self):
+    def _create_switch(self) -> None:
         # The main function that creates the switch display elements
 
         switch_x = self._radius
         switch_y = self._radius
+
+        # These are Optional[int] values, let mypy know they should never be None here
+        assert self._height is not None and self._width is not None
 
         # Define the motion "keyframes" that define the switch movement
         if self._horizontal:  # horizontal switch orientation
@@ -614,12 +622,12 @@ class SwitchRound(Widget, Control):
                 self._width,
             ]
 
-        self.touch_boundary = [
+        self.touch_boundary = (
             self._bounding_box[0] - self._touch_padding,
             self._bounding_box[1] - self._touch_padding,
             self._bounding_box[2] + 2 * self._touch_padding,
             self._bounding_box[3] + 2 * self._touch_padding,
-        ]
+        )
 
         # Store initial positions of moving elements to be used in _draw_function
         self._switch_initial_x = self._switch_circle.x
@@ -661,7 +669,7 @@ class SwitchRound(Widget, Control):
         # due to any changes that might have occurred in the bounding_box
         self._update_position()
 
-    def _get_offset_position(self, position):
+    def _get_offset_position(self, position: float) -> Tuple[int, int, float]:
         # Function to calculate the offset position (x, y, angle) of the moving
         # elements of an animated widget.  Designed to be flexible depending upon
         # the widget's desired response.
@@ -683,7 +691,7 @@ class SwitchRound(Widget, Control):
 
         return x_offset, y_offset, angle_offset
 
-    def _draw_position(self, position):
+    def _draw_position(self, position: float) -> None:
         # Draw the position of the slider.
         # The position parameter is a float between 0 and 1 (0= off, 1= on).
 
@@ -733,7 +741,7 @@ class SwitchRound(Widget, Control):
             self._text_0.hidden = False
             self._text_1.hidden = True
 
-    def _animate_switch(self):
+    def _animate_switch(self) -> None:
         # The animation function for the switch.
         # 1.  Move the switch
         # 2.  Update the self._value to the opposite of its current value.
@@ -756,10 +764,10 @@ class SwitchRound(Widget, Control):
 
             if self._animation_time == 0:
                 if not self._value:
-                    position = 1
+                    position = 1.0
                     self._draw_position(1)
                 else:
-                    position = 0
+                    position = 0.0
                     self._draw_position(0)
             else:  # animate over time
                 # constrain the elapsed time
@@ -789,11 +797,12 @@ class SwitchRound(Widget, Control):
                 self._value = False
                 break
 
-    def selected(self, touch_point):
+    def selected(self, touch_point: Tuple[int, int, Optional[int]]) -> None:
         """Response function when Switch is selected.  When selected, the switch
         position and value is changed with an animation.
 
-        :param touch_point: x,y location of the screen, in absolute display coordinates.
+        :param touch_point: x, y, p location of the screen, converted to local coordinates, plus
+            an optional pressure value for screens that support it.
         :return: None
 
         """
@@ -809,11 +818,14 @@ class SwitchRound(Widget, Control):
         # touch_point is adjusted for group's x,y position before sending to super()
         super().selected((touch_x, touch_y, 0))
 
-    def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
+    def contains(
+        self, touch_point: Tuple[int, int, Optional[int]]
+    ) -> bool:  # overrides, then calls Control.contains(x,y)
         """Checks if the Widget was touched.  Returns True if the touch_point
         is within the Control's touch_boundary.
 
-        :param touch_point: x,y location of the screen, in absolute display coordinates.
+        :param touch_point: x, y, p location of the screen, converted to local coordinates, plus
+            an optional pressure value for screens that support it.
         :return: Boolean
 
         """
@@ -825,7 +837,7 @@ class SwitchRound(Widget, Control):
         return super().contains((touch_x, touch_y, 0))
 
     @property
-    def value(self):
+    def value(self) -> bool:
         """The current switch value (Boolean).
 
         :return: Boolean
@@ -833,17 +845,19 @@ class SwitchRound(Widget, Control):
         return self._value
 
     @value.setter
-    def value(self, new_value):
+    def value(self, new_value: bool) -> None:
         if new_value != self._value:
-            fake_touch_point = [0, 0, 0]  # send an arbitrary touch_point
+            fake_touch_point = (0, 0, 0)  # send an arbitrary touch_point
             self.selected(fake_touch_point)
 
     @property
-    def width(self):
+    def width(self) -> int:
+        # Type is Optional[int], let mypy know that it can't be None here
+        assert self._width is not None
         return self._width
 
     @width.setter
-    def width(self, new_width):
+    def width(self, new_width: int) -> None:
         if self._width is None:
             self._width = 4 * self._radius
         else:
@@ -851,16 +865,18 @@ class SwitchRound(Widget, Control):
         self._create_switch()
 
     @property
-    def height(self):
+    def height(self) -> int:
+        # Type is Optional[int], let mypy know that it can't be None here
+        assert self._height is not None
         return self._height
 
     @height.setter
-    def height(self, new_height):
+    def height(self, new_height: int) -> None:
         self._height = new_height
         self._radius = new_height // 2
         self._create_switch()
 
-    def resize(self, new_width, new_height):
+    def resize(self, new_width: int, new_height: int) -> None:
         """Resize the switch to a new requested width and height.
 
         :param int new_width: requested maximum width
@@ -893,7 +909,7 @@ class SwitchRound(Widget, Control):
 ######  color support functions  ######
 
 
-def _color_to_tuple(value):
+def _color_to_tuple(value: Union[Tuple[int, int, int], int]) -> Tuple[int, int, int]:
     """Converts a color from a 24-bit integer to a tuple.
     :param value: RGB LED desired value - can be a RGB tuple or a 24-bit integer.
     """
@@ -905,12 +921,16 @@ def _color_to_tuple(value):
         r = value >> 16
         g = (value >> 8) & 0xFF
         b = value & 0xFF
-        return [r, g, b]
+        return (r, g, b)
 
     raise ValueError("Color must be a tuple or 24-bit integer value.")
 
 
-def _color_fade(start_color, end_color, fraction):
+def _color_fade(
+    start_color: Union[Tuple[int, int, int], int],
+    end_color: Union[Tuple[int, int, int], int],
+    fraction: float,
+) -> Tuple[int, ...]:
     """Linear extrapolation of a color between two RGB colors (tuple or 24-bit integer).
     :param start_color: starting color
     :param end_color: ending color
@@ -930,4 +950,4 @@ def _color_fade(start_color, end_color, fraction):
         faded_color[i] = start_color[i] - int(
             (start_color[i] - end_color[i]) * fraction
         )
-    return faded_color
+    return tuple(faded_color)

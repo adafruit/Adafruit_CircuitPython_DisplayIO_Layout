@@ -81,7 +81,7 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.
 
 
 # Modeled after the line y = x
-def linear_interpolation(pos):
+def linear_interpolation(pos: float) -> float:
     """
     Easing function for animations: Linear Interpolation.
     """
@@ -89,7 +89,7 @@ def linear_interpolation(pos):
 
 
 # Modeled after the parabola y = x^2
-def quadratic_easein(pos):
+def quadratic_easein(pos: float) -> float:
     """
     Easing function for animations: Quadratic Ease In
     """
@@ -97,7 +97,7 @@ def quadratic_easein(pos):
 
 
 # Modeled after the parabola y = -x^2 + 2x
-def quadratic_easeout(pos):
+def quadratic_easeout(pos: float) -> float:
     """
     Easing function for animations: Quadratic Ease Out.
     """
@@ -107,7 +107,7 @@ def quadratic_easeout(pos):
 # Modeled after the piecewise quadratic
 # y = (1/2)((2x)^2)             ; [0, 0.5)
 # y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
-def quadratic_easeinout(pos):
+def quadratic_easeinout(pos: float) -> float:
     """
     Easing function for animations: Quadratic Ease In & Out
     """
@@ -117,7 +117,7 @@ def quadratic_easeinout(pos):
 
 
 # Modeled after the cubic y = x^3
-def cubic_easein(pos):
+def cubic_easein(pos: float) -> float:
     """
     Easing function for animations: Cubic Ease In
     """
@@ -125,7 +125,7 @@ def cubic_easein(pos):
 
 
 # Modeled after the cubic y = (x - 1)^3 + 1
-def cubic_easeout(pos):
+def cubic_easeout(pos: float) -> float:
     """
     Easing function for animations: Cubic Ease Out
     """
@@ -136,7 +136,7 @@ def cubic_easeout(pos):
 # Modeled after the piecewise cubic
 # y = (1/2)((2x)^3)       ; [0, 0.5)
 # y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
-def cubic_easeinout(pos):
+def cubic_easeinout(pos: float) -> float:
     """
     Easing function for animations: Cubic Ease In & Out
     """
@@ -147,7 +147,7 @@ def cubic_easeinout(pos):
 
 
 # Modeled after the quartic x^4
-def quartic_easein(pos):
+def quartic_easein(pos: float) -> float:
     """
     Easing function for animations: Quartic Ease In
     """
@@ -155,7 +155,7 @@ def quartic_easein(pos):
 
 
 # Modeled after the quartic y = 1 - (x - 1)^4
-def quartic_easeout(pos):
+def quartic_easeout(pos: float) -> float:
     """
     Easing function for animations: Quartic Ease Out
     """
@@ -166,7 +166,7 @@ def quartic_easeout(pos):
 # Modeled after the piecewise quartic
 # y = (1/2)((2x)^4)        ; [0, 0.5)
 # y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
-def quartic_easeinout(pos):
+def quartic_easeinout(pos: float) -> float:
     """
     Easing function for animations: Quartic Ease In & Out
     """
@@ -177,7 +177,7 @@ def quartic_easeinout(pos):
 
 
 # Modeled after the quintic y = x^5
-def quintic_easein(pos):
+def quintic_easein(pos: float) -> float:
     """
     Easing function for animations: Quintic Ease In
     """
@@ -185,7 +185,7 @@ def quintic_easein(pos):
 
 
 # Modeled after the quintic y = (x - 1)^5 + 1
-def quintic_easeout(pos):
+def quintic_easeout(pos: float) -> float:
     """
     Easing function for animations: Quintic Ease Out
     """
@@ -196,7 +196,7 @@ def quintic_easeout(pos):
 # Modeled after the piecewise quintic
 # y = (1/2)((2x)^5)       ; [0, 0.5)
 # y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
-def quintic_easeinout(pos):
+def quintic_easeinout(pos: float) -> float:
     """
     Easing function for animations: Quintic Ease In & Out
     """
@@ -207,7 +207,7 @@ def quintic_easeinout(pos):
 
 
 # Modeled after quarter-cycle of sine wave
-def sine_easein(pos):
+def sine_easein(pos: float) -> float:
     """
     Easing function for animations: Sine Ease In
     """
@@ -215,7 +215,7 @@ def sine_easein(pos):
 
 
 # Modeled after quarter-cycle of sine wave (different phase)
-def sine_easeout(pos):
+def sine_easeout(pos: float) -> float:
     """
     Easing function for animations: Sine Ease Out
     """
@@ -223,7 +223,7 @@ def sine_easeout(pos):
 
 
 # Modeled after half sine wave
-def sine_easeinout(pos):
+def sine_easeinout(pos: float) -> float:
     """
     Easing function for animations: Sine Ease In & Out
     """
@@ -231,7 +231,7 @@ def sine_easeinout(pos):
 
 
 # Modeled after shifted quadrant IV of unit circle
-def circular_easein(pos):
+def circular_easein(pos: float) -> float:
     """
     Easing function for animations: Circular Ease In
     """
@@ -239,7 +239,7 @@ def circular_easein(pos):
 
 
 # Modeled after shifted quadrant II of unit circle
-def circular_easeout(pos):
+def circular_easeout(pos: float) -> float:
     """
     Easing function for animations: Circular Ease Out
     """
@@ -249,7 +249,7 @@ def circular_easeout(pos):
 # Modeled after the piecewise circular function
 # y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)
 # y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
-def circular_easeinout(pos):
+def circular_easeinout(pos: float) -> float:
     """
     Easing function for animations: Circular Ease In & Out
     """
@@ -259,7 +259,7 @@ def circular_easeinout(pos):
 
 
 # Modeled after the exponential function y = 2^(10(x - 1))
-def exponential_easein(pos):
+def exponential_easein(pos: float) -> float:
     """
     Easing function for animations: Exponential Ease In
     """
@@ -269,7 +269,7 @@ def exponential_easein(pos):
 
 
 # Modeled after the exponential function y = -2^(-10x) + 1
-def exponential_easeout(pos):
+def exponential_easeout(pos: float) -> float:
     """
     Easing function for animations: Exponential Ease Out
     """
@@ -281,7 +281,7 @@ def exponential_easeout(pos):
 # Modeled after the piecewise exponential
 # y = (1/2)2^(10(2x - 1))         ; [0,0.5)
 # y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
-def exponential_easeinout(pos):
+def exponential_easeinout(pos: float) -> float:
     """
     Easing function for animations: Exponential Ease In & Out
     """
@@ -293,7 +293,7 @@ def exponential_easeinout(pos):
 
 
 # Modeled after the damped sine wave y = sin(13pi/2*x)*pow(2, 10 * (x - 1))
-def elastic_easein(pos):
+def elastic_easein(pos: float) -> float:
     """
     Easing function for animations: Elastic Ease In
     """
@@ -301,7 +301,7 @@ def elastic_easein(pos):
 
 
 # Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*pow(2, -10x) + 1
-def elastic_easeout(pos):
+def elastic_easeout(pos: float) -> float:
     """
     Easing function for animations: Elastic Ease Out
     """
@@ -311,7 +311,7 @@ def elastic_easeout(pos):
 # Modeled after the piecewise exponentially-damped sine wave:
 # y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
 # y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
-def elastic_easeinout(pos):
+def elastic_easeinout(pos: float) -> float:
     """
     Easing function for animations: Elastic Ease In & Out
     """
@@ -324,7 +324,7 @@ def elastic_easeinout(pos):
 
 
 # Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
-def back_easein(pos):
+def back_easein(pos: float) -> float:
     """
     Easing function for animations: Back Ease In
     """
@@ -332,7 +332,7 @@ def back_easein(pos):
 
 
 # Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
-def back_easeout(pos):
+def back_easeout(pos: float) -> float:
     """
     Easing function for animations: Back Ease Out
     """
@@ -343,7 +343,7 @@ def back_easeout(pos):
 # Modeled after the piecewise overshooting cubic function:
 # y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
 # y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
-def back_easeinout(pos):
+def back_easeinout(pos: float) -> float:
     """
     Easing function for animations: Back Ease In & Out
     """
@@ -354,14 +354,14 @@ def back_easeinout(pos):
     return 0.5 * (1 - (fos * fos * fos - fos * math.sin(fos * math.pi))) + 0.5
 
 
-def bounce_easein(pos):
+def bounce_easein(pos: float) -> float:
     """
     Easing function for animations: Bounce Ease In
     """
     return 1 - bounce_easeout(1 - pos)
 
 
-def bounce_easeout(pos):
+def bounce_easeout(pos: float) -> float:
     """
     Easing function for animations: Bounce Ease Out
     """
@@ -374,7 +374,7 @@ def bounce_easeout(pos):
     return (54 / 5.0 * pos * pos) - (513 / 25.0 * pos) + 268 / 25.0
 
 
-def bounce_easeinout(pos):
+def bounce_easeinout(pos: float) -> float:
     """
     Easing function for animations: Bounce Ease In & Out
     """

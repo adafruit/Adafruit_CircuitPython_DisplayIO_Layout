@@ -24,7 +24,7 @@ Implementation Notes
 """
 try:
     # Used only for typing
-    from typing import Tuple
+    from typing import Any, List, Tuple, Union
 except ImportError:
     pass
 
@@ -61,18 +61,18 @@ class GridLayout(displayio.Group):
     # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
-        x,
-        y,
-        width,
-        height,
-        grid_size,
-        cell_padding=0,
-        divider_lines=False,
-        h_divider_line_rows=None,
-        v_divider_line_cols=None,
-        divider_line_color=0xFFFFFF,
-        cell_anchor_point=(0.0, 0.0),
-    ):
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        grid_size: tuple[int, int],
+        cell_padding: int = 0,
+        divider_lines: bool = False,
+        h_divider_line_rows: Union[Tuple[int, ...], List[int], None] = None,
+        v_divider_line_cols: Union[Tuple[int, ...], List[int], None] = None,
+        divider_line_color: int = 0xFFFFFF,
+        cell_anchor_point: Tuple[float, float] = (0.0, 0.0),
+    ) -> None:
         super().__init__(x=x, y=y)
         self.x = x
         self.y = y
@@ -80,13 +80,13 @@ class GridLayout(displayio.Group):
         self._height = height
         self.grid_size = grid_size
         self.cell_padding = cell_padding
-        self._cell_content_list = []
+        self._cell_content_list: List[dict[str, Any]] = []
         self._cell_anchor_point = cell_anchor_point
 
-        self._divider_lines = []
+        self._divider_lines: List[dict[str, Any]] = []
         self._divider_color = divider_line_color
-        self.h_divider_line_rows = h_divider_line_rows
-        self.v_divider_line_cols = v_divider_line_cols
+        self.h_divider_line_rows = h_divider_line_rows or tuple()
+        self.v_divider_line_cols = v_divider_line_cols or tuple()
 
         self._divider_lines_enabled = (
             (divider_lines is True)
@@ -95,19 +95,14 @@ class GridLayout(displayio.Group):
         )
 
         if divider_lines:
-            if self.h_divider_line_rows is None:
+            if h_divider_line_rows is None:
                 self.h_divider_line_rows = []
                 for _y in range(self.grid_size[1] + 1):
                     self.h_divider_line_rows.append(_y)
-            if self.v_divider_line_cols is None:
+            if v_divider_line_cols is None:
                 self.v_divider_line_cols = []
                 for _x in range(self.grid_size[0] + 1):
                     self.v_divider_line_cols.append(_x)
-        else:
-            if not h_divider_line_rows:
-                self.h_divider_line_rows = tuple()
-            if not v_divider_line_cols:
-                self.v_divider_line_cols = tuple()
 
         # use at least 1 padding so that content is inside the divider lines
         if cell_padding == 0 and (
@@ -115,7 +110,7 @@ class GridLayout(displayio.Group):
         ):
             self.cell_padding = 1
 
-    def _layout_cells(self):
+    def _layout_cells(self) -> None:
         # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         for cell in self._cell_content_list:
             if cell["content"] not in self:
@@ -382,8 +377,12 @@ class GridLayout(displayio.Group):
                         self.append(line_obj["tilegrid"])
 
     def add_content(
-        self, cell_content, grid_position, cell_size, cell_anchor_point=None
-    ):
+        self,
+        cell_content: displayio.Group,
+        grid_position: Tuple[int, int],
+        cell_size: Tuple[int, int],
+        cell_anchor_point: Union[Tuple[float, ...], None] = None,
+    ) -> None:
         """Add a child to the grid.
 
         :param cell_content: the content to add to this cell e.g. label, button, etc...
@@ -412,7 +411,7 @@ class GridLayout(displayio.Group):
         self._cell_content_list.append(sub_view_obj)
         self._layout_cells()
 
-    def get_cell(self, cell_coordinates):
+    def get_cell(self, cell_coordinates: Tuple[int, int]) -> displayio.Group:
         """
         Return a cells content based on the cell_coordinates. Raises
         KeyError if coordinates were not found in the GridLayout.
