@@ -317,9 +317,9 @@ class Cartesian(Widget):
         self.append(self._screen_tilegrid)
         self.append(self._corner_tilegrid)
 
-        self._pointer = None
-        self._circle_palette = None
-        self.plot_line_point: Optional[List[Tuple[int, int]]] = None
+        self._pointer: Optional[vectorio.Circle] = None
+        self._circle_palette: Optional[displayio.Palette] = None
+        self.plot_line_point: List[Tuple[int, int]] = []
 
     @staticmethod
     def _get_font_height(font: terminalio.FONT, scale: int) -> Tuple[int, int]:
@@ -448,9 +448,6 @@ class Cartesian(Widget):
     def _draw_pointers(self, x: int, y: int) -> None:
 
         self._circle_palette = displayio.Palette(1)
-
-        # mypy, _circle_palette can't be None at this point
-        assert self._circle_palette is not None
 
         self._circle_palette[0] = self._pointer_color
         self._pointer = vectorio.Circle(
@@ -591,8 +588,6 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
-        # mypy, plot_line_point can't be None at this point
-        assert self.plot_line_point is not None
 
         self._add_point(x, y)
         if not self._pointer:
@@ -616,8 +611,6 @@ class Cartesian(Widget):
 
         rtype: None
         """
-        # mypy, plot_line_point can't be None at this point
-        assert self.plot_line_point is not None
 
         self._add_point(x, y)
         if len(self.plot_line_point) > 1:
@@ -641,5 +634,5 @@ class Cartesian(Widget):
 
         rtype: None
         """
-        self.plot_line_point = None
+        self.plot_line_point = []
         self._plot_bitmap.fill(palette_index)
