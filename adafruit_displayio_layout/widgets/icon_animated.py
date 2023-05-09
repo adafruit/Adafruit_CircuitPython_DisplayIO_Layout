@@ -211,7 +211,7 @@ class IconAnimated(IconWidget):
             animation_palette = self.__class__.palette_buffer
 
             # For mypy, if class is configured correctly this must be true
-            assert isinstance(self.__class__.display, Display)
+            assert self.__class__.display is not None
 
             # store the current display refresh setting
             refresh_status = self.__class__.display.auto_refresh
@@ -291,7 +291,7 @@ class IconAnimated(IconWidget):
             animation_palette = self.__class__.palette_buffer
 
             # For mypy, if class is configured correctly this must be true
-            assert isinstance(self.__class__.display, Display)
+            assert self.__class__.display is not None
 
             # store the current display refresh setting
             refresh_status = self.__class__.display.auto_refresh
