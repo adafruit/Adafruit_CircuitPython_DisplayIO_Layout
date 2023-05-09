@@ -21,6 +21,12 @@ Implementation Notes
 
 """
 
+try:
+    from typing import Optional, Tuple
+except ImportError:
+    pass
+
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
@@ -46,20 +52,24 @@ class Control:
 
     def __init__(
         self,
-    ):
+    ) -> None:
         self.touch_boundary = (
-            None  # `self.touch_boundary` should be updated by the subclass
+            0,
+            0,
+            0,
+            0,  # `self.touch_boundary` should be updated by the subclass
         )
         # Tuple of [x, y, width, height]: [int, int, int, int] all in pixel units
         # where x,y define the upper left corner
         # and width and height define the size of the `touch_boundary`
 
-    def contains(self, touch_point):
+    def contains(self, touch_point: Tuple[int, int, Optional[int]]) -> bool:
         """Checks if the Control was touched.  Returns True if the touch_point is within the
          Control's touch_boundary.
 
-        :param touch_point: x,y location of the screen, converted to local coordinates.
-        :type touch_point: Tuple[x,y]
+        :param touch_point: x, y, p location of the screen, converted to local coordinates, plus
+            an optional pressure value for screens that support it.
+        :type touch_point: Tuple[int, int, Optional[int]]
         :return: Boolean
 
         """
@@ -82,11 +92,12 @@ class Control:
         return False
 
     # place holder touch_handler response functions
-    def selected(self, touch_point):
+    def selected(self, touch_point: Tuple[int, int, Optional[int]]) -> None:
         """Response function when Control is selected. Should be overridden by subclass.
 
-        :param touch_point: x,y location of the screen, converted to local coordinates.
-        :type touch_point: Tuple[x,y]
+        :param touch_point: x, y, p location of the screen, converted to local coordinates, plus
+            an optional pressure value for screens that support it.
+        :type touch_point: Tuple[int, int, Optional[int]]
         :return: None
 
         """

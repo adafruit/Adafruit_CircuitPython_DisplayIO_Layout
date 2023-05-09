@@ -36,7 +36,7 @@ except ImportError:
     pass
 
 try:
-    from typing import Tuple
+    from typing import Any, List, Optional, Tuple
 except ImportError:
     pass
 
@@ -178,7 +178,7 @@ class Cartesian(Widget):
         tick_color: int = 0xFFFFFF,
         major_tick_stroke: int = 1,
         major_tick_length: int = 5,
-        tick_label_font=terminalio.FONT,
+        tick_label_font: terminalio.FONT = terminalio.FONT,
         font_color: int = 0xFFFFFF,
         pointer_radius: int = 1,
         pointer_color: int = 0xFFFFFF,
@@ -186,7 +186,7 @@ class Cartesian(Widget):
         nudge_x: int = 0,
         nudge_y: int = 0,
         verbose: bool = False,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
 
         super().__init__(**kwargs)
@@ -317,12 +317,12 @@ class Cartesian(Widget):
         self.append(self._screen_tilegrid)
         self.append(self._corner_tilegrid)
 
-        self._pointer = None
-        self._circle_palette = None
-        self.plot_line_point = None
+        self._pointer: Optional[vectorio.Circle] = None
+        self._circle_palette: Optional[displayio.Palette] = None
+        self.plot_line_point: List[Tuple[int, int]] = []
 
     @staticmethod
-    def _get_font_height(font, scale: int) -> Tuple[int, int]:
+    def _get_font_height(font: terminalio.FONT, scale: int) -> Tuple[int, int]:
         if hasattr(font, "get_bounding_box"):
             font_height = int(scale * font.get_bounding_box()[1])
             font_width = int(scale * font.get_bounding_box()[0])
@@ -448,6 +448,7 @@ class Cartesian(Widget):
     def _draw_pointers(self, x: int, y: int) -> None:
 
         self._circle_palette = displayio.Palette(1)
+
         self._circle_palette[0] = self._pointer_color
         self._pointer = vectorio.Circle(
             radius=self._pointer_radius, x=x, y=y, pixel_shader=self._circle_palette
@@ -455,7 +456,7 @@ class Cartesian(Widget):
 
         self.append(self._pointer)
 
-    def _calc_local_xy(self, x: int, y: int) -> (int, int):
+    def _calc_local_xy(self, x: int, y: int) -> Tuple[int, int]:
         local_x = (
             int((x - self._xrange[0]) * self._factorx * self._valuex) + self._nudge_x
         )
@@ -469,24 +470,24 @@ class Cartesian(Widget):
         )
         return (local_x, local_y)
 
-    def _check_local_x_in_range(self, local_x):
+    def _check_local_x_in_range(self, local_x: int) -> bool:
         return 0 <= local_x < self.width
 
-    def _check_local_y_in_range(self, local_y):
+    def _check_local_y_in_range(self, local_y: int) -> bool:
         return 0 <= local_y < self.height
 
-    def _check_local_xy_in_range(self, local_x, local_y):
+    def _check_local_xy_in_range(self, local_x: int, local_y: int) -> bool:
         return self._check_local_x_in_range(local_x) and self._check_local_y_in_range(
             local_y
         )
 
-    def _check_x_in_range(self, x):
+    def _check_x_in_range(self, x: int) -> bool:
         return self._xrange[0] <= x <= self._xrange[1]
 
-    def _check_y_in_range(self, y):
+    def _check_y_in_range(self, y: int) -> bool:
         return self._yrange[0] <= y <= self._yrange[1]
 
-    def _check_xy_in_range(self, x, y):
+    def _check_xy_in_range(self, x: int, y: int) -> bool:
         return self._check_x_in_range(x) and self._check_y_in_range(y)
 
     def _add_point(self, x: int, y: int) -> None:
@@ -587,6 +588,7 @@ class Cartesian(Widget):
         :return: None
         rtype: None
         """
+
         self._add_point(x, y)
         if not self._pointer:
             self._draw_pointers(
@@ -609,6 +611,7 @@ class Cartesian(Widget):
 
         rtype: None
         """
+
         self._add_point(x, y)
         if len(self.plot_line_point) > 1:
             bitmaptools.draw_line(
@@ -620,7 +623,7 @@ class Cartesian(Widget):
                 1,
             )
 
-    def clear_plot_lines(self, palette_index=5):
+    def clear_plot_lines(self, palette_index: int = 5) -> None:
         """clear_plot_lines function.
 
         clear all added lines
@@ -631,5 +634,5 @@ class Cartesian(Widget):
 
         rtype: None
         """
-        self.plot_line_point = None
+        self.plot_line_point = []
         self._plot_bitmap.fill(palette_index)

@@ -30,6 +30,12 @@ from adafruit_display_text import bitmap_label
 from adafruit_displayio_layout.widgets.control import Control
 from adafruit_displayio_layout.widgets.widget import Widget
 
+try:
+    from typing import Any, Optional, Tuple
+except ImportError:
+    pass
+
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
@@ -61,13 +67,13 @@ class IconWidget(Widget, Control):
 
     def __init__(
         self,
-        label_text,
-        icon,
-        on_disk=False,
-        transparent_index=None,
-        label_background=None,
-        **kwargs
-    ):
+        label_text: str,
+        icon: str,
+        on_disk: bool = False,
+        transparent_index: Optional[int] = None,
+        label_background: Optional[int] = None,
+        **kwargs: Any
+    ) -> None:
         super().__init__(**kwargs)
 
         self._icon = icon
@@ -95,20 +101,23 @@ class IconWidget(Widget, Control):
             _label.background_color = label_background
 
         self.append(_label)
-        self.touch_boundary = (
+        self.touch_boundary: Tuple[int, int, int, int] = (
             0,
             0,
             image.width,
             image.height + _label.bounding_box[3],
         )
 
-    def contains(self, touch_point):  # overrides, then calls Control.contains(x,y)
+    def contains(
+        self, touch_point: Tuple[int, int, Optional[int]]
+    ) -> bool:  # overrides, then calls Control.contains(x,y)
 
         """Checks if the IconWidget was touched.  Returns True if the touch_point is
         within the IconWidget's touch_boundary.
 
-        :param touch_point: x,y location of the screen, converted to local coordinates.
-        :type touch_point: Tuple[x,y]
+        :param touch_point: x, y, p location of the screen, converted to local coordinates, plus
+            an optional pressure value for screens that support it.
+        :type touch_point: Tuple[int, int, Optional[int]]
         :return: Boolean
         """
 
