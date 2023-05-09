@@ -174,7 +174,7 @@ class Widget(displayio.Group):
         self,
         x: int = 0,
         y: int = 0,
-        scale: float = 1,
+        scale: int = 1,
         width: Optional[int] = None,
         height: Optional[int] = None,
         anchor_point: Optional[Tuple[float, float]] = None,

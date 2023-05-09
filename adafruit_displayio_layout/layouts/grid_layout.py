@@ -24,7 +24,7 @@ Implementation Notes
 """
 try:
     # Used only for typing
-    from typing import Any, List, Tuple, Union
+    from typing import Any, List, Optional, Tuple, Union
 except ImportError:
     pass
 
@@ -381,7 +381,7 @@ class GridLayout(displayio.Group):
         cell_content: displayio.Group,
         grid_position: Tuple[int, int],
         cell_size: Tuple[int, int],
-        cell_anchor_point: Union[Tuple[float, ...], None] = None,
+        cell_anchor_point: Optional[Tuple[float, ...]] = None,
     ) -> None:
         """Add a child to the grid.
 

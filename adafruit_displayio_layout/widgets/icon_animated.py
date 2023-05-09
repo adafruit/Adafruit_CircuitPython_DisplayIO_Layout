@@ -25,7 +25,7 @@ import gc
 import time
 from math import pi
 import bitmaptools
-from displayio import TileGrid, Bitmap, Display, Palette
+from displayio import TileGrid, Bitmap, Palette
 import adafruit_imageload
 from adafruit_displayio_layout.widgets.icon_widget import IconWidget
 from adafruit_displayio_layout.widgets.easing import quadratic_easeout as easein
@@ -33,6 +33,7 @@ from adafruit_displayio_layout.widgets.easing import quadratic_easein as easeout
 
 try:
     from typing import Any, Optional, Tuple
+    from displayio import Display  # pylint: disable=ungrouped-imports
 except ImportError:
     pass
 
