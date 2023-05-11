@@ -111,7 +111,6 @@ class IconWidget(Widget, Control):
     def contains(
         self, touch_point: Tuple[int, int, Optional[int]]
     ) -> bool:  # overrides, then calls Control.contains(x,y)
-
         """Checks if the IconWidget was touched.  Returns True if the touch_point is
         within the IconWidget's touch_boundary.
 

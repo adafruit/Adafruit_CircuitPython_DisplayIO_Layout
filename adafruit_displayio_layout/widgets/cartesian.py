@@ -188,7 +188,6 @@ class Cartesian(Widget):
         verbose: bool = False,
         **kwargs: Any,
     ) -> None:
-
         super().__init__(**kwargs)
 
         self._verbose = verbose
@@ -335,7 +334,6 @@ class Cartesian(Widget):
         return font_width, font_height
 
     def _draw_axes(self) -> None:
-
         bitmaptools.fill_region(
             self._axesx_bitmap,
             0,
@@ -432,7 +430,6 @@ class Cartesian(Widget):
 
             if self._subticks:
                 if i in subticks:
-
                     bitmaptools.fill_region(
                         self._axesy_bitmap,
                         self._axesy_width
@@ -446,7 +443,6 @@ class Cartesian(Widget):
                     )
 
     def _draw_pointers(self, x: int, y: int) -> None:
-
         self._circle_palette = displayio.Palette(1)
 
         self._circle_palette[0] = self._pointer_color

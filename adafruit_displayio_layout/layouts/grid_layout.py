@@ -153,7 +153,6 @@ class GridLayout(displayio.Group):
                         pass
 
                 if not hasattr(cell["content"], "anchor_point"):
-
                     cell["content"].x = (
                         int(grid_position_x * self._width / grid_size_x)
                         + self.cell_padding

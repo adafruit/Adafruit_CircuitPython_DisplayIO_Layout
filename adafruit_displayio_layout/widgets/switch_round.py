@@ -452,7 +452,6 @@ class SwitchRound(Widget, Control):
         value: bool = False,  # initial value
         **kwargs: Any,
     ) -> None:
-
         self._radius = height // 2
 
         # If width is not provided, then use the preferred aspect ratio
@@ -758,7 +757,6 @@ class SwitchRound(Widget, Control):
         start_time = time.monotonic()  # set the starting time for animation
 
         while True:
-
             # Determines the direction of movement, depending upon if the
             # switch is going from on->off or off->on
 

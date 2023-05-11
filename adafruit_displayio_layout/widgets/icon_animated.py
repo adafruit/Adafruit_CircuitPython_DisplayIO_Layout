@@ -152,7 +152,6 @@ class IconAnimated(IconWidget):
         animation_time: float = 0.15,
         **kwargs: Any,
     ) -> None:
-
         if self.__class__.display is None:
             raise ValueError(
                 "Must initialize class using\n"
@@ -206,7 +205,6 @@ class IconAnimated(IconWidget):
                 )
 
         if self._animation_time > 0:
-
             animation_bitmap = self.__class__.bitmap_buffer
             animation_palette = self.__class__.palette_buffer
 

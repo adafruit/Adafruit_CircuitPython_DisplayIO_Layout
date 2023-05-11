@@ -39,7 +39,6 @@ from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
 class gVars:
     def __init__(self):
-
         self.gVarsDict = {
             0: "my_debug",
             1: "rtc",
@@ -486,6 +485,7 @@ bg_group = displayio.Group()
 """
    From: https://learn.adafruit.com/making-a-pyportal-user-interface-displayio/the-full-code
 """
+
 
 # This will handle switching Images and Icons
 def set_image(group, filename):

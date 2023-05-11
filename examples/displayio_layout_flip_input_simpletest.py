@@ -101,7 +101,6 @@ display.show(my_group)  # add high level Group to the display
 display.auto_refresh = True
 
 while True:
-
     p = ts.touch_point
     # print("touch_point p: {}".format(p)) # print the touch point
 

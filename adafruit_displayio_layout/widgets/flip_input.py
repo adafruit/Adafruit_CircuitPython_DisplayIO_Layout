@@ -262,9 +262,7 @@ class FlipInput(Widget, Control):
         # Add the two arrow triangles, if required
 
         if (arrow_color is not None) or (arrow_outline is not None):
-
             if horizontal:  # horizontal orientation, add left and right arrows
-
                 if (
                     (arrow_width is not None)
                     and (arrow_height is not None)
@@ -304,7 +302,6 @@ class FlipInput(Widget, Control):
                         )
                     )
             else:  # vertical orientation, add upper and lower arrows
-
                 if (
                     (arrow_height is not None)
                     and (arrow_width is not None)
@@ -345,13 +342,11 @@ class FlipInput(Widget, Control):
 
     # Draw function to update the current value
     def _update_value(self, new_value: int, animate: bool = True) -> None:
-
         if (
             (self._animation_time is not None)
             and (self._animation_time > 0)  # If animation is required
             and (animate)
         ):
-
             if ((new_value - self.value) == 1) or (
                 (self.value == (len(self.value_list) - 1)) and (new_value == 0)
             ):  # wrap around
@@ -553,7 +548,6 @@ def _draw_position(
     position: float = 0.0,
     horizontal: bool = True,
 ) -> None:
-
     x_offset1 = bitmap1_offset[0]
     y_offset1 = bitmap1_offset[1]
     x_offset2 = bitmap2_offset[0]
@@ -597,6 +591,7 @@ def _draw_position(
 
 
 # pylint: disable=invalid-name
+
 
 # _blit_constrained: Copies bitmaps with constraints to the dimensions
 def _blit_constrained(
@@ -662,7 +657,6 @@ def _animate_bitmap(
     animation_time: float,
     horizontal: bool,
 ) -> None:
-
     start_time = time.monotonic()
 
     if start_position > end_position:  # direction is decreasing: "out"
@@ -686,7 +680,6 @@ def _animate_bitmap(
     display.auto_refresh = True
 
     while True:
-
         this_time = time.monotonic()
         target_position = (
             start_position
@@ -709,7 +702,6 @@ def _animate_bitmap(
             )
             display.auto_refresh = True
         else:
-
             _draw_position(
                 target_bitmap,
                 bitmap1,

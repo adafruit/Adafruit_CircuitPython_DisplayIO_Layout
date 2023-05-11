@@ -85,7 +85,6 @@ class TabLayout(displayio.Group):
         showing_tab_transparent_indexes: Optional[Union[int, Tuple[int, int]]] = None,
         tab_count: int = None,
     ):
-
         if display is None:
             # pylint: disable=import-outside-toplevel
             import board
@@ -283,7 +282,6 @@ class TabLayout(displayio.Group):
 
         if touch_event:
             if 0 <= touch_event[1] <= self.tab_height:
-
                 touched_tab_index = touch_event[0] // (
                     self.display.width // self.tab_count
                 )

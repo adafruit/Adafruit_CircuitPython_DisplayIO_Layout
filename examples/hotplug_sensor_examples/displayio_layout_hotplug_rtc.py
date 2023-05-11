@@ -27,7 +27,6 @@ from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
 class gVars:
     def __init__(self):
-
         self.gVarsDict = {
             0: "my_debug",
             1: "rtc",
@@ -524,7 +523,6 @@ ss = 5
 
 
 def handle_dt(dt):
-
     RetVal = False
     s = "Date/time: "
     sYY = str(dt[yy])
@@ -652,5 +650,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

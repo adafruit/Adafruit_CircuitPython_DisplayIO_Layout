@@ -55,6 +55,5 @@ test_page_layout.add_content(page_2_group, "page_2")
 
 main_group.append(test_page_layout)
 while True:
-
     time.sleep(1)
     test_page_layout.next_page()

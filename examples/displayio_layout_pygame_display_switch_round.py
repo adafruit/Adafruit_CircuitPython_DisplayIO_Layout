@@ -72,7 +72,6 @@ my_switch = Switch(
 
 main_group.append(my_switch)
 while display.running:
-
     # get mouse up  events
     ev = pygame.event.get(eventtype=pygame.MOUSEBUTTONUP)
     # proceed events

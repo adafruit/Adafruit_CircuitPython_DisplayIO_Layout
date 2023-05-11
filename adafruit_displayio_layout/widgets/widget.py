@@ -180,7 +180,6 @@ class Widget(displayio.Group):
         anchor_point: Optional[Tuple[float, float]] = None,
         anchored_position: Optional[Tuple[int, int]] = None,
     ) -> None:
-
         super().__init__(x=x, y=y, scale=scale)
         # send x,y and scale to Group
         #
