@@ -25,7 +25,7 @@ import gc
 import time
 import displayio
 from terminalio import FONT
-
+import bitmaptools
 from adafruit_display_shapes.triangle import Triangle
 
 from adafruit_display_text import bitmap_label
@@ -42,7 +42,6 @@ try:
     from typing import Any, List, Optional, Tuple
 except ImportError:
     pass
-
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
@@ -381,7 +380,12 @@ class FlipInput(Widget, Control):
             start_bitmap = displayio.Bitmap(
                 self._label.bitmap.width, self._label.bitmap.height, 2
             )  # color depth 2
-            start_bitmap.blit(0, 0, self._label.bitmap)
+
+            # CircuitPython Versions <= 8.2.0
+            # start_bitmap.blit(0, 0, self._label.bitmap)
+
+            # CircuitPython Versions >= 9.0.0
+            bitmaptools.blit(start_bitmap, self._label.bitmap, 0, 0)
 
             # get the bitmap1 position offsets
             bitmap1_offset = (
@@ -555,11 +559,20 @@ def _draw_position(
 
     if position == 0.0:
         target_bitmap.fill(0)
-        target_bitmap.blit(x_offset1, y_offset1, bitmap1)
+
+        # CircuitPython Versions <= 8.2.0
+        # target_bitmap.blit(x_offset1, y_offset1, bitmap1)
+
+        # CircuitPython Versions >= 9.0.0
+        bitmaptools.blit(target_bitmap, bitmap1, x_offset1, y_offset1)
         return
     if position == 1.0:
         target_bitmap.fill(0)
-        target_bitmap.blit(x_offset2, y_offset2, bitmap2)
+        # CircuitPython Versions <= 8.2.0
+        # target_bitmap.blit(x_offset2, y_offset2, bitmap2)
+
+        # CircuitPython Versions >= 9.0.0
+        bitmaptools.blit(target_bitmap, bitmap2, x_offset2, y_offset2)
         return
 
     if horizontal:
@@ -641,7 +654,11 @@ def _blit_constrained(
     ):
         return
 
-    target.blit(x, y, source, x1=x1, y1=y1, x2=x2, y2=y2)
+    # CircuitPython Versions <= 8.2.0
+    # target.blit(x, y, source, x1=x1, y1=y1, x2=x2, y2=y2)
+
+    # CircuitPython Versions >= 9.0.0
+    bitmaptools.blit(target, source, x, y, x1=x1, y1=y1, x2=x2, y2=y2)
 
 
 # _animate_bitmap - performs animation of scrolling between two bitmaps
