@@ -30,6 +30,7 @@ except ImportError:
 
 import math
 import displayio
+from vectorio import Rectangle
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
@@ -264,50 +265,40 @@ class GridLayout(displayio.Group):
                             - int(cell["cell_anchor_point"][0] * _measured_width)
                         )
 
-                    _horizontal_divider_line = displayio.Shape(
-                        _measured_width + (2 * self.cell_padding),
-                        1,
-                        mirror_x=False,
-                        mirror_y=False,
-                    )
-
-                    _bottom_divider_tilegrid = displayio.TileGrid(
-                        _horizontal_divider_line,
+                    _bottom_divider_rect = Rectangle(
                         pixel_shader=palette,
+                        width=_measured_width + (2 * self.cell_padding),
+                        height=1,
                         y=_bottom_line_loc_y,
                         x=_bottom_line_loc_x,
                     )
 
-                    _top_divider_tilegrid = displayio.TileGrid(
-                        _horizontal_divider_line,
+                    _top_divider_rect = Rectangle(
+                        width=_measured_width + (2 * self.cell_padding),
+                        height=1,
                         pixel_shader=palette,
                         y=_top_line_loc_y,
                         x=_top_line_loc_x,
                     )
 
-                    _vertical_divider_line = displayio.Shape(
-                        1,
-                        _measured_height + (2 * self.cell_padding),
-                        mirror_x=False,
-                        mirror_y=False,
-                    )
-
-                    _left_divider_tilegrid = displayio.TileGrid(
-                        _vertical_divider_line,
+                    _left_divider_rect = Rectangle(
                         pixel_shader=palette,
+                        width=1,
+                        height=_measured_height + (2 * self.cell_padding),
                         y=_top_line_loc_y,
                         x=_top_line_loc_x,
                     )
 
-                    _right_divider_tilegrid = displayio.TileGrid(
-                        _vertical_divider_line,
+                    _right_divider_rect = Rectangle(
                         pixel_shader=palette,
+                        width=1,
+                        height=_measured_height + (2 * self.cell_padding),
                         y=_right_line_loc_y,
                         x=_right_line_loc_x,
                     )
 
                     for line_obj in self._divider_lines:
-                        self.remove(line_obj["tilegrid"])
+                        self.remove(line_obj["rect"])
 
                     """
                     Only use bottom divider lines on the bottom row. All
@@ -324,8 +315,7 @@ class GridLayout(displayio.Group):
                     ):
                         self._divider_lines.append(
                             {
-                                "shape": _horizontal_divider_line,
-                                "tilegrid": _bottom_divider_tilegrid,
+                                "rect": _bottom_divider_rect,
                             }
                         )
 
@@ -336,8 +326,7 @@ class GridLayout(displayio.Group):
                     if grid_position_y in self.h_divider_line_rows:
                         self._divider_lines.append(
                             {
-                                "shape": _horizontal_divider_line,
-                                "tilegrid": _top_divider_tilegrid,
+                                "rect": _top_divider_rect,
                             }
                         )
 
@@ -348,8 +337,7 @@ class GridLayout(displayio.Group):
                     if grid_position_x in self.v_divider_line_cols:
                         self._divider_lines.append(
                             {
-                                "shape": _horizontal_divider_line,
-                                "tilegrid": _left_divider_tilegrid,
+                                "rect": _left_divider_rect,
                             }
                         )
                     """
@@ -367,13 +355,12 @@ class GridLayout(displayio.Group):
                     ):
                         self._divider_lines.append(
                             {
-                                "shape": _vertical_divider_line,
-                                "tilegrid": _right_divider_tilegrid,
+                                "rect": _right_divider_rect,
                             }
                         )
 
                     for line_obj in self._divider_lines:
-                        self.append(line_obj["tilegrid"])
+                        self.append(line_obj["rect"])
 
     def add_content(
         self,
