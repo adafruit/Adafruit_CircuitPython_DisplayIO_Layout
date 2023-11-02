@@ -122,7 +122,7 @@ class Widget(displayio.Group):
     The Widget class has several options for setting the widget position on the screen.
     In the simplest case, you can define the widget's *.x* and *.y* properties to set
     the position.  (**Reminder**: If your widget is directly shown by the display using
-    *display.show(my_widget)*), then the *.x* and *.y* positions will be in the display's
+    *display.root_group=my_widget*), then the *.x* and *.y* positions will be in the display's
     coordinate system.  But if your widget is held inside of another Group, then its
     coordinates will be in that Group's coordinate system.)
 

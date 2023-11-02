@@ -148,7 +148,7 @@ class SwitchRound(Widget, Control):
 
         .. code-block:: python
 
-            display.show(my_switch) # add the group to the display
+            display.root_group = my_switch # add the group to the display
 
         If you want to have multiple display elements, you can create a group and then
         append the switch and the other elements to the group.  Then, you can add the full
@@ -164,7 +164,7 @@ class SwitchRound(Widget, Control):
             # Append other display elements to the group
             #
 
-            display.show(my_group) # add the group to the display
+            display.root_group = my_group # add the group to the display
 
         For a full example, including how to respond to screen touches, check out the
         following examples in the `Adafruit_CircuitPython_DisplayIO_Layout

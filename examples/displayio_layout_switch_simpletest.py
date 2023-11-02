@@ -30,7 +30,7 @@ my_group = displayio.Group()
 my_group.append(my_switch)
 
 # Add my_group to the display
-display.show(my_group)
+display.root_group = my_group
 
 # Start the main loop
 while True:

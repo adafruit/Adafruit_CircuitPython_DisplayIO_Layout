@@ -18,7 +18,7 @@ display = PyGameDisplay(width=320, height=240)
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 switch_x = 30
 switch_y = 30

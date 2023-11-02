@@ -98,7 +98,7 @@ class Cartesian(Widget):
 
     .. code-block:: python
 
-        display.show(my_plane) # add the group to the display
+        display.root_group = my_plane # add the group to the display
 
     If you want to have multiple display elements, you can create a group and then
     append the plane and the other elements to the group.  Then, you can add the full
@@ -114,7 +114,7 @@ class Cartesian(Widget):
         # Append other display elements to the group
         #
 
-        display.show(my_group) # add the group to the display
+        display.root_group = my_group # add the group to the display
 
 
     **Summary: Cartesian Features and input variables**

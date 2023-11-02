@@ -21,7 +21,7 @@ display = board.DISPLAY
 
 # create and show main_group
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 font = terminalio.FONT
 

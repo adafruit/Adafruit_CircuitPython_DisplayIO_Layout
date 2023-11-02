@@ -18,7 +18,7 @@ display = board.DISPLAY
 
 # create and show main_group
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 # create the page layout
 test_page_layout = PageLayout(x=0, y=0)
