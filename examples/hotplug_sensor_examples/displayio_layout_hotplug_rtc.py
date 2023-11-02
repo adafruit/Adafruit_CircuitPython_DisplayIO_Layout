@@ -222,7 +222,7 @@ display.rotation = 0
 
 # create and show main_group
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 # fon.gvars bitmap_font.load_font("fonts/Helvetica-Bold-16.bdf")
 font_arial = bitmap_font.load_font("/fonts/Arial-16.bdf")

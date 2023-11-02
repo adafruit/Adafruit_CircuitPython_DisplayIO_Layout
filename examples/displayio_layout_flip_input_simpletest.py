@@ -97,7 +97,7 @@ my_group.append(my_flip1)
 my_group.append(my_flip2)
 my_group.append(my_flip3)
 
-display.show(my_group)  # add high level Group to the display
+display.root_group = my_group  # add high level Group to the display
 display.auto_refresh = True
 
 while True:

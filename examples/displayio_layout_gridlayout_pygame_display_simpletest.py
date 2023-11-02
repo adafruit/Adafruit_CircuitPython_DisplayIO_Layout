@@ -18,7 +18,7 @@ from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 
 display = PyGameDisplay(width=320, height=240)
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 layout = GridLayout(
     x=10,

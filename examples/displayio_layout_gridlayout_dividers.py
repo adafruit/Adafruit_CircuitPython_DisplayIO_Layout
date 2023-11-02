@@ -17,7 +17,7 @@ display = board.DISPLAY
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 layout = GridLayout(
     x=10,

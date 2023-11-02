@@ -30,7 +30,7 @@ my_plane = Cartesian(
 
 my_group = displayio.Group()
 my_group.append(my_plane)
-display.show(my_group)  # add high level Group to the display
+display.root_group = my_group  # add high level Group to the display
 
 data = [
     # (0, 0),  # we do this point manually - so we have no wait...

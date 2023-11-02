@@ -69,7 +69,7 @@ car5 = Cartesian(
 )
 my_group.append(car5)
 
-display.show(my_group)
+display.root_group = my_group
 
 while True:
     pass

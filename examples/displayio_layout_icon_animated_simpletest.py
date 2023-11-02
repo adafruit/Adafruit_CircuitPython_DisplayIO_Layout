@@ -52,7 +52,7 @@ main_group = displayio.Group()
 main_group.append(icon_zoom)
 main_group.append(icon_shrink)
 
-display.show(main_group)
+display.root_group = main_group
 
 
 COOLDOWN_TIME = 0.25
