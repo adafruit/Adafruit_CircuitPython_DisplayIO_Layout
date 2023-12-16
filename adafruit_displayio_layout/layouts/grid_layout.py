@@ -448,7 +448,7 @@ class GridLayout(displayio.Group):
     @property
     def height(self) -> int:
         """
-        The width in pixels of the GridLayout.
+        The height in pixels of the GridLayout.
         """
         return self._height
 
