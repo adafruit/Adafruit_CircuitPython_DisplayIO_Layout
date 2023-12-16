@@ -406,7 +406,19 @@ class GridLayout(displayio.Group):
         :return: the displayio content object at those coordinates
         """
         for index, cell in enumerate(self._cell_content_list):
+            # exact location 1x1 cell
             if cell["grid_position"] == cell_coordinates:
+                return self._cell_content_list[index]["content"]
+
+            # multi-spanning cell, any size bigger than 1x1
+            if (
+                cell["grid_position"][0]
+                <= cell_coordinates[0]
+                < cell["grid_position"][0] + cell["cell_size"][0]
+                and cell["grid_position"][1]
+                <= cell_coordinates[1]
+                < cell["grid_position"][1] + cell["cell_size"][1]
+            ):
                 return self._cell_content_list[index]["content"]
 
         raise KeyError(
@@ -425,3 +437,40 @@ class GridLayout(displayio.Group):
           pixels of a 1x1 cell in the GridLayout
         """
         return (self._width // self.grid_size[0], self._height // self.grid_size[1])
+
+    @property
+    def width(self) -> int:
+        """
+        The width in pixels of the GridLayout.
+        """
+        return self._width
+
+    @property
+    def height(self) -> int:
+        """
+        The width in pixels of the GridLayout.
+        """
+        return self._height
+
+    def which_cell_contains(
+        self, pixel_location: Union[Tuple[int, int], List[int]]
+    ) -> Optional[tuple]:
+        """
+        Given a pixel x,y coordinate returns the location of the cell
+        that contains the coordinate.
+
+        :param pixel_location: x,y pixel coordinate as a tuple or list
+        :returns: cell coordinates x,y tuple or None if the pixel coordinates are
+            outside the bounds of the GridLayout
+        """
+        cell_size = self.cell_size_pixels
+        if (
+            not self.x <= pixel_location[0] < self.x + self.width
+            or not self.y <= pixel_location[1] < self.y + self.height
+        ):
+            return None
+
+        cell_x_coord = (pixel_location[0] - self.x) // cell_size[0]
+        cell_y_coord = (pixel_location[1] - self.y) // cell_size[1]
+
+        return cell_x_coord, cell_y_coord
