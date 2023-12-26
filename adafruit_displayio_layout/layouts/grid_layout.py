@@ -111,8 +111,14 @@ class GridLayout(displayio.Group):
         ):
             self.cell_padding = 1
 
+    def layout_cells(self):
+        """render the grid with all cell content and dividers"""
+        self._layout_cells()
+
     def _layout_cells(self) -> None:
         # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+        for line_obj in self._divider_lines:
+            self.remove(line_obj["rect"])
         for cell in self._cell_content_list:
             if cell["content"] not in self:
                 grid_size_x = self.grid_size[0]
@@ -359,8 +365,8 @@ class GridLayout(displayio.Group):
                             }
                         )
 
-                    for line_obj in self._divider_lines:
-                        self.append(line_obj["rect"])
+        for line_obj in self._divider_lines:
+            self.append(line_obj["rect"])
 
     def add_content(
         self,
@@ -368,6 +374,7 @@ class GridLayout(displayio.Group):
         grid_position: Tuple[int, int],
         cell_size: Tuple[int, int],
         cell_anchor_point: Optional[Tuple[float, ...]] = None,
+        layout_cells=True,
     ) -> None:
         """Add a child to the grid.
 
@@ -395,7 +402,8 @@ class GridLayout(displayio.Group):
             "cell_size": cell_size,
         }
         self._cell_content_list.append(sub_view_obj)
-        self._layout_cells()
+        if layout_cells:
+            self._layout_cells()
 
     def get_cell(self, cell_coordinates: Tuple[int, int]) -> displayio.Group:
         """
