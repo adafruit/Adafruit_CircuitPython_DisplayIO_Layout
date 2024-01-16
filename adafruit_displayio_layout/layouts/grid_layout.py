@@ -303,9 +303,6 @@ class GridLayout(displayio.Group):
                         x=_right_line_loc_x,
                     )
 
-                    for line_obj in self._divider_lines:
-                        self.remove(line_obj["rect"])
-
                     """
                     Only use bottom divider lines on the bottom row. All
                     other rows rely on top divder lines of the row beneath them.
