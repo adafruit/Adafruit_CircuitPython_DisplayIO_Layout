@@ -32,6 +32,7 @@ inheritance_graph_attrs = dict(rankdir="TB")
 # autodoc module docs will fail to generate with a warning.
 autodoc_mock_imports = [
     "vectorio",
+    "terminalio",
     "bitmaptools",
 ]
 

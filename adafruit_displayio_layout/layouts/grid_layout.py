@@ -111,8 +111,14 @@ class GridLayout(displayio.Group):
         ):
             self.cell_padding = 1
 
+    def layout_cells(self):
+        """render the grid with all cell content and dividers"""
+        self._layout_cells()
+
     def _layout_cells(self) -> None:
         # pylint: disable=too-many-locals, too-many-branches, too-many-statements
+        for line_obj in self._divider_lines:
+            self.remove(line_obj["rect"])
         for cell in self._cell_content_list:
             if cell["content"] not in self:
                 grid_size_x = self.grid_size[0]
@@ -297,9 +303,6 @@ class GridLayout(displayio.Group):
                         x=_right_line_loc_x,
                     )
 
-                    for line_obj in self._divider_lines:
-                        self.remove(line_obj["rect"])
-
                     """
                     Only use bottom divider lines on the bottom row. All
                     other rows rely on top divder lines of the row beneath them.
@@ -359,8 +362,8 @@ class GridLayout(displayio.Group):
                             }
                         )
 
-                    for line_obj in self._divider_lines:
-                        self.append(line_obj["rect"])
+        for line_obj in self._divider_lines:
+            self.append(line_obj["rect"])
 
     def add_content(
         self,
@@ -368,6 +371,7 @@ class GridLayout(displayio.Group):
         grid_position: Tuple[int, int],
         cell_size: Tuple[int, int],
         cell_anchor_point: Optional[Tuple[float, ...]] = None,
+        layout_cells=True,
     ) -> None:
         """Add a child to the grid.
 
@@ -395,7 +399,8 @@ class GridLayout(displayio.Group):
             "cell_size": cell_size,
         }
         self._cell_content_list.append(sub_view_obj)
-        self._layout_cells()
+        if layout_cells:
+            self._layout_cells()
 
     def get_cell(self, cell_coordinates: Tuple[int, int]) -> displayio.Group:
         """
@@ -406,7 +411,19 @@ class GridLayout(displayio.Group):
         :return: the displayio content object at those coordinates
         """
         for index, cell in enumerate(self._cell_content_list):
+            # exact location 1x1 cell
             if cell["grid_position"] == cell_coordinates:
+                return self._cell_content_list[index]["content"]
+
+            # multi-spanning cell, any size bigger than 1x1
+            if (
+                cell["grid_position"][0]
+                <= cell_coordinates[0]
+                < cell["grid_position"][0] + cell["cell_size"][0]
+                and cell["grid_position"][1]
+                <= cell_coordinates[1]
+                < cell["grid_position"][1] + cell["cell_size"][1]
+            ):
                 return self._cell_content_list[index]["content"]
 
         raise KeyError(
@@ -425,3 +442,40 @@ class GridLayout(displayio.Group):
           pixels of a 1x1 cell in the GridLayout
         """
         return (self._width // self.grid_size[0], self._height // self.grid_size[1])
+
+    @property
+    def width(self) -> int:
+        """
+        The width in pixels of the GridLayout.
+        """
+        return self._width
+
+    @property
+    def height(self) -> int:
+        """
+        The height in pixels of the GridLayout.
+        """
+        return self._height
+
+    def which_cell_contains(
+        self, pixel_location: Union[Tuple[int, int], List[int]]
+    ) -> Optional[tuple]:
+        """
+        Given a pixel x,y coordinate returns the location of the cell
+        that contains the coordinate.
+
+        :param pixel_location: x,y pixel coordinate as a tuple or list
+        :returns: cell coordinates x,y tuple or None if the pixel coordinates are
+            outside the bounds of the GridLayout
+        """
+        cell_size = self.cell_size_pixels
+        if (
+            not self.x <= pixel_location[0] < self.x + self.width
+            or not self.y <= pixel_location[1] < self.y + self.height
+        ):
+            return None
+
+        cell_x_coord = (pixel_location[0] - self.x) // cell_size[0]
+        cell_y_coord = (pixel_location[1] - self.y) // cell_size[1]
+
+        return cell_x_coord, cell_y_coord
