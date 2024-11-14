@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 """
-`grid_layout`
+`linear_layout`
 ================================================================================
 
 A layout that organizes cells into a vertical or horizontal line.
