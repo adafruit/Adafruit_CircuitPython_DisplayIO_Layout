@@ -87,10 +87,8 @@ class TabLayout(displayio.Group):
     ):
         if display is None:
             # pylint: disable=import-outside-toplevel
-            import board
-
-            if hasattr(board, "DISPLAY"):
-                display = board.DISPLAY
+            import board  
+            display = getattr(board, "DISPLAY", None)
         if inactive_tab_spritesheet is None:
             raise AttributeError("Must pass inactive_tab_spritesheet")
         if showing_tab_spritesheet is None:
