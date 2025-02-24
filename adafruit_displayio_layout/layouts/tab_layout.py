@@ -22,19 +22,22 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
+
 try:
-    from typing import Optional, Union, Tuple
-    from fontio import BuiltinFont
+    from typing import Optional, Tuple, Union
+
     from adafruit_bitmap_font.bdf import BDF
     from adafruit_bitmap_font.pcf import PCF
+    from fontio import BuiltinFont
 except ImportError:
     pass
 
-import terminalio
-import displayio
 import adafruit_imageload
+import displayio
+import terminalio
 from adafruit_display_text.bitmap_label import Label
 from adafruit_imageload.tilegrid_inflator import inflate_tilegrid
+
 from adafruit_displayio_layout.layouts.page_layout import PageLayout
 
 __version__ = "0.0.0+auto.0"
@@ -68,8 +71,6 @@ class TabLayout(displayio.Group):
     :param int tab_count: How many tabs to draw in the layout. Positive whole numbers are valid.
     """
 
-    # pylint: disable=too-many-instance-attributes, too-many-arguments, invalid-name, too-many-branches
-
     def __init__(
         self,
         x: int = 0,
@@ -86,8 +87,7 @@ class TabLayout(displayio.Group):
         tab_count: int = None,
     ):
         if display is None:
-            # pylint: disable=import-outside-toplevel
-            import board
+            import board  # noqa: PLC0415, non-top-level-import
 
             if hasattr(board, "DISPLAY"):
                 display = board.DISPLAY
@@ -100,9 +100,7 @@ class TabLayout(displayio.Group):
 
         super().__init__(x=x, y=y)
         self.tab_count = tab_count
-        self._active_bmp, self._active_palette = adafruit_imageload.load(
-            showing_tab_spritesheet
-        )
+        self._active_bmp, self._active_palette = adafruit_imageload.load(showing_tab_spritesheet)
         self._inactive_bmp, self._inactive_palette = adafruit_imageload.load(
             inactive_tab_spritesheet
         )
@@ -121,9 +119,7 @@ class TabLayout(displayio.Group):
             for index in inactive_tab_transparent_indexes:
                 self._inactive_palette.make_transparent(index)
         else:
-            raise AttributeError(
-                "inactive_tab_transparent_indexes must be int or tuple"
-            )
+            raise AttributeError("inactive_tab_transparent_indexes must be int or tuple")
 
         self.tab_height = self._active_bmp.height
         self.display = display
@@ -147,8 +143,7 @@ class TabLayout(displayio.Group):
                     bmp_obj=self._inactive_bmp,
                     bmp_palette=self._inactive_palette,
                     target_size=(
-                        (self.display.width // self.tab_count)
-                        // (self._active_bmp.width // 3),
+                        (self.display.width // self.tab_count) // (self._active_bmp.width // 3),
                         3,
                     ),
                 )
@@ -165,8 +160,7 @@ class TabLayout(displayio.Group):
 
                 _tab_label.anchor_point = (0.5, 0.5)
                 _tab_label.anchored_position = (
-                    _tab_tilegrid.x
-                    + ((_tab_tilegrid.width * _tab_tilegrid.tile_width) // 2),
+                    _tab_tilegrid.x + ((_tab_tilegrid.width * _tab_tilegrid.tile_width) // 2),
                     (_tab_tilegrid.height * _tab_tilegrid.tile_height) // 2,
                 )
                 _new_tab_group.append(_tab_label)
@@ -282,8 +276,6 @@ class TabLayout(displayio.Group):
 
         if touch_event:
             if 0 <= touch_event[1] <= self.tab_height:
-                touched_tab_index = touch_event[0] // (
-                    self.display.width // self.tab_count
-                )
+                touched_tab_index = touch_event[0] // (self.display.width // self.tab_count)
                 print(f"{touch_event[0]} - {touched_tab_index}")
                 self.showing_page_index = touched_tab_index

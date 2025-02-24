@@ -7,8 +7,10 @@ This is a basic demonstration of a Cartesian widget for line-ploting
 """
 
 import time
+
 import board
 import displayio
+
 from adafruit_displayio_layout.widgets.cartesian import Cartesian
 
 # create the display on the PyPortal or Clue or PyBadge(for example)

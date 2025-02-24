@@ -6,13 +6,13 @@
 This is a basic demonstration of a FlipInput widget.
 """
 
-# pylint: disable=invalid-name
-
 import time
+
+import adafruit_touchscreen
 import board
 import displayio
-import adafruit_touchscreen
 from adafruit_bitmap_font import bitmap_font
+
 from adafruit_displayio_layout.widgets.flip_input import FlipInput
 
 display = board.DISPLAY  # create the display on the PyPortal,
@@ -62,7 +62,7 @@ my_flip2 = FlipInput(
     anchor_point=[0.0, 0.0],
     anchored_position=[220, 40],
     color=0xFF2222,  # reddish orange color
-    value_list=["{0:02d}".format(x) for x in range(1, 31 + 1)],
+    value_list=[f"{x:02d}" for x in range(1, 31 + 1)],
     # use a list of strings from 01 through 31
     # use the {0:02d} format string to always use two digits (e.g. '03')
     font_scale=5,
@@ -75,7 +75,7 @@ my_flip3 = FlipInput(
     anchor_point=[0.5, 1.0],
     anchored_position=[320 // 2, 240 - 10],
     color=0xFF2222,  # reddish orange color
-    value_list=["{}".format(x) for x in range(1985, 2022, 1)],
+    value_list=[f"{x}" for x in range(1985, 2022, 1)],
     # use a list with values of stringsfrom 1985 to 2022
     font=my_font,
     horizontal=True,  # use horizontal arrows

@@ -4,14 +4,16 @@
 """
 Make a TabLayout change tabs with the touchscreen
 """
-import displayio
-import board
-import terminalio
+
 import adafruit_touchscreen
-from adafruit_display_text.bitmap_label import Label
-from adafruit_display_shapes.rect import Rect
+import board
+import displayio
+import terminalio
 from adafruit_display_shapes.circle import Circle
+from adafruit_display_shapes.rect import Rect
 from adafruit_display_shapes.triangle import Triangle
+from adafruit_display_text.bitmap_label import Label
+
 from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
 # built-in display

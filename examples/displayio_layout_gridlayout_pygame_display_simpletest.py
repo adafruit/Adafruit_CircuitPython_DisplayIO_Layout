@@ -7,11 +7,11 @@ Displayed with Blinka_Displayio_PyGameDisplay
 
 Requires: https://github.com/FoamyGuy/Blinka_Displayio_PyGameDisplay
 """
+
 import displayio
 import terminalio
 from adafruit_display_text import label
 from blinka_displayio_pygamedisplay import PyGameDisplay
-
 
 # Make the display context. Change size if you want
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
@@ -31,15 +31,11 @@ layout = GridLayout(
 _labels = []
 
 _labels.append(
-    label.Label(
-        terminalio.FONT, scale=2, x=0, y=0, text="Hello", background_color=0x770077
-    )
+    label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Hello", background_color=0x770077)
 )
 layout.add_content(_labels[0], grid_position=(0, 0), cell_size=(1, 1))
 _labels.append(
-    label.Label(
-        terminalio.FONT, scale=2, x=0, y=0, text="World", background_color=0x007700
-    )
+    label.Label(terminalio.FONT, scale=2, x=0, y=0, text="World", background_color=0x007700)
 )
 layout.add_content(_labels[1], grid_position=(1, 0), cell_size=(1, 1))
 _labels.append(label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Hello"))

@@ -54,7 +54,7 @@ class LinearLayout(Widget):
         self.x = x
         self.y = y
         self.padding = padding
-        if orientation not in [self.VERTICAL_ORIENTATION, self.HORIZONTAL_ORIENTATION]:
+        if orientation not in {self.VERTICAL_ORIENTATION, self.HORIZONTAL_ORIENTATION}:
             raise ValueError(
                 "Orientation must be either LinearLayout.VERTICAL_ORIENTATION"
                 " or LinearLayout.HORIZONTAL_ORIENTATION"
@@ -77,7 +77,6 @@ class LinearLayout(Widget):
         self._layout()
 
     def _layout(self):
-        # pylint: disable=too-many-branches, protected-access
         self._prev_content_end = 0
 
         for _, content in enumerate(self._content_list):
@@ -100,14 +99,10 @@ class LinearLayout(Widget):
                 else:
                     content.x = self._prev_content_end
                     if not hasattr(content, "tile_width"):
-                        self._prev_content_end = (
-                            content.x + content.width + (self.padding * 2)
-                        )
+                        self._prev_content_end = content.x + content.width + (self.padding * 2)
                     else:
                         self._prev_content_end = (
-                            content.x
-                            + (content.width * content.tile_width)
-                            + (self.padding * 2)
+                            content.x + (content.width * content.tile_width) + (self.padding * 2)
                         )
             else:  # use anchor point
                 content.anchor_point = (
@@ -130,9 +125,7 @@ class LinearLayout(Widget):
 
                 else:
                     original_achored_pos_y = (
-                        content.anchored_position[1]
-                        if content.anchored_position is not None
-                        else 0
+                        content.anchored_position[1] if content.anchored_position is not None else 0
                     )
 
                     content.anchored_position = (

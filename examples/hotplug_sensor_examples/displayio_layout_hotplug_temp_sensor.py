@@ -9,26 +9,28 @@ This script can make use of an I2C Realtime Clock type DS3231
 However, when the flag 'use_ntp' is set, the DS3231 will not be used
 instead the NTP class from adafruit_ntp.py will be used.
 """
+
 import time
+
+import adafruit_tmp117
+import adafruit_touchscreen
 import board
 import busio
 import displayio
-import terminalio
-import adafruit_tmp117
-from adafruit_ds3231 import DS3231
-from digitalio import DigitalInOut
 import neopixel
-import adafruit_touchscreen
+import terminalio
+from adafruit_bitmap_font import bitmap_font
+from adafruit_display_shapes.circle import Circle
+from adafruit_display_shapes.rect import Rect
+from adafruit_display_shapes.triangle import Triangle
+from adafruit_display_text.bitmap_label import Label
+from adafruit_ds3231 import DS3231
 from adafruit_esp32spi import adafruit_esp32spi
 from adafruit_ntp import NTP
 from adafruit_pyportal import PyPortal
-from adafruit_display_text.bitmap_label import Label
-from adafruit_display_shapes.rect import Rect
-from adafruit_display_shapes.circle import Circle
-from adafruit_display_shapes.triangle import Triangle
-from adafruit_bitmap_font import bitmap_font
-from adafruit_displayio_layout.layouts.tab_layout import TabLayout
+from digitalio import DigitalInOut
 
+from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
 # +-------------------------------------------------------+
 # | Definition for variables in the past defined as global|
@@ -115,13 +117,9 @@ class gVars:
                 # key: {}".format(s, n))
                 self.g_vars[n] = value
             else:
-                raise KeyError(
-                    "variable '{:" ">20s}' not found in self.gVars_rDict".format(s)
-                )
+                raise KeyError("variable '{:" ">20s}' not found in self.gVars_rDict".format(s))
         else:
-            raise TypeError(
-                "myVars.write(): param s expected str, {} received".format(type(s))
-            )
+            raise TypeError(f"myVars.write(): param s expected str, {type(s)} received")
 
     def read(self, s):
         RetVal = None
@@ -168,8 +166,7 @@ class gVars:
     def list(self):
         for i in range(0, len(self.g_vars) - 1):
             print(
-                "self.g_vars['{:"
-                ">20s}'] = {}".format(
+                "self.g_vars['{:" ">20s}'] = {}".format(
                     self.gVarsDict[i], self.g_vars[i] if i in self.g_vars else "None"
                 )
             )
@@ -337,10 +334,7 @@ print("Connected to", str(esp.ssid, "utf-8"), "\tRSSI:", esp.rssi)
 print("Please wait...")
 if myVars.read("my_debug"):
     print("My IP address is", esp.pretty_ip(esp.ip_address))
-    print(
-        "IP lookup adafruit.com: %s"
-        % esp.pretty_ip(esp.get_host_by_name("adafruit.com"))
-    )
+    print("IP lookup adafruit.com: %s" % esp.pretty_ip(esp.get_host_by_name("adafruit.com")))
     print("Ping google.com: %d ms" % esp.ping("google.com"))
 
 
@@ -368,7 +362,7 @@ def refresh_from_NTP():
         # (defined in secrets.h)
         ntp_current_time = time.time()
         if myVars.read("my_debug"):
-            print("Seconds since Jan 1, 1970: {} seconds".format(ntp_current_time))
+            print(f"Seconds since Jan 1, 1970: {ntp_current_time} seconds")
 
         # Convert the current time in seconds since Jan 1, 1970 to a struct_time
         myVars.write("default_dt", time.localtime(ntp_current_time))
@@ -761,23 +755,15 @@ def get_temp():
             print("Temperature sensor has disconnected")
             t = ""
             myVars.write("temp_sensor", None)
-            pge4_lbl.text = myVars.read(
-                "pge4_lbl_dflt"
-            )  # clean the line  (eventually: t2)
+            pge4_lbl.text = myVars.read("pge4_lbl_dflt")  # clean the line  (eventually: t2)
             pge4_lbl2.text = "Sensor disconnected."
             pge4_lbl3.text = "Check wiring."
     return RetVal
 
 
-# Moved these six definitions outside handle_dt()
-# to correct pylint error 'too many variables'
 dt_ridxs = {"yy": 0, "mo": 1, "dd": 2, "hh": 3, "mm": 4, "ss": 5}
 
 # print("dict dt_ridxs =", dt_ridxs.keys())
-
-
-""" Function called by get_dt()
-    Created to repair pylint error R0912: Too many branches (13/12)"""
 
 
 def handle_dt(dt):
@@ -785,9 +771,6 @@ def handle_dt(dt):
     RetVal = False
     s = "Date/time: "
     sYY = str(dt[dt_ridxs["yy"]])  # was: str(dt[yy])
-    # print("dt_ridxs["mo"] = ", dt_ridxs["mo"])
-    # modified mo because plynt error R0914 'Too many local variables'
-    # mo = dt_ridxs["mo"]
     dd = dt_ridxs["dd"]
     hh = dt_ridxs["hh"]
     mm = dt_ridxs["mm"]
@@ -831,14 +814,14 @@ def handle_dt(dt):
 
     if myVars.read("c_secs") != myVars.read("o_secs"):
         myVars.write("o_secs", myVars.read("c_secs"))
-        sDT3 = s + "{} {}".format(sDT, sDT2)
+        sDT3 = s + f"{sDT} {sDT2}"
         print(sDT3)
 
         pge3_lbl3.text = sDT2
         if my_debug:
-            print("pge3_lbl.text = {}".format(pge3_lbl.text))
-            print("pge3_lbl2.text = {}".format(pge3_lbl2.text))
-            print("pge3_lbl3.text = {}".format(pge3_lbl3.text))
+            print(f"pge3_lbl.text = {pge3_lbl.text}")
+            print(f"pge3_lbl2.text = {pge3_lbl2.text}")
+            print(f"pge3_lbl3.text = {pge3_lbl3.text}")
         RetVal = True
 
     # Return from here with a False but don't set the pge3_lbl to default.
@@ -898,11 +881,6 @@ def hms_to_cnt():
     return (dt.tm_hour * 3600) + (dt.tm_min * 60) + dt.tm_sec
 
 
-""" Created this function to correct pylint errors:
-    'Too many branches' R0912 and
-    'Too many statements' R0915"""
-
-
 def ck_next_NTP_sync():
     s_cnt = myVars.read("s_cnt")
     c_cnt = hms_to_cnt()  # set current count (seconds)
@@ -917,9 +895,7 @@ def ck_next_NTP_sync():
     myVars.write("s_cnt", hms_to_cnt())
     # --- five minutes count down calculations #1 ---
     if my_debug:
-        print(
-            TAG + "five_min = {}, s_cnt = {}, c_cnt = {}".format(five_min, s_cnt, c_cnt)
-        )
+        print(TAG + f"five_min = {five_min}, s_cnt = {s_cnt}, c_cnt = {c_cnt}")
         print(TAG + "c_elapsed = ", c_elapsed)
 
     # --- five minutes count down calculations #2 ---
@@ -928,7 +904,7 @@ def ck_next_NTP_sync():
     myVars.write("five_min_cnt", five_min)  # remember count
     mm2 = five_min // 60
     ss2 = five_min - (mm2 * 60)
-    t2 = "{:02d}:{:02d}".format(mm2, ss2)
+    t2 = f"{mm2:02d}:{ss2:02d}"
     t0 = t1 + t2 + t3
     print(t0)
     pge3_lbl4.text = t0
@@ -973,7 +949,7 @@ def main():
                 if otp and ntp_refresh:
                     refresh_from_NTP()  # first re-synchronize internal clock from NTP server
                 if get_dt():
-                    print("Loop nr: {:03d}".format(cnt))
+                    print(f"Loop nr: {cnt:03d}")
             else:
                 connect_rtc()
             if myVars.read("temp_sensor") is not None:

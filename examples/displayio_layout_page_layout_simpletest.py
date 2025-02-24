@@ -4,13 +4,16 @@
 """
 Make a PageLayout with two pages and change between them.
 """
+
 import time
-import displayio
+
 import board
+import displayio
 import terminalio
-from adafruit_display_text.bitmap_label import Label
-from adafruit_display_shapes.rect import Rect
 from adafruit_display_shapes.circle import Circle
+from adafruit_display_shapes.rect import Rect
+from adafruit_display_text.bitmap_label import Label
+
 from adafruit_displayio_layout.layouts.page_layout import PageLayout
 
 # built-in display

@@ -30,8 +30,6 @@ except ImportError:
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
-# pylint: disable=unsubscriptable-object, unnecessary-pass
-
 
 class Control:
     """A Control class for responsive elements, including touch response functions for displays.
