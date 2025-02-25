@@ -22,6 +22,7 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
+
 try:
     # Used only for typing
     from typing import Any, List, Optional, Tuple, Union
@@ -29,6 +30,7 @@ except ImportError:
     pass
 
 import math
+
 import displayio
 from vectorio import Rectangle
 
@@ -58,8 +60,6 @@ class GridLayout(displayio.Group):
 
     """
 
-    # pylint: disable=too-many-arguments
-    # pylint: disable=too-many-instance-attributes
     def __init__(
         self,
         x: int,
@@ -106,9 +106,7 @@ class GridLayout(displayio.Group):
                     self.v_divider_line_cols.append(_x)
 
         # use at least 1 padding so that content is inside the divider lines
-        if cell_padding == 0 and (
-            divider_lines or h_divider_line_rows or v_divider_line_cols
-        ):
+        if cell_padding == 0 and (divider_lines or h_divider_line_rows or v_divider_line_cols):
             self.cell_padding = 1
 
     def layout_cells(self):
@@ -116,7 +114,6 @@ class GridLayout(displayio.Group):
         self._layout_cells()
 
     def _layout_cells(self) -> None:
-        # pylint: disable=too-many-locals, too-many-branches, too-many-statements
         for line_obj in self._divider_lines:
             self.remove(line_obj["rect"])
         for cell in self._cell_content_list:
@@ -310,11 +307,8 @@ class GridLayout(displayio.Group):
                     areas larger than 1x1 cells. For 1x1 cells this will equal zero
                     and not change anything.
                     """
-                    if (
-                        grid_position_y + content_cell_size_y - 1
-                    ) == grid_size_y - 1 and (
-                        (grid_position_y + content_cell_size_y - 1) + 1
-                        in self.h_divider_line_rows
+                    if (grid_position_y + content_cell_size_y - 1) == grid_size_y - 1 and (
+                        (grid_position_y + content_cell_size_y - 1) + 1 in self.h_divider_line_rows
                     ):
                         self._divider_lines.append(
                             {
@@ -350,11 +344,8 @@ class GridLayout(displayio.Group):
                     areas larger than 1x1 cells. For 1x1 cells this will equal zero
                     and not change anything.
                     """
-                    if (
-                        grid_position_x + content_cell_size_x - 1
-                    ) == grid_size_x - 1 and (
-                        (grid_position_x + content_cell_size_x - 1) + 1
-                        in self.v_divider_line_cols
+                    if (grid_position_x + content_cell_size_x - 1) == grid_size_x - 1 and (
+                        (grid_position_x + content_cell_size_x - 1) + 1 in self.v_divider_line_cols
                     ):
                         self._divider_lines.append(
                             {
@@ -426,11 +417,7 @@ class GridLayout(displayio.Group):
             ):
                 return self._cell_content_list[index]["content"]
 
-        raise KeyError(
-            "GridLayout does not contain cell at coordinates {}".format(
-                cell_coordinates
-            )
-        )
+        raise KeyError(f"GridLayout does not contain cell at coordinates {cell_coordinates}")
 
     @property
     def cell_size_pixels(self) -> Tuple[int, int]:

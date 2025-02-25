@@ -21,19 +21,23 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
+
 import gc
 import time
 from math import pi
-import bitmaptools
-from displayio import TileGrid, Bitmap, Palette
+
 import adafruit_imageload
-from adafruit_displayio_layout.widgets.icon_widget import IconWidget
-from adafruit_displayio_layout.widgets.easing import quadratic_easeout as easein
+import bitmaptools
+from displayio import Bitmap, Palette, TileGrid
+
 from adafruit_displayio_layout.widgets.easing import quadratic_easein as easeout
+from adafruit_displayio_layout.widgets.easing import quadratic_easeout as easein
+from adafruit_displayio_layout.widgets.icon_widget import IconWidget
 
 try:
     from typing import Any, Optional, Tuple
-    from displayio import Display  # pylint: disable=ungrouped-imports
+
+    from busdisplay import BusDisplay
 except ImportError:
     pass
 
@@ -43,7 +47,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.
 
 
 class IconAnimated(IconWidget):
-
     """
     An animated touch enabled widget that holds an icon image loaded with
     OnDiskBitmap and a text label centered beneath it. Includes optional
@@ -76,9 +79,6 @@ class IconAnimated(IconWidget):
     :type anchored_position: Tuple[int, int]
     """
 
-    # pylint: disable=bad-super-call, too-many-instance-attributes, too-many-locals
-    # pylint: disable=too-many-arguments, unused-argument
-
     display = None
     # The other Class variables are created in Class method `init_class`:
     #               max_scale, bitmap_buffer, palette_buffer
@@ -86,7 +86,7 @@ class IconAnimated(IconWidget):
     @classmethod
     def init_class(
         cls,
-        display: Optional[Display],
+        display: Optional[BusDisplay],
         max_scale: float = 1.5,
         max_icon_size: Tuple[int, int] = (80, 80),
         max_color_depth: int = 256,
@@ -168,9 +168,8 @@ class IconAnimated(IconWidget):
             if scale > self.__class__.max_scale:
                 print(
                     "Warning - IconAnimated: max_scale is constrained by value of "
-                    "IconAnimated.max_scale set by IconAnimated.init_class(): {}".format(
-                        self.__class__.max_scale
-                    )
+                    "IconAnimated.max_scale set by "
+                    f"IconAnimated.init_class(): {self.__class__.max_scale}"
                 )
             self._scale = max(0, min(scale, self.__class__.max_scale))
 
@@ -233,9 +232,7 @@ class IconAnimated(IconWidget):
             )  # blit the image into the center of the zoom_bitmap
 
             # place zoom_bitmap at same location as image
-            animation_tilegrid = TileGrid(
-                animation_bitmap, pixel_shader=animation_palette
-            )
+            animation_tilegrid = TileGrid(animation_bitmap, pixel_shader=animation_palette)
             animation_tilegrid.x = -(animation_bitmap.width - _image.width) // 2
             animation_tilegrid.y = -(animation_bitmap.height - _image.height) // 2
 

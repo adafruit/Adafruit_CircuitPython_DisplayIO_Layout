@@ -23,20 +23,18 @@ Implementation Notes
 
 import gc
 import time
+
 import displayio
+from adafruit_display_shapes.triangle import Triangle
+from adafruit_display_text import bitmap_label
 from terminalio import FONT
 
-from adafruit_display_shapes.triangle import Triangle
-
-from adafruit_display_text import bitmap_label
-from adafruit_displayio_layout.widgets.widget import Widget
 from adafruit_displayio_layout.widgets.control import Control
-
-# pylint: disable=reimported
 
 # select the two "easing" functions to use for animations
 from adafruit_displayio_layout.widgets.easing import back_easeinout as easein
 from adafruit_displayio_layout.widgets.easing import back_easeinout as easeout
+from adafruit_displayio_layout.widgets.widget import Widget
 
 try:
     from typing import Any, List, Optional, Tuple
@@ -46,10 +44,6 @@ except ImportError:
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
-
-
-# pylint: disable=too-many-arguments, too-many-branches, too-many-statements
-# pylint: disable=too-many-locals, too-many-instance-attributes
 
 
 class FlipInput(Widget, Control):
@@ -121,7 +115,6 @@ class FlipInput(Widget, Control):
 
         # initialize the Control superclass
 
-        # pylint: disable=bad-super-call
         super(Control, self).__init__()
 
         self.value_list = value_list
@@ -157,18 +150,14 @@ class FlipInput(Widget, Control):
             for i, character in enumerate(this_value):
                 glyph = self._font.get_glyph(ord(character))
 
-                if (
-                    i == 0
-                ):  # if it's the first character in the string, check the left value
+                if i == 0:  # if it's the first character in the string, check the left value
                     if left is None:
                         left = glyph.dx
                     else:
                         left = min(left, glyph.dx)
 
                 if right is None:
-                    right = max(
-                        xposition + glyph.dx + glyph.width, xposition + glyph.shift_x
-                    )
+                    right = max(xposition + glyph.dx + glyph.width, xposition + glyph.shift_x)
                 else:
                     right = max(
                         right,
@@ -189,12 +178,7 @@ class FlipInput(Widget, Control):
                 xposition = xposition + glyph.shift_x
 
         # Something is wrong if left, right, top, or bottom are still None here
-        assert (
-            right is not None
-            and left is not None
-            and top is not None
-            and bottom is not None
-        )
+        assert right is not None and left is not None and top is not None and bottom is not None
 
         self._bounding_box = [
             0,
@@ -226,10 +210,7 @@ class FlipInput(Widget, Control):
         if horizontal:  # horizontal orientation, add arrow padding to x-dimension and
             # alt_padding to y-dimension
             self.touch_boundary = (
-                self._bounding_box[0]
-                - self._arrow_gap
-                - arrow_height
-                - self._arrow_touch_padding,
+                self._bounding_box[0] - self._arrow_gap - arrow_height - self._arrow_touch_padding,
                 self._bounding_box[1] - self._alt_touch_padding,
                 self._bounding_box[2]
                 + 2 * (self._arrow_gap + arrow_height + self._arrow_touch_padding),
@@ -239,10 +220,7 @@ class FlipInput(Widget, Control):
             # alt_padding to x-dimension
             self.touch_boundary = (
                 self._bounding_box[0] - self._alt_touch_padding,
-                self._bounding_box[1]
-                - self._arrow_gap
-                - arrow_height
-                - self._arrow_touch_padding,
+                self._bounding_box[1] - self._arrow_gap - arrow_height - self._arrow_touch_padding,
                 self._bounding_box[2] + 2 * self._alt_touch_padding,
                 self._bounding_box[3]
                 + 2 * (self._arrow_gap + arrow_height + self._arrow_touch_padding),
@@ -263,11 +241,7 @@ class FlipInput(Widget, Control):
 
         if (arrow_color is not None) or (arrow_outline is not None):
             if horizontal:  # horizontal orientation, add left and right arrows
-                if (
-                    (arrow_width is not None)
-                    and (arrow_height is not None)
-                    and (arrow_width > 0)
-                ):
+                if (arrow_width is not None) and (arrow_height is not None) and (arrow_width > 0):
                     mid_point_y = self._bounding_box[1] + self._bounding_box[3] // 2
                     self.append(
                         Triangle(
@@ -284,13 +258,9 @@ class FlipInput(Widget, Control):
 
                     self.append(
                         Triangle(
-                            self._bounding_box[0]
-                            + self._bounding_box[2]
-                            + self._arrow_gap,
+                            self._bounding_box[0] + self._bounding_box[2] + self._arrow_gap,
                             mid_point_y - arrow_height // 2,
-                            self._bounding_box[0]
-                            + self._bounding_box[2]
-                            + self._arrow_gap,
+                            self._bounding_box[0] + self._bounding_box[2] + self._arrow_gap,
                             mid_point_y + arrow_height // 2,
                             self._bounding_box[0]
                             + self._bounding_box[2]
@@ -301,44 +271,35 @@ class FlipInput(Widget, Control):
                             outline=arrow_outline,
                         )
                     )
-            else:  # vertical orientation, add upper and lower arrows
-                if (
-                    (arrow_height is not None)
-                    and (arrow_width is not None)
-                    and (arrow_height > 0)
-                ):
-                    mid_point_x = self._bounding_box[0] + self._bounding_box[2] // 2
-                    self.append(
-                        Triangle(
-                            mid_point_x - arrow_width // 2,
-                            self._bounding_box[1] - self._arrow_gap,
-                            mid_point_x + arrow_width // 2,
-                            self._bounding_box[1] - self._arrow_gap,
-                            mid_point_x,
-                            self._bounding_box[1] - self._arrow_gap - arrow_height,
-                            fill=arrow_color,
-                            outline=arrow_outline,
-                        )
+            elif (arrow_height is not None) and (arrow_width is not None) and (arrow_height > 0):
+                mid_point_x = self._bounding_box[0] + self._bounding_box[2] // 2
+                self.append(
+                    Triangle(
+                        mid_point_x - arrow_width // 2,
+                        self._bounding_box[1] - self._arrow_gap,
+                        mid_point_x + arrow_width // 2,
+                        self._bounding_box[1] - self._arrow_gap,
+                        mid_point_x,
+                        self._bounding_box[1] - self._arrow_gap - arrow_height,
+                        fill=arrow_color,
+                        outline=arrow_outline,
                     )
-                    self.append(
-                        Triangle(
-                            mid_point_x - arrow_width // 2,
-                            self._bounding_box[1]
-                            + self._bounding_box[3]
-                            + self._arrow_gap,
-                            mid_point_x + arrow_width // 2,
-                            self._bounding_box[1]
-                            + self._bounding_box[3]
-                            + self._arrow_gap,
-                            mid_point_x,
-                            self._bounding_box[1]
-                            + self._bounding_box[3]
-                            + self._arrow_gap
-                            + arrow_height,
-                            fill=arrow_color,
-                            outline=arrow_outline,
-                        )
+                )
+                self.append(
+                    Triangle(
+                        mid_point_x - arrow_width // 2,
+                        self._bounding_box[1] + self._bounding_box[3] + self._arrow_gap,
+                        mid_point_x + arrow_width // 2,
+                        self._bounding_box[1] + self._bounding_box[3] + self._arrow_gap,
+                        mid_point_x,
+                        self._bounding_box[1]
+                        + self._bounding_box[3]
+                        + self._arrow_gap
+                        + arrow_height,
+                        fill=arrow_color,
+                        outline=arrow_outline,
                     )
+                )
 
     # Draw function to update the current value
     def _update_value(self, new_value: int, animate: bool = True) -> None:
@@ -370,9 +331,7 @@ class FlipInput(Widget, Control):
             palette = displayio.Palette(2)
             palette.make_transparent(0)
             palette[1] = self._color
-            animation_tilegrid = displayio.TileGrid(
-                animation_bitmap, pixel_shader=palette
-            )
+            animation_tilegrid = displayio.TileGrid(animation_bitmap, pixel_shader=palette)
 
             # add bitmap to the animation_group
             self._animation_group.append(animation_tilegrid)
@@ -452,9 +411,7 @@ class FlipInput(Widget, Control):
         # offsetting for self.x and self.y before calling the Control superclass function
         #
         ######
-        touch_x = (
-            touch_point[0] - self.x
-        )  # adjust touch position for the local position
+        touch_x = touch_point[0] - self.x  # adjust touch position for the local position
         touch_y = touch_point[1] - self.y
 
         return super().contains((touch_x, touch_y, 0))
@@ -475,29 +432,22 @@ class FlipInput(Widget, Control):
                     self.value = self.value - 1
 
                 elif (
-                    (t_b[0] + t_b[2] // 2)
-                    <= (touch_point[0] - self.x)
-                    <= (t_b[0] + t_b[2])
+                    (t_b[0] + t_b[2] // 2) <= (touch_point[0] - self.x) <= (t_b[0] + t_b[2])
                 ):  # in right half of touch_boundary
                     self.value = self.value + 1
 
-            else:
-                if (
-                    t_b[1] <= (touch_point[1] - self.y) < (t_b[1] + t_b[3] // 2)
-                ):  # in upper half of touch_boundary
-                    self.value = self.value + 1
+            elif (
+                t_b[1] <= (touch_point[1] - self.y) < (t_b[1] + t_b[3] // 2)
+            ):  # in upper half of touch_boundary
+                self.value = self.value + 1
 
-                elif (
-                    (t_b[1] + t_b[3] // 2)
-                    <= (touch_point[1] - self.y)
-                    <= (t_b[1] + t_b[3])
-                ):  # in lower half of touch_boundary
-                    self.value = self.value - 1
+            elif (
+                (t_b[1] + t_b[3] // 2) <= (touch_point[1] - self.y) <= (t_b[1] + t_b[3])
+            ):  # in lower half of touch_boundary
+                self.value = self.value - 1
 
             self._pressed = True  # update the state variable
-            self._last_pressed = (
-                time.monotonic()
-            )  # value changed, so update cool_down timer
+            self._last_pressed = time.monotonic()  # value changed, so update cool_down timer
 
     def released(self) -> None:
         """Response function when the Control is released. Resets the state variables
@@ -525,9 +475,7 @@ class FlipInput(Widget, Control):
             try:
                 new_value = self.value_list.index(new_value)
             except ValueError:
-                print(
-                    'ValueError: Value "{}" not found in value_list.'.format(new_value)
-                )
+                print(f'ValueError: Value "{new_value}" not found in value_list.')
                 return None
 
         new_value = new_value % len(self.value_list)  # Update the value
@@ -590,9 +538,6 @@ def _draw_position(
         )
 
 
-# pylint: disable=invalid-name
-
-
 # _blit_constrained: Copies bitmaps with constraints to the dimensions
 def _blit_constrained(
     target: displayio.Bitmap,
@@ -633,12 +578,7 @@ def _blit_constrained(
     if y2 > source.height:
         y2 = source.height
 
-    if (
-        (x > target.width)
-        or (y > target.height)
-        or (x1 > source.width)
-        or (y1 > source.height)
-    ):
+    if (x > target.width) or (y > target.height) or (x1 > source.width) or (y1 > source.height):
         return
 
     target.blit(x, y, source, x1=x1, y1=y1, x2=x2, y2=y2)
@@ -683,9 +623,7 @@ def _animate_bitmap(
         this_time = time.monotonic()
         target_position = (
             start_position
-            + (end_position - start_position)
-            * (this_time - start_time)
-            / animation_time
+            + (end_position - start_position) * (this_time - start_time) / animation_time
         )
 
         display.auto_refresh = False

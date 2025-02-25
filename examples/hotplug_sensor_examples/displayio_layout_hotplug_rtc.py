@@ -6,16 +6,18 @@ Make a PageLayout and illustrate all of it's features
 """
 
 import time
-import displayio
-import board
-import terminalio
+
 import adafruit_tmp117
-from adafruit_ds3231 import DS3231
-from adafruit_display_text.bitmap_label import Label
-from adafruit_display_shapes.rect import Rect
-from adafruit_display_shapes.circle import Circle
-from adafruit_display_shapes.triangle import Triangle
+import board
+import displayio
+import terminalio
 from adafruit_bitmap_font import bitmap_font
+from adafruit_display_shapes.circle import Circle
+from adafruit_display_shapes.rect import Rect
+from adafruit_display_shapes.triangle import Triangle
+from adafruit_display_text.bitmap_label import Label
+from adafruit_ds3231 import DS3231
+
 from adafruit_displayio_layout.layouts.tab_layout import TabLayout
 
 # +-------------------------------------------------------+
@@ -89,13 +91,9 @@ class gVars:
                 # key: {}".format(s, n))
                 self.g_vars[n] = value
             else:
-                raise KeyError(
-                    "variable '{:" ">20s}' not found in self.gVars_rDict".format(s)
-                )
+                raise KeyError("variable '{:" ">20s}' not found in self.gVars_rDict".format(s))
         else:
-            raise TypeError(
-                "myVars.write(): param s expected str, {} received".format(type(s))
-            )
+            raise TypeError(f"myVars.write(): param s expected str, {type(s)} received")
 
     def read(self, s):
         RetVal = None
@@ -135,8 +133,7 @@ class gVars:
     def list(self):
         for i in range(0, len(self.g_vars) - 1):
             print(
-                "self.g_vars['{:"
-                ">20s}'] = {}".format(
+                "self.g_vars['{:" ">20s}'] = {}".format(
                     self.gVarsDict[i], self.g_vars[i] if i in self.g_vars else "None"
                 )
             )
@@ -358,22 +355,22 @@ main_group.append(test_page_layout)
 
 # change page with function by name
 test_page_layout.show_page(page_name=pages[2])
-print("showing page index:{}".format(test_page_layout.showing_page_index))
+print(f"showing page index:{test_page_layout.showing_page_index}")
 time.sleep(1)
 
 # change page with function by index
 test_page_layout.show_page(page_index=0)
-print("showing page name: {}".format(test_page_layout.showing_page_name))
+print(f"showing page name: {test_page_layout.showing_page_name}")
 time.sleep(1)
 
 # change page by updating the page name property
 test_page_layout.showing_page_name = pages[2]
-print("showing page index: {}".format(test_page_layout.showing_page_index))
+print(f"showing page index: {test_page_layout.showing_page_index}")
 time.sleep(1)
 
 # change page by updating the page index property
 test_page_layout.showing_page_index = 1
-print("showing page name: {}".format(test_page_layout.showing_page_name))
+print(f"showing page name: {test_page_layout.showing_page_name}")
 time.sleep(5)
 
 """
@@ -471,12 +468,8 @@ def get_temp():
             temp = myVars.read("temp_sensor").temperature
             if myVars.read("temp_in_fahrenheit"):
                 temp = (temp * 1.8) + 32
-            t = "{:5.2f} ".format(temp) + myVars.read("t1")
-            if (
-                myVars.read("my_debug")
-                and temp is not None
-                and not myVars.read("temp_in_REPL")
-            ):
+            t = f"{temp:5.2f} " + myVars.read("t1")
+            if myVars.read("my_debug") and temp is not None and not myVars.read("temp_in_REPL"):
                 myVars.write("temp_in_REPL", True)
                 print("get_temp(): {} {}".format(myVars.read("t0"), t))
             if showing_page_idx == 3:  # show temperature on most right Tab page
@@ -485,7 +478,7 @@ def get_temp():
                         "old_temp"
                     ):  # Only update if there is a change in temperature
                         myVars.write("old_temp", temp)
-                        t = "{:5.2f} ".format(temp) + myVars.read("t1")
+                        t = f"{temp:5.2f} " + myVars.read("t1")
                         pge4_lbl.text = ""
                         pge4_lbl2.text = myVars.read("t0")
                         pge4_lbl3.text = t
@@ -500,19 +493,12 @@ def get_temp():
             print("Temperature sensor has disconnected")
             t = ""
             myVars.write("temp_sensor", None)
-            pge4_lbl.text = myVars.read(
-                "pge4_lbl_dflt"
-            )  # clean the line  (eventually: t2)
+            pge4_lbl.text = myVars.read("pge4_lbl_dflt")  # clean the line  (eventually: t2)
             pge4_lbl2.text = ""
             pge4_lbl3.text = ""
 
     return RetVal
 
-
-"""
-    Function called by get_dt()
-    Created to repair pylint error R0912: Too many branches (13/12)
-"""
 
 yy = 0
 mo = 1
@@ -562,14 +548,14 @@ def handle_dt(dt):
 
     if myVars.read("c_secs") != myVars.read("o_secs"):
         myVars.write("o_secs", myVars.read("c_secs"))
-        sDT3 = s + "{} {}".format(sDT, sDT2)
+        sDT3 = s + f"{sDT} {sDT2}"
         print(sDT3)
 
         pge3_lbl3.text = sDT2
         if myVars.read("my_debug"):
-            print("pge3_lbl.text = {}".format(pge3_lbl.text))
-            print("pge3_lbl2.text = {}".format(pge3_lbl2.text))
-            print("pge3_lbl3.text = {}".format(pge3_lbl3.text))
+            print(f"pge3_lbl.text = {pge3_lbl.text}")
+            print(f"pge3_lbl2.text = {pge3_lbl2.text}")
+            print(f"pge3_lbl3.text = {pge3_lbl3.text}")
         RetVal = True
 
     # Return from here with a False but don't set the pge3_lbl to default.
@@ -627,7 +613,7 @@ def main():
     cnt = 0
     while True:
         try:
-            print("Loop nr: {:03d}".format(cnt))
+            print(f"Loop nr: {cnt:03d}")
             # print("main(): type(rtc) object = ", type(myVars.read("rtc")))
             if myVars.read("rtc") is not None:
                 get_dt()

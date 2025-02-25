@@ -4,10 +4,12 @@
 """
 Illustrate how to use divider lines with GridLayout
 """
+
 import board
 import displayio
 import terminalio
 from adafruit_display_text import label
+
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 
 # use built in display (PyPortal, PyGamer, PyBadge, CLUE, etc.)
@@ -31,15 +33,11 @@ layout = GridLayout(
 _labels = []
 
 _labels.append(
-    label.Label(
-        terminalio.FONT, scale=2, x=0, y=0, text="Hello", background_color=0x770077
-    )
+    label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Hello", background_color=0x770077)
 )
 layout.add_content(_labels[0], grid_position=(0, 0), cell_size=(1, 1))
 _labels.append(
-    label.Label(
-        terminalio.FONT, scale=2, x=0, y=0, text="World", background_color=0x007700
-    )
+    label.Label(terminalio.FONT, scale=2, x=0, y=0, text="World", background_color=0x007700)
 )
 layout.add_content(_labels[1], grid_position=(1, 0), cell_size=(1, 1))
 _labels.append(label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Hello"))

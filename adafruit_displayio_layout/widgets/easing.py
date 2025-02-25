@@ -75,7 +75,6 @@ Implementation Notes
 
 import math
 
-
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
@@ -285,7 +284,7 @@ def exponential_easeinout(pos: float) -> float:
     """
     Easing function for animations: Exponential Ease In & Out
     """
-    if pos in (0.0, 1.0):
+    if pos in {0.0, 1.0}:
         return pos
     if pos < 0.5:
         return 0.5 * math.pow(2, (20 * pos) - 10)
@@ -318,8 +317,7 @@ def elastic_easeinout(pos: float) -> float:
     if pos < 0.5:
         return 0.5 * math.sin(13 * math.pi * pos) * math.pow(2, 10 * ((2 * pos) - 1))
     return 0.5 * (
-        math.sin(-13 * math.pi / 2 * ((2 * pos - 1) + 1)) * pow(2, -10 * (2 * pos - 1))
-        + 2
+        math.sin(-13 * math.pi / 2 * ((2 * pos - 1) + 1)) * pow(2, -10 * (2 * pos - 1)) + 2
     )
 
 

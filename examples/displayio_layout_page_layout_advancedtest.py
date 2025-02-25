@@ -4,14 +4,17 @@
 """
 Make a PageLayout and illustrate all of it's features
 """
+
 import time
-import displayio
+
 import board
+import displayio
 import terminalio
-from adafruit_display_text.bitmap_label import Label
-from adafruit_display_shapes.rect import Rect
 from adafruit_display_shapes.circle import Circle
+from adafruit_display_shapes.rect import Rect
 from adafruit_display_shapes.triangle import Triangle
+from adafruit_display_text.bitmap_label import Label
+
 from adafruit_displayio_layout.layouts.page_layout import PageLayout
 
 # built-in display
@@ -77,22 +80,22 @@ main_group.append(test_page_layout)
 
 # change page with function by name
 test_page_layout.show_page(page_name="page_3")
-print("showing page index:{}".format(test_page_layout.showing_page_index))
+print(f"showing page index:{test_page_layout.showing_page_index}")
 time.sleep(1)
 
 # change page with function by index
 test_page_layout.show_page(page_index=0)
-print("showing page name: {}".format(test_page_layout.showing_page_name))
+print(f"showing page name: {test_page_layout.showing_page_name}")
 time.sleep(1)
 
 # change page by updating the page name property
 test_page_layout.showing_page_name = "page_3"
-print("showing page index: {}".format(test_page_layout.showing_page_index))
+print(f"showing page index: {test_page_layout.showing_page_index}")
 time.sleep(1)
 
 # change page by updating the page index property
 test_page_layout.showing_page_index = 1
-print("showing page name: {}".format(test_page_layout.showing_page_name))
+print(f"showing page name: {test_page_layout.showing_page_name}")
 time.sleep(5)
 
 another_text = Label(

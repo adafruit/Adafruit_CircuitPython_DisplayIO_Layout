@@ -21,13 +21,11 @@ Implementation Notes
 
 """
 
-# pylint: disable=too-many-lines, too-many-instance-attributes, too-many-arguments
-# pylint: disable=too-many-locals, too-many-statements
-
 import displayio
 import terminalio
-from adafruit_display_text import bitmap_label
 import vectorio
+from adafruit_display_text import bitmap_label
+
 from adafruit_displayio_layout.widgets.widget import Widget
 
 try:
@@ -229,28 +227,20 @@ class Cartesian(Widget):
         self._valuey = self.height / 100
         self._factory = 100 / (self._yrange[1] - self._yrange[0])
 
-        self._tick_bitmap = displayio.Bitmap(
-            self._tick_line_thickness, self._tick_line_height, 3
-        )
+        self._tick_bitmap = displayio.Bitmap(self._tick_line_thickness, self._tick_line_height, 3)
         self._tick_bitmap.fill(1)
 
         self._subticks = subticks
 
         axesx_height = (
-            2
-            + self._axes_line_thickness
-            + self._font_height
-            + self._tick_line_height // 2
+            2 + self._axes_line_thickness + self._font_height + self._tick_line_height // 2
         )
 
         self._axesx_bitmap = displayio.Bitmap(self.width, axesx_height, 4)
         self._axesx_bitmap.fill(0)
 
         self._axesy_width = (
-            2
-            + self._axes_line_thickness
-            + self._font_width
-            + self._tick_line_height // 2
+            2 + self._axes_line_thickness + self._font_width + self._tick_line_height // 2
         )
 
         self._axesy_bitmap = displayio.Bitmap(self._axesy_width, self.height, 4)
@@ -408,20 +398,14 @@ class Cartesian(Widget):
                     self._font,
                     color=self._font_color,
                     text=text_tick,
-                    x=-shift_label_x
-                    - self._axes_line_thickness
-                    - self._tick_line_height
-                    - 2,
+                    x=-shift_label_x - self._axes_line_thickness - self._tick_line_height - 2,
                     y=0 + self.height - text_dist,
                 )
                 self.append(tick_text)
 
                 bitmaptools.fill_region(
                     self._axesy_bitmap,
-                    self._axesy_width
-                    - self._axes_line_thickness
-                    - self._tick_line_height
-                    - 1,
+                    self._axesy_width - self._axes_line_thickness - self._tick_line_height - 1,
                     text_dist,
                     self._axesy_width - self._axes_line_thickness - 1,
                     text_dist + self._tick_line_thickness,
@@ -453,9 +437,7 @@ class Cartesian(Widget):
         self.append(self._pointer)
 
     def _calc_local_xy(self, x: int, y: int) -> Tuple[int, int]:
-        local_x = (
-            int((x - self._xrange[0]) * self._factorx * self._valuex) + self._nudge_x
-        )
+        local_x = int((x - self._xrange[0]) * self._factorx * self._valuex) + self._nudge_x
         # details on `+ (self.height - 1)` :
         # the bitmap is set to self.width & self.height
         # but we are only allowed to draw to pixels 0..height-1 and 0..width-1
@@ -473,9 +455,7 @@ class Cartesian(Widget):
         return 0 <= local_y < self.height
 
     def _check_local_xy_in_range(self, local_x: int, local_y: int) -> bool:
-        return self._check_local_x_in_range(local_x) and self._check_local_y_in_range(
-            local_y
-        )
+        return self._check_local_x_in_range(local_x) and self._check_local_y_in_range(local_y)
 
     def _check_x_in_range(self, x: int) -> bool:
         return self._xrange[0] <= x <= self._xrange[1]
@@ -498,30 +478,15 @@ class Cartesian(Widget):
         if self._verbose:
             print("")
             print(
-                "xy:      ({: >4}, {: >4})  "
-                "_xrange: ({: >4}, {: >4})  "
-                "_yrange: ({: >4}, {: >4})  "
-                "".format(
-                    x,
-                    y,
-                    self._xrange[0],
-                    self._xrange[1],
-                    self._yrange[0],
-                    self._yrange[1],
-                )
+                f"xy:      ({x: >4}, {y: >4})  "
+                + f"_xrange: ({self._xrange[0]: >4}, {self._xrange[1]: >4})  "
+                + f"_yrange: ({self._yrange[0]: >4}, {self._yrange[1]: >4})  "
+                ""
             )
             print(
-                "local_*: ({: >4}, {: >4})  "
-                " width:  ({: >4}, {: >4})  "
-                " height: ({: >4}, {: >4})  "
-                "".format(
-                    local_x,
-                    local_y,
-                    0,
-                    self.width,
-                    0,
-                    self.height,
-                )
+                f"local_*: ({local_x: >4}, {local_y: >4})  "
+                + f" width:  ({0: >4}, {self.width: >4})  "
+                + f" height: ({0: >4}, {self.height: >4})  "
             )
         if self._check_xy_in_range(x, y):
             if self._check_local_xy_in_range(local_x, local_y):
@@ -536,44 +501,28 @@ class Cartesian(Widget):
                 if not self._check_local_x_in_range(local_x):
                     raise ValueError(
                         "local_x out of range: "
-                        "local_x:{: >4}; _xrange({: >4}, {: >4})"
-                        "".format(
-                            local_x,
-                            0,
-                            self.width,
-                        )
+                        f"local_x:{local_x: >4}; _xrange({0: >4}, {self.width: >4})"
+                        ""
                     )
                 if not self._check_local_y_in_range(local_y):
                     raise ValueError(
                         "local_y out of range: "
-                        "local_y:{: >4}; _yrange({: >4}, {: >4})"
-                        "".format(
-                            local_y,
-                            0,
-                            self.height,
-                        )
+                        f"local_y:{local_y: >4}; _yrange({0: >4}, {self.height: >4})"
+                        ""
                     )
         else:
             # for better error messages we check in detail what failed...
             if not self._check_x_in_range(x):
                 raise ValueError(
                     "x out of range:    "
-                    "x:{: >4}; xrange({: >4}, {: >4})"
-                    "".format(
-                        x,
-                        self._xrange[0],
-                        self._xrange[1],
-                    )
+                    f"x:{x: >4}; xrange({self._xrange[0]: >4}, {self._xrange[1]: >4})"
+                    ""
                 )
             if not self._check_y_in_range(y):
                 raise ValueError(
                     "y out of range:    "
-                    "y:{: >4}; yrange({: >4}, {: >4})"
-                    "".format(
-                        y,
-                        self._yrange[0],
-                        self._yrange[1],
-                    )
+                    f"y:{y: >4}; yrange({self._yrange[0]: >4}, {self._yrange[1]: >4})"
+                    ""
                 )
 
     def update_pointer(self, x: int, y: int) -> None:

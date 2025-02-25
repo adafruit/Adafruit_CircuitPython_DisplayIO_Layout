@@ -4,10 +4,13 @@
 """
 Creates two animated icons with touch response: zoom and shrink animations.
 """
+
 import time
+
+import adafruit_touchscreen
 import board
 import displayio
-import adafruit_touchscreen
+
 from adafruit_displayio_layout.widgets.icon_animated import IconAnimated
 
 display = board.DISPLAY
@@ -22,9 +25,7 @@ ts = adafruit_touchscreen.Touchscreen(
 )
 
 
-IconAnimated.init_class(
-    display, max_scale=1.5, max_icon_size=(48, 48), max_color_depth=255
-)
+IconAnimated.init_class(display, max_scale=1.5, max_icon_size=(48, 48), max_color_depth=255)
 
 icon_zoom = IconAnimated(
     "Zoom",
