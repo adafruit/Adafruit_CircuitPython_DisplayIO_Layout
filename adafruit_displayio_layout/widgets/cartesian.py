@@ -479,15 +479,14 @@ class Cartesian(Widget):
             print("")
             print(
                 f"xy:      ({x: >4}, {y: >4})  "
-                f"_xrange: ({self._xrange[0]: >4}, {self._xrange[1]: >4})  "
-                f"_yrange: ({self._yrange[0]: >4}, {self._yrange[1]: >4})  "
+                + f"_xrange: ({self._xrange[0]: >4}, {self._xrange[1]: >4})  "
+                + f"_yrange: ({self._yrange[0]: >4}, {self._yrange[1]: >4})  "
                 ""
             )
             print(
                 f"local_*: ({local_x: >4}, {local_y: >4})  "
-                f" width:  ({0: >4}, {self.width: >4})  "
-                f" height: ({0: >4}, {self.height: >4})  "
-                ""
+                + f" width:  ({0: >4}, {self.width: >4})  "
+                + f" height: ({0: >4}, {self.height: >4})  "
             )
         if self._check_xy_in_range(x, y):
             if self._check_local_xy_in_range(local_x, local_y):
