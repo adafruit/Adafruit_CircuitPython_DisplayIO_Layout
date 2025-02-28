@@ -11,6 +11,7 @@ instead the NTP class from adafruit_ntp.py will be used.
 """
 
 import time
+from os import getenv
 
 import adafruit_tmp117
 import adafruit_touchscreen
@@ -275,7 +276,7 @@ synchronized local time"
     )
 else:
     print("\nTabLayout test with I2C Temperature sensor and I2C Realtime clock")
-print("Add your WiFi SSID, WiFi password and Timezone in file: secrets.h\n")
+print("Add your WiFi SSID, WiFi password and Timezone in file: settings.toml\n")
 
 if myVars.read("my_debug"):
     while not i2c.try_lock():
@@ -303,13 +304,9 @@ if myVars.read("my_debug"):
 # NOTE: there is also the board.SD_CARD_DETECT pin (33)(but I don't know yet how to interface it)
 ####
 
-# you'll need to pass in an io username and key
-# Get wifi details and more from a secrets.py file
-try:
-    from secrets import secrets
-except ImportError:
-    print("WiFi secrets are kept in secrets.py, please add them there!")
-    raise
+# Get WiFi details, ensure these are setup in settings.toml
+ssid = getenv("CIRCUITPY_WIFI_SSID")
+password = getenv("CIRCUITPY_WIFI_PASSWORD")
 
 if myVars.read("my_debug"):
     if esp.status == adafruit_esp32spi.WL_IDLE_STATUS:
@@ -320,13 +317,13 @@ if myVars.read("my_debug"):
     for ap in esp.scan_networks():
         print("\t%s\t\tRSSI: %d" % (str(ap["ssid"], "utf-8"), ap["rssi"]))
 
-# Get our username, key and desired timezone
-location = secrets.get("timezone", None)
+# Get our desired timezone
+location = getenv("timezone", None)
 
 print("\nConnecting to AP...")
 while not esp.is_connected:
     try:
-        esp.connect_AP(secrets["ssid"], secrets["password"])
+        esp.connect_AP(ssid, password)
     except RuntimeError as e:
         print("could not connect to AP, retrying: ", e)
         continue
@@ -359,7 +356,7 @@ def refresh_from_NTP():
         myVars.write("online_time_present", True)
         myVars.write("ntp_refresh", False)
         # Get the current time in seconds since Jan 1, 1970 and correct it for local timezone
-        # (defined in secrets.h)
+        # (defined in settings.toml)
         ntp_current_time = time.time()
         if myVars.read("my_debug"):
             print(f"Seconds since Jan 1, 1970: {ntp_current_time} seconds")
@@ -377,9 +374,9 @@ if myVars.read("use_ntp"):
     # Initialize the NTP object
     ntp = NTP(esp)
 
-    location = secrets.get("timezone", location)
+    location = getenv("timezone", location)
     if myVars.read("my_debug"):
-        print("location (from secrets.h) = ", location)
+        print(f"location (from settings.toml) = {location}")
     if location == "Europe/Lisbon":
         if myVars.read("my_debug"):
             print("Using timezone Europe/Lisbon")
