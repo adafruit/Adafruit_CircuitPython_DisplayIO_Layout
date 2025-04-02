@@ -393,31 +393,63 @@ class GridLayout(displayio.Group):
         if layout_cells:
             self._layout_cells()
 
-    def get_cell(self, cell_coordinates: Tuple[int, int]) -> displayio.Group:
+    def get_content(self, grid_position: Tuple[int, int]) -> displayio.Group:
         """
-        Return a cells content based on the cell_coordinates. Raises
+        Return a cells content based on the grid_position. Raises
         KeyError if coordinates were not found in the GridLayout.
 
-        :param tuple cell_coordinates: the coordinates to lookup in the grid
+        :param tuple grid_position: the coordinates to lookup in the grid
         :return: the displayio content object at those coordinates
         """
         for index, cell in enumerate(self._cell_content_list):
             # exact location 1x1 cell
-            if cell["grid_position"] == cell_coordinates:
+            if cell["grid_position"] == grid_position:
                 return self._cell_content_list[index]["content"]
 
             # multi-spanning cell, any size bigger than 1x1
             if (
                 cell["grid_position"][0]
-                <= cell_coordinates[0]
+                <= grid_position[0]
                 < cell["grid_position"][0] + cell["cell_size"][0]
                 and cell["grid_position"][1]
-                <= cell_coordinates[1]
+                <= grid_position[1]
                 < cell["grid_position"][1] + cell["cell_size"][1]
             ):
                 return self._cell_content_list[index]["content"]
 
-        raise KeyError(f"GridLayout does not contain cell at coordinates {cell_coordinates}")
+        raise KeyError(f"GridLayout does not contain content at coordinates {grid_position}")
+
+    def pop_content(self, grid_position: Tuple[int, int]) -> None:
+        """
+        Remove and return a cells content based on the grid_position. Raises
+        KeyError if coordinates were not found in the GridLayout.
+
+        :param tuple grid_position: the coordinates to lookup in the grid
+        :return: the displayio content object at those coordinates
+        """
+        for index, cell in enumerate(self._cell_content_list):
+            # exact location 1x1 cell
+            if cell["grid_position"] == grid_position:
+                _found = self._cell_content_list.pop(index)
+                self._layout_cells()
+                self.remove(_found["content"])
+                return _found["content"]
+
+            # multi-spanning cell, any size bigger than 1x1
+            if (
+                cell["grid_position"][0]
+                <= grid_position[0]
+                < cell["grid_position"][0] + cell["cell_size"][0]
+                and cell["grid_position"][1]
+                <= grid_position[1]
+                < cell["grid_position"][1] + cell["cell_size"][1]
+            ):
+                _found = self._cell_content_list.pop(index)
+                self._layout_cells()
+                self.remove(_found["content"])
+                return _found["content"]
+
+        raise KeyError(f"GridLayout does not contain content at coordinates {grid_position}")
 
     @property
     def cell_size_pixels(self) -> Tuple[int, int]:
