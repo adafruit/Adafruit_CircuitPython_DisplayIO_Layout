@@ -37,7 +37,7 @@ from adafruit_displayio_layout.widgets.icon_widget import IconWidget
 try:
     from typing import Any, Optional, Tuple
 
-    from busdisplay import BusDisplay
+    from circuitpython_typing.displayio import AnyDisplay
 except ImportError:
     pass
 
@@ -86,7 +86,7 @@ class IconAnimated(IconWidget):
     @classmethod
     def init_class(
         cls,
-        display: Optional[BusDisplay],
+        display: Optional[AnyDisplay],
         max_scale: float = 1.5,
         max_icon_size: Tuple[int, int] = (80, 80),
         max_color_depth: int = 256,
@@ -100,7 +100,7 @@ class IconAnimated(IconWidget):
                 ``IconAnimated.init_class(display=board.DISPLAY, max_scale=1.5,
                 max_icon_size=(80,80), max_color_depth=256)``
 
-        :param displayio.Display display: The display where the icons will be displayed.
+        :param AnyDisplay display: The display where the icons will be displayed.
         :param float max_scale: The maximum zoom of the any of the icons, should be >= 1.0,
          (default: 1.5)
         :param max_icon_size: The maximum (x,y) pixel dimensions of any `IconAnimated` bitmap size
