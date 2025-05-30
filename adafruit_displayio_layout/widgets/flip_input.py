@@ -38,6 +38,8 @@ from adafruit_displayio_layout.widgets.widget import Widget
 
 try:
     from typing import Any, List, Optional, Tuple
+
+    from circuitpython_typing.displayio import AnyDisplay
 except ImportError:
     pass
 
@@ -54,7 +56,7 @@ class FlipInput(Widget, Control):
     :param int x: pixel position
     :param int y: pixel position
 
-    :param displayio.Display display: the display where the widget will be displayed
+    :param AnyDisplay display: the display where the widget will be displayed
     :param value_list: the list of strings that will be displayed
     :type value_list: List[str]
     :param Font font: the font used for the text (defaults to ``terminalio.FONT``)
@@ -87,7 +89,7 @@ class FlipInput(Widget, Control):
 
     def __init__(
         self,
-        display: displayio.Display,
+        display: AnyDisplay,
         *,
         value_list: List[str],
         font: FONT = FONT,
@@ -586,7 +588,7 @@ def _blit_constrained(
 
 # _animate_bitmap - performs animation of scrolling between two bitmaps
 def _animate_bitmap(
-    display: displayio.Display,
+    display: AnyDisplay,
     target_bitmap: displayio.Bitmap,
     bitmap1: displayio.Bitmap,
     bitmap1_offset: Tuple[int, int],

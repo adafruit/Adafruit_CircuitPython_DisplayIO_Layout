@@ -28,6 +28,7 @@ try:
 
     from adafruit_bitmap_font.bdf import BDF
     from adafruit_bitmap_font.pcf import PCF
+    from circuitpython_typing.displayio import AnyDisplay
     from fontio import BuiltinFont
 except ImportError:
     pass
@@ -53,7 +54,7 @@ class TabLayout(displayio.Group):
 
     :param int x: x location the layout should be placed. Pixel coordinates.
     :param int y: y location the layout should be placed. Pixel coordinates.
-    :param displayio.Display display: The Display object to show the tab layout on.
+    :param AnyDisplay display: The Display object to show the tab layout on.
     :param int tab_text_scale: Size of the text shown in the tabs.
       Whole numbers 1 and greater are valid
     :param Optional[Union[BuiltinFont, BDF, PCF]] custom_font: A pre-loaded font object to use
@@ -75,7 +76,7 @@ class TabLayout(displayio.Group):
         self,
         x: int = 0,
         y: int = 0,
-        display: Optional[displayio.Display] = None,
+        display: Optional[AnyDisplay] = None,
         tab_text_scale: int = 1,
         custom_font: Optional[Union[BuiltinFont, BDF, PCF]] = terminalio.FONT,
         inactive_tab_spritesheet: Optional[str] = None,
