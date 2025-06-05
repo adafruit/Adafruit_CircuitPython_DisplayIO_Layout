@@ -378,6 +378,15 @@ class GridLayout(displayio.Group):
          then the cell_anchor_point from the GridLayout will be used.
         :return: None"""
 
+        grid_x = grid_position[0]
+        grid_y = grid_position[1]
+        max_grid_x = self.grid_size[0]
+        max_grid_y = self.grid_size[1]
+        if grid_x >= max_grid_x or grid_y >= max_grid_y:
+            raise ValueError(
+                f"Grid position {grid_position} is out of bounds for grid size {self.grid_size}"
+            )
+
         if cell_anchor_point:
             _this_cell_anchor_point = cell_anchor_point
         else:
