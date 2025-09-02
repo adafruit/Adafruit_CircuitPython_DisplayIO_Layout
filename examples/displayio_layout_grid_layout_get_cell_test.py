@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 """
 Make green and purple rectangles and then update the color
-and text values of the labels using the get_cell() function.
+and text values of the labels using the get_content() function.
 """
 
 import board
@@ -47,14 +47,14 @@ layout.add_content(_labels[3], grid_position=(1, 1), cell_size=(1, 1))
 
 main_group.append(layout)
 
-layout.get_cell((0, 0)).text = "Happy"
-layout.get_cell((1, 0)).text = "Circuit"
+layout.get_content((0, 0)).text = "Happy"
+layout.get_content((1, 0)).text = "Circuit"
 
-layout.get_cell((0, 1)).text = "Python"
-layout.get_cell((1, 1)).text = "Day"
+layout.get_content((0, 1)).text = "Python"
+layout.get_content((1, 1)).text = "Day"
 
-layout.get_cell((0, 1)).background_color = 0x007700
-layout.get_cell((1, 1)).background_color = 0x770077
+layout.get_content((0, 1)).background_color = 0x007700
+layout.get_content((1, 1)).background_color = 0x770077
 
 while True:
     pass
