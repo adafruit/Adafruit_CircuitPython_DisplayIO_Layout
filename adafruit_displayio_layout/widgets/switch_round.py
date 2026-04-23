@@ -540,8 +540,8 @@ class SwitchRound(Widget, Control):
         circle_y0 = switch_y
 
         if self._flip:
-            circle_x0 = circle_x0 - self._x_motion
-            circle_y0 = circle_y0 - self._y_motion
+            circle_x0 -= self._x_motion
+            circle_y0 -= self._y_motion
 
         self._switch_circle = Circle(
             x0=circle_x0,
@@ -763,8 +763,7 @@ class SwitchRound(Widget, Control):
             else:  # animate over time
                 # constrain the elapsed time
                 elapsed_time = time.monotonic() - start_time
-                if elapsed_time > self._animation_time:
-                    elapsed_time = self._animation_time
+                elapsed_time = min(elapsed_time, self._animation_time)
 
                 if self._value:
                     position = 1 - (elapsed_time) / self._animation_time  # fraction from 0 to 1

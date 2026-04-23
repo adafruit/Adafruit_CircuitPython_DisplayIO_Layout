@@ -177,7 +177,7 @@ class FlipInput(Widget, Control):
                 else:
                     bottom = max(bottom, -glyph.dy)
 
-                xposition = xposition + glyph.shift_x
+                xposition += glyph.shift_x
 
         # Something is wrong if left, right, top, or bottom are still None here
         assert right is not None and left is not None and top is not None and bottom is not None
@@ -431,22 +431,22 @@ class FlipInput(Widget, Control):
                 if (
                     t_b[0] <= (touch_point[0] - self.x) < (t_b[0] + t_b[2] // 2)
                 ):  # in left half of touch_boundary
-                    self.value = self.value - 1
+                    self.value -= 1
 
                 elif (
                     (t_b[0] + t_b[2] // 2) <= (touch_point[0] - self.x) <= (t_b[0] + t_b[2])
                 ):  # in right half of touch_boundary
-                    self.value = self.value + 1
+                    self.value += 1
 
             elif (
                 t_b[1] <= (touch_point[1] - self.y) < (t_b[1] + t_b[3] // 2)
             ):  # in upper half of touch_boundary
-                self.value = self.value + 1
+                self.value += 1
 
             elif (
                 (t_b[1] + t_b[3] // 2) <= (touch_point[1] - self.y) <= (t_b[1] + t_b[3])
             ):  # in lower half of touch_boundary
-                self.value = self.value - 1
+                self.value -= 1
 
             self._pressed = True  # update the state variable
             self._last_pressed = time.monotonic()  # value changed, so update cool_down timer
@@ -480,7 +480,7 @@ class FlipInput(Widget, Control):
                 print(f'ValueError: Value "{new_value}" not found in value_list.')
                 return None
 
-        new_value = new_value % len(self.value_list)  # Update the value
+        new_value %= len(self.value_list)  # Update the value
         if new_value != self._value:
             self._update_value(new_value)
             self._value = new_value
@@ -565,20 +565,18 @@ def _blit_constrained(
         x2 -= x
         x = 0
     if x1 < 0:
-        x = x - x1
+        x -= x1
         x1 = 0  # move to origin
-    if x2 > source.width:
-        x2 = source.width
+    x2 = min(x2, source.width)
 
     if y < 0:
         y1 -= y  # offset the clip region
         y2 -= y
         y = 0
     if y1 < 0:
-        y = y - y1
+        y -= y1
         y1 = 0
-    if y2 > source.height:
-        y2 = source.height
+    y2 = min(y2, source.height)
 
     if (x > target.width) or (y > target.height) or (x1 > source.width) or (y1 > source.height):
         return

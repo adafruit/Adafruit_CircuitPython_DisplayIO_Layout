@@ -118,7 +118,7 @@ class gVars:
                 # key: {}".format(s, n))
                 self.g_vars[n] = value
             else:
-                raise KeyError("variable '{:" ">20s}' not found in self.gVars_rDict".format(s))
+                raise KeyError(f"variable '{s:>20s}' not found in self.gVars_rDict")
         else:
             raise TypeError(f"myVars.write(): param s expected str, {type(s)} received")
 
@@ -167,7 +167,7 @@ class gVars:
     def list(self):
         for i in range(0, len(self.g_vars) - 1):
             print(
-                "self.g_vars['{:" ">20s}'] = {}".format(
+                "self.g_vars['{:>20s}'] = {}".format(
                     self.gVarsDict[i], self.g_vars[i] if i in self.g_vars else "None"
                 )
             )
@@ -315,7 +315,7 @@ if myVars.read("my_debug"):
     print("MAC addr:", [hex(i) for i in esp.MAC_address])
 
     for ap in esp.scan_networks():
-        print("\t%s\t\tRSSI: %d" % (str(ap["ssid"], "utf-8"), ap["rssi"]))
+        print(f"\t{str(ap['ssid'], 'utf-8')}\t\tRSSI: {ap['rssi']:d}")
 
 # Get our desired timezone
 location = getenv("timezone", None)
@@ -331,8 +331,8 @@ print("Connected to", str(esp.ssid, "utf-8"), "\tRSSI:", esp.rssi)
 print("Please wait...")
 if myVars.read("my_debug"):
     print("My IP address is", esp.pretty_ip(esp.ip_address))
-    print("IP lookup adafruit.com: %s" % esp.pretty_ip(esp.get_host_by_name("adafruit.com")))
-    print("Ping google.com: %d ms" % esp.ping("google.com"))
+    print(f"IP lookup adafruit.com: {esp.pretty_ip(esp.get_host_by_name('adafruit.com'))}")
+    print(f"Ping google.com: {esp.ping('google.com'):d} ms")
 
 
 def refresh_from_NTP():

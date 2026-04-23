@@ -91,7 +91,7 @@ class gVars:
                 # key: {}".format(s, n))
                 self.g_vars[n] = value
             else:
-                raise KeyError("variable '{:" ">20s}' not found in self.gVars_rDict".format(s))
+                raise KeyError(f"variable '{s:>20s}' not found in self.gVars_rDict")
         else:
             raise TypeError(f"myVars.write(): param s expected str, {type(s)} received")
 
@@ -133,7 +133,7 @@ class gVars:
     def list(self):
         for i in range(0, len(self.g_vars) - 1):
             print(
-                "self.g_vars['{:" ">20s}'] = {}".format(
+                "self.g_vars['{:>20s}'] = {}".format(
                     self.gVarsDict[i], self.g_vars[i] if i in self.g_vars else "None"
                 )
             )
