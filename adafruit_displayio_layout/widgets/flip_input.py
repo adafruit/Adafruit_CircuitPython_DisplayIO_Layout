@@ -336,6 +336,7 @@ class FlipInput(Widget, Control):
 
             # add bitmap to the animation_group
             self._animation_group.append(animation_tilegrid)
+            self._animation_group.hidden = False
 
             # store away the initial starting bitmap
             start_bitmap = displayio.Bitmap(
@@ -378,6 +379,7 @@ class FlipInput(Widget, Control):
 
             # hide the animation group
             self._animation_group.pop()
+            self._animation_group.hidden = True
             # free up memory
             del animation_bitmap
             del start_bitmap
@@ -598,59 +600,39 @@ def _animate_bitmap(
     animation_time: float,
     horizontal: bool,
 ) -> None:
-    start_time = time.monotonic()
-
     if start_position > end_position:  # direction is decreasing: "out"
         [bitmap2, bitmap1] = [bitmap1, bitmap2]
         [bitmap2_offset, bitmap1_offset] = [bitmap1_offset, bitmap2_offset]
         easing_function = easeout  # use the "out" easing function
-
     else:  # direction is increasing: "in"
         easing_function = easein  # use the "in" easing function
 
+    # draw each frame by hand, so every frame is shown in full
+    was_auto_refresh = display.auto_refresh
     display.auto_refresh = False
-    _draw_position(
-        target_bitmap,
-        bitmap1,
-        bitmap1_offset,
-        bitmap2,
-        bitmap2_offset,
-        position=start_position,
-        horizontal=horizontal,
-    )
-    display.auto_refresh = True
 
+    start_time = time.monotonic()
     while True:
-        this_time = time.monotonic()
-        target_position = (
-            start_position
-            + (end_position - start_position) * (this_time - start_time) / animation_time
-        )
-
-        display.auto_refresh = False
-        if (this_time - start_time) < animation_time:
-            display.auto_refresh = False
-            _draw_position(
-                target_bitmap,
-                bitmap1,
-                bitmap1_offset,
-                bitmap2,
-                bitmap2_offset,
-                position=easing_function(target_position),
-                horizontal=horizontal,
+        elapsed = time.monotonic() - start_time
+        if elapsed < animation_time:
+            position = easing_function(
+                start_position + (end_position - start_position) * elapsed / animation_time
             )
-            display.auto_refresh = True
         else:
-            _draw_position(
-                target_bitmap,
-                bitmap1,
-                bitmap1_offset,
-                bitmap2,
-                bitmap2_offset,
-                position=end_position,
-                horizontal=horizontal,
-            )
+            position = end_position  # land exactly on the final position
 
+        _draw_position(
+            target_bitmap,
+            bitmap1,
+            bitmap1_offset,
+            bitmap2,
+            bitmap2_offset,
+            position=position,
+            horizontal=horizontal,
+        )
+        display.refresh()
+
+        if elapsed >= animation_time:
             break
-        display.auto_refresh = True
-    display.auto_refresh = True
+
+    display.auto_refresh = was_auto_refresh
