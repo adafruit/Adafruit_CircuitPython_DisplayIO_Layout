@@ -7,8 +7,10 @@ This is a basic demonstration of a Cartesian widget for line-ploting
 """
 
 import time
+
 import board
 import displayio
+
 from adafruit_displayio_layout.widgets.cartesian import Cartesian
 
 # create the display on the PyPortal or Clue or PyBadge(for example)
@@ -30,7 +32,7 @@ my_plane = Cartesian(
 
 my_group = displayio.Group()
 my_group.append(my_plane)
-display.show(my_group)  # add high level Group to the display
+display.root_group = my_group  # add high level Group to the display
 
 data = [
     # (0, 0),  # we do this point manually - so we have no wait...

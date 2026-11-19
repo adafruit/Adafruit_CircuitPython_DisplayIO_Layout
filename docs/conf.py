@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
-
 # SPDX-FileCopyrightText: 2017 Scott Shawcroft, written for Adafruit Industries
 #
 # SPDX-License-Identifier: MIT
 
+import datetime
 import os
 import sys
-import datetime
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -32,6 +30,7 @@ inheritance_graph_attrs = dict(rankdir="TB")
 # autodoc module docs will fail to generate with a warning.
 autodoc_mock_imports = [
     "vectorio",
+    "terminalio",
     "bitmaptools",
 ]
 
@@ -54,9 +53,7 @@ project = "Adafruit DisplayIO_Layout Library"
 creation_year = "2021"
 current_year = str(datetime.datetime.now().year)
 year_duration = (
-    current_year
-    if current_year == creation_year
-    else creation_year + " - " + current_year
+    current_year if current_year == creation_year else creation_year + " - " + current_year
 )
 copyright = year_duration + " Tim Cocks"
 author = "Tim Cocks"
@@ -114,24 +111,17 @@ napoleon_numpy_docstring = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+import sphinx_rtd_theme
 
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    try:
-        import sphinx_rtd_theme
-
-        html_theme = "sphinx_rtd_theme"
-        html_theme_path = [sphinx_rtd_theme.get_html_theme_path(), "."]
-    except:
-        html_theme = "default"
-        html_theme_path = ["."]
-else:
-    html_theme_path = ["."]
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+# Include extra css to work around rtd theme glitches
+html_css_files = ["custom.css"]
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

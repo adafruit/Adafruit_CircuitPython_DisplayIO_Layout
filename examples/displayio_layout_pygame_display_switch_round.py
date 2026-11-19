@@ -7,18 +7,19 @@ Displayed with Blinka_Displayio_PyGameDisplay
 
 Requires: https://github.com/FoamyGuy/Blinka_Displayio_PyGameDisplay
 """
+
 import displayio
 import pygame
 from blinka_displayio_pygamedisplay import PyGameDisplay
-from adafruit_displayio_layout.widgets.switch_round import SwitchRound as Switch
 
+from adafruit_displayio_layout.widgets.switch_round import SwitchRound as Switch
 
 # Make the display context. Change size if you want
 display = PyGameDisplay(width=320, height=240)
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 switch_x = 30
 switch_y = 30

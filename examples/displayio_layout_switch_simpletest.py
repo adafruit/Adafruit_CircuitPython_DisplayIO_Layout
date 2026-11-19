@@ -6,9 +6,11 @@ Creates a single sliding switch widget.
 """
 
 import time
+
+import adafruit_touchscreen
 import board
 import displayio
-import adafruit_touchscreen
+
 from adafruit_displayio_layout.widgets.switch_round import SwitchRound as Switch
 
 display = board.DISPLAY
@@ -30,7 +32,7 @@ my_group = displayio.Group()
 my_group.append(my_switch)
 
 # Add my_group to the display
-display.show(my_group)
+display.root_group = my_group
 
 # Start the main loop
 while True:

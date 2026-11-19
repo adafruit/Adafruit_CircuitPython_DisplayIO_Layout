@@ -22,11 +22,11 @@ Implementation Notes
 
 """
 
-
-import terminalio
-from displayio import TileGrid, OnDiskBitmap
 import adafruit_imageload
+import terminalio
 from adafruit_display_text import bitmap_label
+from displayio import OnDiskBitmap, TileGrid
+
 from adafruit_displayio_layout.widgets.control import Control
 from adafruit_displayio_layout.widgets.widget import Widget
 
@@ -41,7 +41,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.
 
 
 class IconWidget(Widget, Control):
-
     """
     A touch enabled widget that holds an icon image loaded with
     adafruit_imageload and a text label centered beneath it.
@@ -63,8 +62,6 @@ class IconWidget(Widget, Control):
     :type anchored_position: Tuple[int, int]
     """
 
-    # pylint: disable=too-many-arguments
-
     def __init__(
         self,
         label_text: str,
@@ -72,7 +69,7 @@ class IconWidget(Widget, Control):
         on_disk: bool = False,
         transparent_index: Optional[int] = None,
         label_background: Optional[int] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
 
@@ -120,9 +117,7 @@ class IconWidget(Widget, Control):
         :return: Boolean
         """
 
-        touch_x = (
-            touch_point[0] - self.x
-        )  # adjust touch position for the local position
+        touch_x = touch_point[0] - self.x  # adjust touch position for the local position
         touch_y = touch_point[1] - self.y
 
         return super().contains((touch_x, touch_y, 0))

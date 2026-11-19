@@ -3,12 +3,14 @@
 # SPDX-License-Identifier: MIT
 """
 Make green and purple rectangles and then update the color
-and text values of the labels using the get_cell() function.
+and text values of the labels using the get_content() function.
 """
+
 import board
 import displayio
 import terminalio
 from adafruit_display_text import label
+
 from adafruit_displayio_layout.layouts.grid_layout import GridLayout
 
 # use built in display (PyPortal, PyGamer, PyBadge, CLUE, etc.)
@@ -18,7 +20,7 @@ display = board.DISPLAY
 
 # Make the display context
 main_group = displayio.Group()
-display.show(main_group)
+display.root_group = main_group
 
 layout = GridLayout(
     x=10,
@@ -31,15 +33,11 @@ layout = GridLayout(
 _labels = []
 
 _labels.append(
-    label.Label(
-        terminalio.FONT, scale=2, x=0, y=0, text="Hello", background_color=0x770077
-    )
+    label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Hello", background_color=0x770077)
 )
 layout.add_content(_labels[0], grid_position=(0, 0), cell_size=(1, 1))
 _labels.append(
-    label.Label(
-        terminalio.FONT, scale=2, x=0, y=0, text="World", background_color=0x007700
-    )
+    label.Label(terminalio.FONT, scale=2, x=0, y=0, text="World", background_color=0x007700)
 )
 layout.add_content(_labels[1], grid_position=(1, 0), cell_size=(1, 1))
 _labels.append(label.Label(terminalio.FONT, scale=2, x=0, y=0, text="Hello"))
@@ -49,14 +47,14 @@ layout.add_content(_labels[3], grid_position=(1, 1), cell_size=(1, 1))
 
 main_group.append(layout)
 
-layout.get_cell((0, 0)).text = "Happy"
-layout.get_cell((1, 0)).text = "Circuit"
+layout.get_content((0, 0)).text = "Happy"
+layout.get_content((1, 0)).text = "Circuit"
 
-layout.get_cell((0, 1)).text = "Python"
-layout.get_cell((1, 1)).text = "Day"
+layout.get_content((0, 1)).text = "Python"
+layout.get_content((1, 1)).text = "Day"
 
-layout.get_cell((0, 1)).background_color = 0x007700
-layout.get_cell((1, 1)).background_color = 0x770077
+layout.get_content((0, 1)).background_color = 0x007700
+layout.get_content((1, 1)).background_color = 0x770077
 
 while True:
     pass

@@ -35,14 +35,16 @@ Implementation Notes
 #
 
 import time
+
 from adafruit_display_shapes.circle import Circle
-from adafruit_display_shapes.roundrect import RoundRect
 from adafruit_display_shapes.rect import Rect
-from adafruit_displayio_layout.widgets.widget import Widget
+from adafruit_display_shapes.roundrect import RoundRect
+
 from adafruit_displayio_layout.widgets.control import Control
 
 # modify the "easing" function that is imported to change the switch animation behaviour
 from adafruit_displayio_layout.widgets.easing import back_easeinout as easing
+from adafruit_displayio_layout.widgets.widget import Widget
 
 try:
     from typing import Any, Optional, Tuple, Union
@@ -55,7 +57,6 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.
 
 
 class SwitchRound(Widget, Control):
-
     """
     .. note:: Jump directly to:
 
@@ -148,7 +149,7 @@ class SwitchRound(Widget, Control):
 
         .. code-block:: python
 
-            display.show(my_switch) # add the group to the display
+            display.root_group = my_switch # add the group to the display
 
         If you want to have multiple display elements, you can create a group and then
         append the switch and the other elements to the group.  Then, you can add the full
@@ -164,7 +165,7 @@ class SwitchRound(Widget, Control):
             # Append other display elements to the group
             #
 
-            display.show(my_group) # add the group to the display
+            display.root_group = my_group # add the group to the display
 
         For a full example, including how to respond to screen touches, check out the
         following examples in the `Adafruit_CircuitPython_DisplayIO_Layout
@@ -419,9 +420,6 @@ class SwitchRound(Widget, Control):
 
     """
 
-    # pylint: disable=too-many-instance-attributes, too-many-arguments, too-many-locals
-    # pylint: disable=too-many-branches, too-many-statements
-
     def __init__(
         self,
         x: int = 0,
@@ -469,7 +467,6 @@ class SwitchRound(Widget, Control):
 
         # initialize the Control superclass
 
-        # pylint: disable=bad-super-call
         super(Control, self).__init__()
 
         self._horizontal = horizontal
@@ -543,8 +540,8 @@ class SwitchRound(Widget, Control):
         circle_y0 = switch_y
 
         if self._flip:
-            circle_x0 = circle_x0 - self._x_motion
-            circle_y0 = circle_y0 - self._y_motion
+            circle_x0 -= self._x_motion
+            circle_y0 -= self._y_motion
 
         self._switch_circle = Circle(
             x0=circle_x0,
@@ -698,9 +695,7 @@ class SwitchRound(Widget, Control):
         position = easing(position)
 
         # Get the position offset from the motion function
-        x_offset, y_offset, _ = self._get_offset_position(
-            position
-        )  # ignore angle_offset
+        x_offset, y_offset, _ = self._get_offset_position(position)  # ignore angle_offset
 
         # Update the switch and text x- and y-positions
         self._switch_circle.x = self._switch_initial_x + x_offset
@@ -711,9 +706,7 @@ class SwitchRound(Widget, Control):
         self._text_1.y = self._text_1_initial_y + y_offset
 
         # Set the color to the correct fade
-        self._switch_circle.fill = _color_fade(
-            self._fill_color_off, self._fill_color_on, position
-        )
+        self._switch_circle.fill = _color_fade(self._fill_color_off, self._fill_color_on, position)
         self._switch_circle.outline = _color_fade(
             self._outline_color_off, self._outline_color_on, position
         )
@@ -770,13 +763,10 @@ class SwitchRound(Widget, Control):
             else:  # animate over time
                 # constrain the elapsed time
                 elapsed_time = time.monotonic() - start_time
-                if elapsed_time > self._animation_time:
-                    elapsed_time = self._animation_time
+                elapsed_time = min(elapsed_time, self._animation_time)
 
                 if self._value:
-                    position = (
-                        1 - (elapsed_time) / self._animation_time
-                    )  # fraction from 0 to 1
+                    position = 1 - (elapsed_time) / self._animation_time  # fraction from 0 to 1
                 else:
                     # fraction from 0 to 1
                     position = (elapsed_time) / self._animation_time
@@ -789,9 +779,7 @@ class SwitchRound(Widget, Control):
             if (position >= 1) and not self._value:
                 self._value = True
                 break
-            if (
-                position <= 0
-            ) and self._value:  # ensures that the final position is drawn
+            if (position <= 0) and self._value:  # ensures that the final position is drawn
                 self._value = False
                 break
 
@@ -807,9 +795,7 @@ class SwitchRound(Widget, Control):
 
         self._animate_switch()  # show the animation and switch the self._value
 
-        touch_x = (
-            touch_point[0] - self.x
-        )  # adjust touch position for the local position
+        touch_x = touch_point[0] - self.x  # adjust touch position for the local position
         touch_y = touch_point[1] - self.y
 
         # Call the parent's .selected function in case there is any work up there.
@@ -827,9 +813,7 @@ class SwitchRound(Widget, Control):
         :return: Boolean
 
         """
-        touch_x = (
-            touch_point[0] - self.x
-        )  # adjust touch position for the local position
+        touch_x = touch_point[0] - self.x  # adjust touch position for the local position
         touch_y = touch_point[1] - self.y
 
         return super().contains((touch_x, touch_y, 0))
@@ -945,7 +929,5 @@ def _color_fade(
 
     faded_color = [0, 0, 0]
     for i in range(3):
-        faded_color[i] = start_color[i] - int(
-            (start_color[i] - end_color[i]) * fraction
-        )
+        faded_color[i] = start_color[i] - int((start_color[i] - end_color[i]) * fraction)
     return tuple(faded_color)

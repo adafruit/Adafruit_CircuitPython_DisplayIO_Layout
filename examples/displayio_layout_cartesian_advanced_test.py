@@ -10,6 +10,7 @@ parameters.
 import board
 import displayio
 import terminalio
+
 from adafruit_displayio_layout.widgets.cartesian import Cartesian
 
 # Fonts used for the Dial tick labels
@@ -69,7 +70,7 @@ car5 = Cartesian(
 )
 my_group.append(car5)
 
-display.show(my_group)
+display.root_group = my_group
 
 while True:
     pass

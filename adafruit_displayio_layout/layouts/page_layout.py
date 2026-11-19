@@ -22,9 +22,9 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
+
 try:
     # Used only for typing
-    # pylint: disable=unused-import
     from typing import Tuple
 
 except ImportError:
@@ -90,16 +90,12 @@ class PageLayout(displayio.Group):
             raise AttributeError("Must pass either page_name or page_index")
 
         if page_index is not None and page_name is not None:
-            raise AttributeError(
-                "Must pass either page_name or page_index only one or the other"
-            )
+            raise AttributeError("Must pass either page_name or page_index only one or the other")
 
         if page_index is not None:
             if page_index >= len(self.page_content_list):
                 raise KeyError(
-                    "KeyError at index {} in list length {}".format(
-                        page_index, len(self.page_content_list)
-                    ),
+                    f"KeyError at index {page_index} in list length {len(self.page_content_list)}",
                 )
 
         if page_name is not None:
@@ -110,7 +106,7 @@ class PageLayout(displayio.Group):
                         _found = True
 
             if not _found:
-                raise KeyError("Page with name {} not found".format(page_name))
+                raise KeyError(f"Page with name {page_name} not found")
 
     def get_page(self, page_name=None, page_index=None):
         """
@@ -133,9 +129,7 @@ class PageLayout(displayio.Group):
                     return cell
 
         raise KeyError(
-            "PageLayout does not contain page: {}".format(
-                page_index if page_index else page_name
-            )
+            f"PageLayout does not contain page: {page_index if page_index else page_name}"
         )
 
     def show_page(self, page_name=None, page_index=None):
@@ -205,11 +199,10 @@ class PageLayout(displayio.Group):
 
         if self._cur_showing_index + 1 < len(self.page_content_list):
             self.show_page(page_index=self._cur_showing_index + 1)
+        elif not loop:
+            print("No more pages")
         else:
-            if not loop:
-                print("No more pages")
-            else:
-                self.show_page(page_index=0)
+            self.show_page(page_index=0)
 
     def previous_page(self, loop=True):
         """
@@ -219,8 +212,7 @@ class PageLayout(displayio.Group):
         """
         if self._cur_showing_index - 1 >= 0:
             self.show_page(page_index=self._cur_showing_index - 1)
+        elif not loop:
+            print("No more pages")
         else:
-            if not loop:
-                print("No more pages")
-            else:
-                self.show_page(page_index=len(self.page_content_list) - 1)
+            self.show_page(page_index=len(self.page_content_list) - 1)

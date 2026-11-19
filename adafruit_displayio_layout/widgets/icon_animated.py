@@ -21,19 +21,23 @@ Implementation Notes
   https://github.com/adafruit/circuitpython/releases
 
 """
+
 import gc
 import time
 from math import pi
-import bitmaptools
-from displayio import TileGrid, Bitmap, Palette
+
 import adafruit_imageload
-from adafruit_displayio_layout.widgets.icon_widget import IconWidget
-from adafruit_displayio_layout.widgets.easing import quadratic_easeout as easein
+import bitmaptools
+from displayio import Bitmap, Palette, TileGrid
+
 from adafruit_displayio_layout.widgets.easing import quadratic_easein as easeout
+from adafruit_displayio_layout.widgets.easing import quadratic_easeout as easein
+from adafruit_displayio_layout.widgets.icon_widget import IconWidget
 
 try:
     from typing import Any, Optional, Tuple
-    from displayio import Display  # pylint: disable=ungrouped-imports
+
+    from circuitpython_typing.displayio import AnyDisplay
 except ImportError:
     pass
 
@@ -74,9 +78,6 @@ class IconAnimated(IconWidget):
     :type anchored_position: Tuple[int, int]
     """
 
-    # pylint: disable=bad-super-call, too-many-instance-attributes, too-many-locals
-    # pylint: disable=too-many-arguments, unused-argument
-
     display = None
 
     # The other Class variables are created in Class method `init_class`:
@@ -85,7 +86,7 @@ class IconAnimated(IconWidget):
     @classmethod
     def init_class(
         cls,
-        display: Optional[Display],
+        display: Optional[AnyDisplay],
         max_scale: float = 1.5,
         max_icon_size: Tuple[int, int] = (80, 80),
         max_color_depth: int = 256,
@@ -99,7 +100,7 @@ class IconAnimated(IconWidget):
                 ``IconAnimated.init_class(display=board.DISPLAY, max_scale=1.5,
                 max_icon_size=(80,80), max_color_depth=256)``
 
-        :param displayio.Display display: The display where the icons will be displayed.
+        :param AnyDisplay display: The display where the icons will be displayed.
         :param float max_scale: The maximum zoom of the any of the icons, should be >= 1.0,
          (default: 1.5)
         :param max_icon_size: The maximum (x,y) pixel dimensions of any `IconAnimated` bitmap size
@@ -167,9 +168,8 @@ class IconAnimated(IconWidget):
             if scale > self.__class__.max_scale:
                 print(
                     "Warning - IconAnimated: max_scale is constrained by value of "
-                    "IconAnimated.max_scale set by IconAnimated.init_class(): {}".format(
-                        self.__class__.max_scale
-                    )
+                    "IconAnimated.max_scale set by "
+                    f"IconAnimated.init_class(): {self.__class__.max_scale}"
                 )
             self._scale = max(0, min(scale, self.__class__.max_scale))
 
@@ -243,9 +243,7 @@ class IconAnimated(IconWidget):
                 )
 
             # place zoom_bitmap at same location as image
-            animation_tilegrid = TileGrid(
-                animation_bitmap, pixel_shader=animation_palette
-            )
+            animation_tilegrid = TileGrid(animation_bitmap, pixel_shader=animation_palette)
             animation_tilegrid.x = -(animation_bitmap.width - _image.width) // 2
             animation_tilegrid.y = -(animation_bitmap.height - _image.height) // 2
 
