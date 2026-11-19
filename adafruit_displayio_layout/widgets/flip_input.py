@@ -23,10 +23,9 @@ Implementation Notes
 
 import gc
 import time
-import displayio
-from terminalio import FONT
-import bitmaptools
 
+import bitmaptools
+import displayio
 from adafruit_display_shapes.triangle import Triangle
 from adafruit_display_text import bitmap_label
 from terminalio import FONT
@@ -324,30 +323,24 @@ class FlipInput(Widget, Control):
 
             gc.collect()
 
-            # create the animation bitmap
+            # create the animation bitmap, sized to match the label's palette
+            label_palette = self._label.tilegrid.pixel_shader
+            color_count = len(label_palette)
+
             animation_bitmap = displayio.Bitmap(
                 self._bounding_box[2] // self._font_scale,
                 self._bounding_box[3] // self._font_scale,
-                2,
-            )  # color depth 2
-
-            palette = displayio.Palette(2)
-            palette.make_transparent(0)
-            palette[1] = self._color
-            animation_tilegrid = displayio.TileGrid(animation_bitmap, pixel_shader=palette)
+                color_count,
+            )
+            animation_tilegrid = displayio.TileGrid(animation_bitmap, pixel_shader=label_palette)
 
             # add bitmap to the animation_group
             self._animation_group.append(animation_tilegrid)
 
             # store away the initial starting bitmap
             start_bitmap = displayio.Bitmap(
-                self._label.bitmap.width, self._label.bitmap.height, 2
-            )  # color depth 2
-
-            # CircuitPython Versions <= 8.2.0
-            # start_bitmap.blit(0, 0, self._label.bitmap)
-
-            # CircuitPython Versions >= 9.0.0
+                self._label.bitmap.width, self._label.bitmap.height, color_count
+            )
             bitmaptools.blit(start_bitmap, self._label.bitmap, 0, 0)
 
             # get the bitmap1 position offsets
@@ -511,20 +504,11 @@ def _draw_position(
 
     if position == 0.0:
         target_bitmap.fill(0)
-
-        # CircuitPython Versions <= 8.2.0
-        # target_bitmap.blit(x_offset1, y_offset1, bitmap1)
-
-        # CircuitPython Versions >= 9.0.0
-        bitmaptools.blit(target_bitmap, bitmap1, x_offset1, y_offset1)
+        _blit_constrained(target_bitmap, x_offset1, y_offset1, bitmap1)
         return
     if position == 1.0:
         target_bitmap.fill(0)
-        # CircuitPython Versions <= 8.2.0
-        # target_bitmap.blit(x_offset2, y_offset2, bitmap2)
-
-        # CircuitPython Versions >= 9.0.0
-        bitmaptools.blit(target_bitmap, bitmap2, x_offset2, y_offset2)
+        _blit_constrained(target_bitmap, x_offset2, y_offset2, bitmap2)
         return
 
     if horizontal:
@@ -566,6 +550,7 @@ def _blit_constrained(
     x2: Optional[int] = None,
     y2: Optional[int] = None,
 ) -> None:
+    # fill in the full source size for any limits not given
     if x1 is None:
         x1 = 0
     if y1 is None:
@@ -575,31 +560,28 @@ def _blit_constrained(
     if y2 is None:
         y2 = source.height
 
+    # trim anything that would land left of or above the target
     if x < 0:
-        x1 -= x  # offset the clip region in positive direction
-        x2 -= x
+        x1 -= x
         x = 0
+    if y < 0:
+        y1 -= y
+        y = 0
+
+    # don't read outside the source
     if x1 < 0:
         x -= x1
-        x1 = 0  # move to origin
-    x2 = min(x2, source.width)
-
-    if y < 0:
-        y1 -= y  # offset the clip region
-        y2 -= y
-        y = 0
+        x1 = 0
     if y1 < 0:
         y -= y1
         y1 = 0
+    x2 = min(x2, source.width)
     y2 = min(y2, source.height)
 
-    if (x > target.width) or (y > target.height) or (x1 > source.width) or (y1 > source.height):
+    # skip if nothing is left to copy, or it lands off the target
+    if x1 >= x2 or y1 >= y2 or x >= target.width or y >= target.height:
         return
 
-    # CircuitPython Versions <= 8.2.0
-    # target.blit(x, y, source, x1=x1, y1=y1, x2=x2, y2=y2)
-
-    # CircuitPython Versions >= 9.0.0
     bitmaptools.blit(target, source, x, y, x1=x1, y1=y1, x2=x2, y2=y2)
 
 
