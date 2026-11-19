@@ -41,7 +41,6 @@ try:
 except ImportError:
     pass
 
-
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
 
@@ -80,6 +79,7 @@ class IconAnimated(IconWidget):
     """
 
     display = None
+
     # The other Class variables are created in Class method `init_class`:
     #               max_scale, bitmap_buffer, palette_buffer
 
@@ -225,11 +225,22 @@ class IconAnimated(IconWidget):
 
             # create the zoom bitmap larger than the original image to allow for zooming
             animation_bitmap.fill(len(animation_palette) - 1)  # transparent fill
-            animation_bitmap.blit(
-                (animation_bitmap.width - _image.width) // 2,
-                (animation_bitmap.height - _image.height) // 2,
-                _image,
-            )  # blit the image into the center of the zoom_bitmap
+
+            if hasattr(animation_bitmap, "blit"):
+                # CircuitPython Versions <= 8.2.0
+                animation_bitmap.blit(
+                    (animation_bitmap.width - _image.width) // 2,
+                    (animation_bitmap.height - _image.height) // 2,
+                    _image,
+                )  # blit the image into the center of the zoom_bitmap
+            elif hasattr(bitmaptools, "blit"):
+                # CircuitPython Versions >= 9.0.0
+                bitmaptools.blit(
+                    animation_bitmap,
+                    _image,
+                    (animation_bitmap.width - _image.width) // 2,
+                    (animation_bitmap.height - _image.height) // 2,
+                )
 
             # place zoom_bitmap at same location as image
             animation_tilegrid = TileGrid(animation_bitmap, pixel_shader=animation_palette)

@@ -24,6 +24,7 @@ Implementation Notes
 import gc
 import time
 
+import bitmaptools
 import displayio
 from adafruit_display_shapes.triangle import Triangle
 from adafruit_display_text import bitmap_label
@@ -42,7 +43,6 @@ try:
     from circuitpython_typing.displayio import AnyDisplay
 except ImportError:
     pass
-
 
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_Layout.git"
@@ -323,26 +323,26 @@ class FlipInput(Widget, Control):
 
             gc.collect()
 
-            # create the animation bitmap
+            # create the animation bitmap, sized to match the label's palette
+            label_palette = self._label.tilegrid.pixel_shader
+            color_count = len(label_palette)
+
             animation_bitmap = displayio.Bitmap(
                 self._bounding_box[2] // self._font_scale,
                 self._bounding_box[3] // self._font_scale,
-                2,
-            )  # color depth 2
-
-            palette = displayio.Palette(2)
-            palette.make_transparent(0)
-            palette[1] = self._color
-            animation_tilegrid = displayio.TileGrid(animation_bitmap, pixel_shader=palette)
+                color_count,
+            )
+            animation_tilegrid = displayio.TileGrid(animation_bitmap, pixel_shader=label_palette)
 
             # add bitmap to the animation_group
             self._animation_group.append(animation_tilegrid)
+            self._animation_group.hidden = False
 
             # store away the initial starting bitmap
             start_bitmap = displayio.Bitmap(
-                self._label.bitmap.width, self._label.bitmap.height, 2
-            )  # color depth 2
-            start_bitmap.blit(0, 0, self._label.bitmap)
+                self._label.bitmap.width, self._label.bitmap.height, color_count
+            )
+            bitmaptools.blit(start_bitmap, self._label.bitmap, 0, 0)
 
             # get the bitmap1 position offsets
             bitmap1_offset = (
@@ -379,6 +379,7 @@ class FlipInput(Widget, Control):
 
             # hide the animation group
             self._animation_group.pop()
+            self._animation_group.hidden = True
             # free up memory
             del animation_bitmap
             del start_bitmap
@@ -505,11 +506,11 @@ def _draw_position(
 
     if position == 0.0:
         target_bitmap.fill(0)
-        target_bitmap.blit(x_offset1, y_offset1, bitmap1)
+        _blit_constrained(target_bitmap, x_offset1, y_offset1, bitmap1)
         return
     if position == 1.0:
         target_bitmap.fill(0)
-        target_bitmap.blit(x_offset2, y_offset2, bitmap2)
+        _blit_constrained(target_bitmap, x_offset2, y_offset2, bitmap2)
         return
 
     if horizontal:
@@ -551,6 +552,7 @@ def _blit_constrained(
     x2: Optional[int] = None,
     y2: Optional[int] = None,
 ) -> None:
+    # fill in the full source size for any limits not given
     if x1 is None:
         x1 = 0
     if y1 is None:
@@ -560,28 +562,29 @@ def _blit_constrained(
     if y2 is None:
         y2 = source.height
 
+    # trim anything that would land left of or above the target
     if x < 0:
-        x1 -= x  # offset the clip region in positive direction
-        x2 -= x
+        x1 -= x
         x = 0
+    if y < 0:
+        y1 -= y
+        y = 0
+
+    # don't read outside the source
     if x1 < 0:
         x -= x1
-        x1 = 0  # move to origin
-    x2 = min(x2, source.width)
-
-    if y < 0:
-        y1 -= y  # offset the clip region
-        y2 -= y
-        y = 0
+        x1 = 0
     if y1 < 0:
         y -= y1
         y1 = 0
+    x2 = min(x2, source.width)
     y2 = min(y2, source.height)
 
-    if (x > target.width) or (y > target.height) or (x1 > source.width) or (y1 > source.height):
+    # skip if nothing is left to copy, or it lands off the target
+    if x1 >= x2 or y1 >= y2 or x >= target.width or y >= target.height:
         return
 
-    target.blit(x, y, source, x1=x1, y1=y1, x2=x2, y2=y2)
+    bitmaptools.blit(target, source, x, y, x1=x1, y1=y1, x2=x2, y2=y2)
 
 
 # _animate_bitmap - performs animation of scrolling between two bitmaps
@@ -597,59 +600,39 @@ def _animate_bitmap(
     animation_time: float,
     horizontal: bool,
 ) -> None:
-    start_time = time.monotonic()
-
     if start_position > end_position:  # direction is decreasing: "out"
         [bitmap2, bitmap1] = [bitmap1, bitmap2]
         [bitmap2_offset, bitmap1_offset] = [bitmap1_offset, bitmap2_offset]
         easing_function = easeout  # use the "out" easing function
-
     else:  # direction is increasing: "in"
         easing_function = easein  # use the "in" easing function
 
+    # draw each frame by hand, so every frame is shown in full
+    was_auto_refresh = display.auto_refresh
     display.auto_refresh = False
-    _draw_position(
-        target_bitmap,
-        bitmap1,
-        bitmap1_offset,
-        bitmap2,
-        bitmap2_offset,
-        position=start_position,
-        horizontal=horizontal,
-    )
-    display.auto_refresh = True
 
+    start_time = time.monotonic()
     while True:
-        this_time = time.monotonic()
-        target_position = (
-            start_position
-            + (end_position - start_position) * (this_time - start_time) / animation_time
-        )
-
-        display.auto_refresh = False
-        if (this_time - start_time) < animation_time:
-            display.auto_refresh = False
-            _draw_position(
-                target_bitmap,
-                bitmap1,
-                bitmap1_offset,
-                bitmap2,
-                bitmap2_offset,
-                position=easing_function(target_position),
-                horizontal=horizontal,
+        elapsed = time.monotonic() - start_time
+        if elapsed < animation_time:
+            position = easing_function(
+                start_position + (end_position - start_position) * elapsed / animation_time
             )
-            display.auto_refresh = True
         else:
-            _draw_position(
-                target_bitmap,
-                bitmap1,
-                bitmap1_offset,
-                bitmap2,
-                bitmap2_offset,
-                position=end_position,
-                horizontal=horizontal,
-            )
+            position = end_position  # land exactly on the final position
 
+        _draw_position(
+            target_bitmap,
+            bitmap1,
+            bitmap1_offset,
+            bitmap2,
+            bitmap2_offset,
+            position=position,
+            horizontal=horizontal,
+        )
+        display.refresh()
+
+        if elapsed >= animation_time:
             break
-        display.auto_refresh = True
-    display.auto_refresh = True
+
+    display.auto_refresh = was_auto_refresh
