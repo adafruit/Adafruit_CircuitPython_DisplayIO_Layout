@@ -595,9 +595,7 @@ class SwitchRound(Widget, Control):
             y=circle_y0 + text1_y_offset,
             height=self._radius,
             width=self._text_stroke,
-            fill=self._fill_color_off,
-            outline=self._outline_color_off,
-            stroke=self._text_stroke,
+            fill=self._outline_color_off,
         )
 
         # bounding_box defines the "local" x and y.
@@ -721,9 +719,8 @@ class SwitchRound(Widget, Control):
         )
 
         self._text_0.fill = self._switch_circle.fill
-        self._text_1.fill = self._switch_circle.fill
+        self._text_1.fill = self._switch_circle.outline
         self._text_0.outline = self._switch_circle.outline
-        self._text_1.outline = self._switch_circle.outline
 
         if self._display_button_text and position >= 0.5:
             self._text_0.hidden = True
